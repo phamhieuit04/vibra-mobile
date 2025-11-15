@@ -22,11 +22,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.vibramobile.R
+import com.example.vibramobile.viewmodels.AuthViewModel
 
 @Composable
 fun WelcomeScreen(
     modifier: Modifier = Modifier,
+    viewModel: AuthViewModel = hiltViewModel<AuthViewModel>(),
     onNavigateToLogin: () -> Unit,
     onNavigateToSignUp: () -> Unit
 ) {
@@ -72,7 +76,7 @@ fun WelcomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(
-                onClick = onNavigateToSignUp,
+                onClick = { viewModel.signup() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -82,7 +86,7 @@ fun WelcomeScreen(
             }
             Spacer(Modifier.height(12.dp))
             OutlinedButton(
-                onClick = onNavigateToLogin,
+                onClick = { viewModel.login() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)

@@ -5,6 +5,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.vibramobile.helpers.NavigationEvent
+import com.example.vibramobile.helpers.Navigator
+import com.example.vibramobile.helpers.ObserverAsEvents
 import com.example.vibramobile.ui.screens.WelcomeScreen
 import com.example.vibramobile.ui.screens.login.LoginScreen
 import com.example.vibramobile.ui.screens.signup.SignUpPasswordScreen
@@ -28,6 +31,13 @@ sealed interface Destination {
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
+
+    ObserverAsEvents(Navigator.channel) { event ->
+        when (event) {
+            is NavigationEvent.NavigateToLogin -> navController.navigate(Destination.Login)
+            is NavigationEvent.NavigateToSignUp -> navController.navigate(Destination.SignUp)
+        }
+    }
 
     NavHost(
         modifier = modifier,

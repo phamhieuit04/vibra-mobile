@@ -26,6 +26,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -41,6 +42,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.vibramobile.R
+import com.example.vibramobile.helpers.NavigationEvent
+import com.example.vibramobile.helpers.Navigator
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 object LoginStep {
@@ -54,6 +58,8 @@ object LoginStep {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier) {
+    val scope = rememberCoroutineScope()
+
     Scaffold(
         containerColor = Color.Black,
         topBar = {
@@ -76,7 +82,7 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "Don't have an account?", color = Color.White, fontSize = 16.sp)
-                TextButton(onClick = {}) {
+                TextButton(onClick = { scope.launch { Navigator.navigate(NavigationEvent.NavigateToSignUp) } }) {
                     Text(
                         text = "Sign up",
                         color = Color.White,
