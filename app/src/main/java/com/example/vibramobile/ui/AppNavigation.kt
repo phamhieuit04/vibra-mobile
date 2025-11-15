@@ -5,9 +5,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.vibramobile.ui.screens.LoginScreen
-import com.example.vibramobile.ui.screens.SignUpScreen
 import com.example.vibramobile.ui.screens.WelcomeScreen
+import com.example.vibramobile.ui.screens.login.LoginScreen
+import com.example.vibramobile.ui.screens.signup.SignUpPasswordScreen
+import com.example.vibramobile.ui.screens.signup.SignUpScreen
 import kotlinx.serialization.Serializable
 
 sealed interface Destination {
@@ -19,6 +20,9 @@ sealed interface Destination {
 
     @Serializable
     object SignUp : Destination
+
+    @Serializable
+    object SignUpPassword : Destination
 }
 
 @Composable
@@ -40,7 +44,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             LoginScreen()
         }
         composable<Destination.SignUp> {
-            SignUpScreen()
+            SignUpScreen(onNavigateToSignUpPassword = { navController.navigate(Destination.SignUpPassword) })
+        }
+        composable<Destination.SignUpPassword> {
+            SignUpPasswordScreen()
         }
     }
 }

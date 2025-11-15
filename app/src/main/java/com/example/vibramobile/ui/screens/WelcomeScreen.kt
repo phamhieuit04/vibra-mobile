@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.R
@@ -81,7 +80,7 @@ fun WelcomeScreen(
             ) {
                 Text(text = "Sign up free", color = Color.White, fontSize = 16.sp)
             }
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(12.dp))
             OutlinedButton(
                 onClick = onNavigateToLogin,
                 modifier = Modifier
@@ -94,8 +93,8 @@ fun WelcomeScreen(
     }
 }
 
-@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
-@Composable
-fun Preview(modifier: Modifier = Modifier) {
-    WelcomeScreen(onNavigateToLogin = {}, onNavigateToSignUp = {})
-}
+//@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
+//@Composable
+//fun Preview(modifier: Modifier = Modifier) {
+//    WelcomeScreen(onNavigateToLogin = {}, onNavigateToSignUp = {})
+//}
