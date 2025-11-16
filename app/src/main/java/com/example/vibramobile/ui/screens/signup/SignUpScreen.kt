@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -30,8 +31,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.R
-import com.example.vibramobile.helpers.NavigationEvent
 import com.example.vibramobile.helpers.Navigator
+import com.example.vibramobile.ui.Destination
 import com.example.vibramobile.ui.screens.login.FormButton
 import com.example.vibramobile.ui.screens.login.FormInput
 import com.example.vibramobile.ui.screens.login.SocialMethod
@@ -39,7 +40,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpScreen(modifier: Modifier = Modifier, onNavigateToSignUpPassword: () -> Unit) {
+fun SignUpScreen(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
 
     Scaffold(
@@ -48,11 +49,13 @@ fun SignUpScreen(modifier: Modifier = Modifier, onNavigateToSignUpPassword: () -
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    Icon(
-                        contentDescription = "",
-                        imageVector = Icons.Default.ArrowBackIosNew,
-                        tint = Color.White
-                    )
+                    IconButton(onClick = { scope.launch { Navigator.navigateUp() } }) {
+                        Icon(
+                            contentDescription = "",
+                            imageVector = Icons.Default.ArrowBackIosNew,
+                            tint = Color.White
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
@@ -64,7 +67,14 @@ fun SignUpScreen(modifier: Modifier = Modifier, onNavigateToSignUpPassword: () -
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "Already have an account?", color = Color.White, fontSize = 16.sp)
-                TextButton(onClick = { scope.launch { Navigator.navigate(NavigationEvent.NavigateToLogin) } }) {
+                TextButton(onClick = {
+                    scope.launch {
+                        Navigator.popBackStack(
+                            destination = Destination.Login,
+                            inclusive = false
+                        )
+                    }
+                }) {
                     Text(
                         text = "Log in",
                         color = Color.White,
@@ -121,7 +131,10 @@ fun SignUpScreen(modifier: Modifier = Modifier, onNavigateToSignUpPassword: () -
                 FormInput(
                     placeholder = "What's your email?",
                 )
-                FormButton(onClick = onNavigateToSignUpPassword, text = "Continue")
+                FormButton(
+                    onClick = { scope.launch { Navigator.navigate(destination = Destination.SignUpPassword) } },
+                    text = "Continue"
+                )
                 Text(
                     text = "or",
                     color = Color.LightGray,

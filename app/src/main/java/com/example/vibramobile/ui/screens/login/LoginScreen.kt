@@ -18,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -42,8 +43,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.vibramobile.R
-import com.example.vibramobile.helpers.NavigationEvent
 import com.example.vibramobile.helpers.Navigator
+import com.example.vibramobile.ui.Destination
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
@@ -66,11 +67,13 @@ fun LoginScreen(modifier: Modifier = Modifier) {
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    Icon(
-                        contentDescription = "",
-                        imageVector = Icons.Default.ArrowBackIosNew,
-                        tint = Color.White
-                    )
+                    IconButton(onClick = { scope.launch { Navigator.navigateUp() } }) {
+                        Icon(
+                            contentDescription = "",
+                            imageVector = Icons.Default.ArrowBackIosNew,
+                            tint = Color.White
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
@@ -82,7 +85,14 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "Don't have an account?", color = Color.White, fontSize = 16.sp)
-                TextButton(onClick = { scope.launch { Navigator.navigate(NavigationEvent.NavigateToSignUp) } }) {
+                TextButton(onClick = {
+                    scope.launch {
+                        Navigator.popBackStack(
+                            destination = Destination.SignUp,
+                            inclusive = false
+                        )
+                    }
+                }) {
                     Text(
                         text = "Sign up",
                         color = Color.White,

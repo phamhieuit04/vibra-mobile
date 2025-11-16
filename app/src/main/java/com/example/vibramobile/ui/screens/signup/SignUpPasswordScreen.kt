@@ -21,28 +21,36 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.ui.screens.login.FormButton
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpPasswordScreen(modifier: Modifier = Modifier) {
+    val scope = rememberCoroutineScope()
+
     Scaffold(
         containerColor = Color.Black,
         topBar = {
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    Icon(
-                        contentDescription = "",
-                        imageVector = Icons.Default.ArrowBackIosNew,
-                        tint = Color.White
-                    )
+                    IconButton(onClick = { scope.launch { Navigator.navigateUp() } }) {
+                        Icon(
+                            contentDescription = "",
+                            imageVector = Icons.Default.ArrowBackIosNew,
+                            tint = Color.White
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )

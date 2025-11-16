@@ -30,9 +30,7 @@ import com.example.vibramobile.viewmodels.AuthViewModel
 @Composable
 fun WelcomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: AuthViewModel = hiltViewModel<AuthViewModel>(),
-    onNavigateToLogin: () -> Unit,
-    onNavigateToSignUp: () -> Unit
+    viewModel: AuthViewModel = hiltViewModel<AuthViewModel>()
 ) {
     Column(
         modifier = modifier
