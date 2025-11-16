@@ -2,7 +2,13 @@ package com.example.vibramobile.ui
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.compose.NavHost
@@ -12,17 +18,22 @@ import androidx.navigation.toRoute
 import com.example.vibramobile.helpers.NavigationAction
 import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.helpers.ObserverAsEvents
+import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.graphs.authGraph
 import com.example.vibramobile.ui.graphs.homeGraph
+import com.example.vibramobile.ui.graphs.searchGraph
 import com.example.vibramobile.ui.screens.home.HomeScreen
 import kotlinx.serialization.Serializable
 
 sealed interface Destination {
     @Serializable
-    object AuthGraph
+    object AuthGraph : Destination
 
     @Serializable
-    object HomeGraph
+    object HomeGraph : Destination
+
+    @Serializable
+    object SearchGraph : Destination
 
     @Serializable
     object WelcomeScreen : Destination
@@ -37,13 +48,17 @@ sealed interface Destination {
     object SignUpPasswordScreen : Destination
 
     @Serializable
-    data class HomeScreen(val userName: String? = null) : Destination
+    object HomeScreen : Destination
+
+    @Serializable
+    object SearchScreen : Destination
 }
 
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
     val animationSpec = tween<IntOffset>(700)
     val navController = rememberNavController()
+    var display by mutableStateOf(false)
 
     ObserverAsEvents(Navigator.channel) { action ->
         when (action) {
@@ -65,36 +80,19 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         }
     }
 
-    NavHost(
-        modifier = modifier,
-        navController = navController,
-        startDestination = Destination.AuthGraph,
-        enterTransition = {
-            slideIntoContainer(
-                AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec
-            )
-        },
-        exitTransition = {
-            slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec
-            )
-        },
-        popEnterTransition = {
-            slideIntoContainer(
-                AnimatedContentTransitionScope.SlideDirection.Right,
-                animationSpec
-            )
-        },
-        popExitTransition = {
-            slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.Right,
-                animationSpec
-            )
+    LaunchedEffect(UiState.displayNavigationBar.value) {
+        if (UiState.displayNavigationBar.value) display = true
+    }
+
+    Scaffold(bottomBar = { if (display) AppNavigationBar() }) { paddingValues ->
+        NavHost(
+            modifier = modifier.padding(paddingValues = paddingValues),
+            navController = navController,
+            startDestination = Destination.AuthGraph
+        ) {
+            authGraph()
+            homeGraph()
+            searchGraph()
         }
-    ) {
-        authGraph()
-        homeGraph()
     }
 }

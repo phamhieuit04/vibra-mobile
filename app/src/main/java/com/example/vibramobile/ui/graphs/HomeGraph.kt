@@ -8,10 +8,9 @@ import com.example.vibramobile.ui.Destination
 import com.example.vibramobile.ui.screens.home.HomeScreen
 
 fun NavGraphBuilder.homeGraph() {
-    navigation<Destination.HomeGraph>(startDestination = Destination.HomeScreen()) {
-        composable<Destination.HomeScreen> { entry ->
-            val homeScreen = entry.toRoute<Destination.HomeScreen>()
-            HomeScreen(userName = homeScreen.userName)
+    navigation<Destination.HomeGraph>(startDestination = Destination.HomeScreen) {
+        composable<Destination.HomeScreen> {
+            HomeScreen()
         }
     }
 }
