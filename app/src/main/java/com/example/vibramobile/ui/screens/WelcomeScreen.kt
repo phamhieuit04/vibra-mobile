@@ -13,6 +13,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -22,16 +23,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.vibramobile.R
-import com.example.vibramobile.viewmodels.AuthViewModel
+import com.example.vibramobile.helpers.Navigator
+import com.example.vibramobile.ui.Destination
+import kotlinx.coroutines.launch
 
 @Composable
-fun WelcomeScreen(
-    modifier: Modifier = Modifier,
-    viewModel: AuthViewModel = hiltViewModel<AuthViewModel>()
-) {
+fun WelcomeScreen(modifier: Modifier = Modifier) {
+    val scope = rememberCoroutineScope()
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -74,7 +74,7 @@ fun WelcomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(
-                onClick = { viewModel.signup() },
+                onClick = { scope.launch { Navigator.navigate(destination = Destination.SignUpScreen) } },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -84,7 +84,7 @@ fun WelcomeScreen(
             }
             Spacer(Modifier.height(12.dp))
             OutlinedButton(
-                onClick = { viewModel.login() },
+                onClick = { scope.launch { Navigator.navigate(destination = Destination.LoginScreen) } },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)

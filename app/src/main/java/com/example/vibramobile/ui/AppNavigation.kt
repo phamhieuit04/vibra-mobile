@@ -8,27 +8,36 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.vibramobile.helpers.NavigationAction
 import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.helpers.ObserverAsEvents
-import com.example.vibramobile.ui.screens.WelcomeScreen
-import com.example.vibramobile.ui.screens.login.LoginScreen
-import com.example.vibramobile.ui.screens.signup.SignUpPasswordScreen
-import com.example.vibramobile.ui.screens.signup.SignUpScreen
+import com.example.vibramobile.ui.graphs.authGraph
+import com.example.vibramobile.ui.graphs.homeGraph
+import com.example.vibramobile.ui.screens.home.HomeScreen
 import kotlinx.serialization.Serializable
 
 sealed interface Destination {
     @Serializable
-    object Welcome : Destination
+    object AuthGraph
 
     @Serializable
-    object Login : Destination
+    object HomeGraph
 
     @Serializable
-    object SignUp : Destination
+    object WelcomeScreen : Destination
 
     @Serializable
-    object SignUpPassword : Destination
+    object LoginScreen : Destination
+
+    @Serializable
+    object SignUpScreen : Destination
+
+    @Serializable
+    object SignUpPasswordScreen : Destination
+
+    @Serializable
+    data class HomeScreen(val userName: String? = null) : Destination
 }
 
 @Composable
@@ -38,8 +47,12 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
     ObserverAsEvents(Navigator.channel) { action ->
         when (action) {
-            is NavigationAction.Navigate -> navController.navigate(route = action.destination)
+            is NavigationAction.Navigate -> navController.navigate(route = action.destination) {
+                action.navOptions(this)
+            }
+
             is NavigationAction.NavigateUp -> navController.navigateUp()
+
             is NavigationAction.PopBackStack -> {
                 val popped = navController.popBackStack(
                     route = action.destination,
@@ -55,7 +68,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = Destination.Welcome,
+        startDestination = Destination.AuthGraph,
         enterTransition = {
             slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Left,
@@ -81,17 +94,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             )
         }
     ) {
-        composable<Destination.Welcome> {
-            WelcomeScreen()
-        }
-        composable<Destination.Login> {
-            LoginScreen()
-        }
-        composable<Destination.SignUp> {
-            SignUpScreen()
-        }
-        composable<Destination.SignUpPassword> {
-            SignUpPasswordScreen()
-        }
+        authGraph()
+        homeGraph()
     }
 }

@@ -18,11 +18,20 @@ sealed interface NavigationAction {
     ) : NavigationAction
 }
 
-object Navigator {
+interface NavigatorInterface {
+    suspend fun navigate(destination: Destination, navOptions: NavOptionsBuilder.() -> Unit = {})
+    suspend fun navigateUp()
+    suspend fun popBackStack(destination: Destination, inclusive: Boolean)
+}
+
+object Navigator : NavigatorInterface {
     private val _channel = Channel<NavigationAction>()
     val channel = _channel.receiveAsFlow()
 
-    suspend fun navigate(destination: Destination, navOptions: NavOptionsBuilder.() -> Unit = {}) {
+    override suspend fun navigate(
+        destination: Destination,
+        navOptions: NavOptionsBuilder.() -> Unit
+    ) {
         _channel.send(
             NavigationAction.Navigate(
                 destination = destination,
@@ -31,11 +40,11 @@ object Navigator {
         )
     }
 
-    suspend fun navigateUp() {
+    override suspend fun navigateUp() {
         _channel.send(NavigationAction.NavigateUp)
     }
 
-    suspend fun popBackStack(destination: Destination, inclusive: Boolean) {
+    override suspend fun popBackStack(destination: Destination, inclusive: Boolean) {
         _channel.send(
             NavigationAction.PopBackStack(
                 destination = destination,

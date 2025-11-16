@@ -12,13 +12,19 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor() : ViewModel() {
     fun login() {
         viewModelScope.launch {
-            Navigator.navigate(destination = Destination.Login)
+            Navigator.navigate(
+                destination = Destination.HomeScreen(userName = "Hieu"),
+                navOptions = {
+                    popUpTo(Destination.AuthGraph) {
+                        inclusive = true
+                    }
+                })
         }
     }
 
     fun signup() {
         viewModelScope.launch {
-            Navigator.navigate(destination = Destination.SignUp)
+//
         }
     }
 }

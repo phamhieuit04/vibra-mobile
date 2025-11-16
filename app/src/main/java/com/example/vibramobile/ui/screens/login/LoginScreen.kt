@@ -39,12 +39,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.vibramobile.R
 import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.ui.Destination
+import com.example.vibramobile.viewmodels.AuthViewModel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
@@ -58,7 +60,10 @@ object LoginStep {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier) {
+fun LoginScreen(
+    modifier: Modifier = Modifier,
+    viewModel: AuthViewModel = hiltViewModel<AuthViewModel>()
+) {
     val scope = rememberCoroutineScope()
 
     Scaffold(
@@ -88,7 +93,7 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                 TextButton(onClick = {
                     scope.launch {
                         Navigator.popBackStack(
-                            destination = Destination.SignUp,
+                            destination = Destination.SignUpScreen,
                             inclusive = false
                         )
                     }
@@ -161,7 +166,7 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             FormInput(placeholder = "Enter your password")
-                            FormButton(onClick = { }, text = "Log in")
+                            FormButton(onClick = { viewModel.login() }, text = "Log in")
                         }
                     }
                 }

@@ -70,7 +70,7 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                 TextButton(onClick = {
                     scope.launch {
                         Navigator.popBackStack(
-                            destination = Destination.Login,
+                            destination = Destination.LoginScreen,
                             inclusive = false
                         )
                     }
@@ -132,7 +132,7 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                     placeholder = "What's your email?",
                 )
                 FormButton(
-                    onClick = { scope.launch { Navigator.navigate(destination = Destination.SignUpPassword) } },
+                    onClick = { scope.launch { Navigator.navigate(destination = Destination.SignUpPasswordScreen) } },
                     text = "Continue"
                 )
                 Text(
