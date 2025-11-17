@@ -13,9 +13,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.LibraryMusic
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -34,10 +40,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.states.UiState
+import com.example.vibramobile.ui.screens.home.HomeScreen
 import kotlinx.coroutines.launch
 
 enum class NavDestination(
@@ -47,7 +55,20 @@ enum class NavDestination(
     val selectedIcon: ImageVector
 ) {
     HOME(Destination.HomeGraph, "Home", Icons.Outlined.Home, Icons.Default.Home),
-    SEARCH(Destination.SearchGraph, "Search", Icons.Outlined.Search, Icons.Default.Search)
+    SEARCH(Destination.SearchGraph, "Search", Icons.Outlined.Search, Icons.Default.Search),
+    CREATE(Destination.SearchGraph, "Create", Icons.Outlined.Add, Icons.Default.Add),
+    LIBRARY(
+        Destination.SearchGraph,
+        "Your Library",
+        Icons.Outlined.LibraryMusic,
+        Icons.Default.LibraryMusic
+    ),
+    PROFILE(
+        Destination.SearchGraph,
+        "Profile",
+        Icons.Outlined.AccountCircle,
+        Icons.Default.AccountCircle
+    )
 }
 
 @Composable
@@ -63,18 +84,14 @@ fun AppNavigationBar(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             NavDestination.entries.forEachIndexed { index, item ->
                 AppNavigationBarItem(
                     onClick = {
                         scope.launch {
                             if (UiState.currentGraph.value != item) {
-                                Navigator.navigate(destination = item.destination) {
-                                    popUpTo(UiState.currentGraph.value.destination) {
-                                        inclusive = true
-                                    }
-                                }
+                                Navigator.navigate(destination = item.destination)
                                 UiState.currentGraph.value = item
                                 selectedDestination = index
                             }

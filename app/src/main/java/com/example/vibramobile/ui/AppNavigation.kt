@@ -2,6 +2,7 @@ package com.example.vibramobile.ui
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -10,11 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import com.example.vibramobile.helpers.NavigationAction
 import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.helpers.ObserverAsEvents
@@ -22,7 +22,6 @@ import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.graphs.authGraph
 import com.example.vibramobile.ui.graphs.homeGraph
 import com.example.vibramobile.ui.graphs.searchGraph
-import com.example.vibramobile.ui.screens.home.HomeScreen
 import kotlinx.serialization.Serializable
 
 sealed interface Destination {
@@ -63,6 +62,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     ObserverAsEvents(Navigator.channel) { action ->
         when (action) {
             is NavigationAction.Navigate -> navController.navigate(route = action.destination) {
+                popUpTo(UiState.currentGraph.value.destination) {
+                    inclusive = true
+                }
                 action.navOptions(this)
             }
 
@@ -84,11 +86,43 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         if (UiState.displayNavigationBar.value) display = true
     }
 
-    Scaffold(bottomBar = { if (display) AppNavigationBar() }) { paddingValues ->
+    Scaffold(
+        containerColor = Color.Black,
+        bottomBar = { if (display) AppNavigationBar() }
+    ) { paddingValues ->
         NavHost(
-            modifier = modifier.padding(paddingValues = paddingValues),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
+                    top = paddingValues.calculateTopPadding(),
+                    bottom = paddingValues.calculateBottomPadding()
+                ),
             navController = navController,
-            startDestination = Destination.AuthGraph
+            startDestination = Destination.AuthGraph,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec
+                )
+            }
         ) {
             authGraph()
             homeGraph()
