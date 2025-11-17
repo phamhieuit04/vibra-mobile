@@ -29,8 +29,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.helpers.Navigator
+import com.example.vibramobile.ui.Destination
 import com.example.vibramobile.ui.screens.login.FormButton
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,7 +76,15 @@ fun SignUpPasswordScreen(modifier: Modifier = Modifier) {
                 fontWeight = FontWeight.Bold
             )
             FormPasswordField(placeholder = "********")
-            FormButton(onClick = {}, text = "Log in")
+            FormButton(onClick = {
+                scope.launch {
+                    Navigator.navigate(destination = Destination.LoginScreen) {
+                        popUpTo(Destination.SignUpPasswordScreen) {
+                            inclusive = true
+                        }
+                    }
+                }
+            }, text = "Log in")
         }
     }
 }
