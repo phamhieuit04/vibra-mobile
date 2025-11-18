@@ -43,6 +43,7 @@ import com.example.vibramobile.models.Category
 import com.example.vibramobile.models.Playlist
 import com.example.vibramobile.models.Song
 import com.example.vibramobile.models.User
+import com.example.vibramobile.states.UserState
 
 val categories = listOf(
     Category(
@@ -352,7 +353,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                             Text(text = song.name, color = Color.White, fontSize = 18.sp)
                             Spacer(Modifier.height(2.dp))
                             Text(
-                                text = song.author.name,
+                                text = song.author.name.toString(),
                                 color = Color.LightGray.copy(alpha = 0.8f),
                                 fontSize = 12.sp
                             )
@@ -453,7 +454,7 @@ fun SongSection(modifier: Modifier = Modifier, songs: List<Song>) {
                         Text(text = song.name, color = Color.White, fontSize = 16.sp)
                         Spacer(Modifier.height(2.dp))
                         Text(
-                            text = song.author.name,
+                            text = song.author.name.toString(),
                             color = Color.LightGray.copy(alpha = 0.8f),
                             fontSize = 12.sp
                         )
@@ -492,7 +493,7 @@ fun AlbumSection(modifier: Modifier = Modifier, albums: List<Playlist>) {
                 Text(text = album.name, color = Color.White, fontSize = 16.sp)
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    text = album.author.name,
+                    text = album.author.name.toString(),
                     color = Color.LightGray.copy(alpha = 0.8f),
                     fontSize = 12.sp
                 )
@@ -518,7 +519,7 @@ fun ArtistSection(modifier: Modifier = Modifier, artists: List<User>) {
                     contentScale = ContentScale.Crop
                 )
                 Spacer(Modifier.height(8.dp))
-                Text(text = artist.name, color = Color.White, fontSize = 16.sp)
+                Text(text = artist.name.toString(), color = Color.White, fontSize = 16.sp)
                 Spacer(Modifier.height(2.dp))
                 Text(
                     text = "${artist.followers} người theo dõi",

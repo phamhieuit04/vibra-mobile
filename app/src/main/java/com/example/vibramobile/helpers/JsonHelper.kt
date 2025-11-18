@@ -18,7 +18,7 @@ object JsonHelper {
         prettyPrint = true
     }
 
-    private fun parseResponse(from: String, to: String): Map<String, JsonElement>? {
+    fun parseResponse(from: String, to: String): Map<String, JsonElement>? {
         val result = json.parseToJsonElement(from).jsonObject
 
         if (to != "data" && to != "message" && to != "errors") return null
@@ -32,13 +32,15 @@ object JsonHelper {
     }
 
     @OptIn(InternalSerializationApi::class)
-    fun <T : Any> parseJson(from: String, to: KClass<T>, key: String): T? {
-        val data = parseResponse(from = from, to = "data")
-        val element = data?.getValue(key = key) ?: return null
-        val serializer: KSerializer<T> = to.serializer()
-
-        val result = json.decodeFromJsonElement(deserializer = serializer, element = element)
-        return result
+    fun <T : Any> parseJson(from: String, to: KClass<T>, key: String? = null): T? {
+        val data = parseResponse(from, "data") ?: return null
+        val element: JsonElement = if (key == null) {
+            JsonObject(data)
+        } else {
+            data[key] ?: return null
+        }
+        val serializer = to.serializer()
+        return json.decodeFromJsonElement(serializer, element)
     }
 
     fun parseString(from: String, to: String, key: String): String? {
