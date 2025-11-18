@@ -1,13 +1,12 @@
 package com.example.vibramobile.ui.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,12 +38,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil3.compose.AsyncImage
 import com.example.vibramobile.R
 import com.example.vibramobile.models.Category
 import com.example.vibramobile.models.Playlist
 import com.example.vibramobile.models.Song
 import com.example.vibramobile.models.User
-import com.example.vibramobile.states.UserState
+import com.example.vibramobile.states.HomeState
+import com.example.vibramobile.viewmodels.HomeViewModel
+import io.ktor.http.encodeURLPath
 
 val categories = listOf(
     Category(
@@ -291,7 +295,10 @@ val artists = listOf(
 )
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
+) {
     Scaffold(
         containerColor = Color.Black,
         topBar = {
@@ -350,10 +357,10 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                         )
                         Spacer(Modifier.width(12.dp))
                         Column() {
-                            Text(text = song.name, color = Color.White, fontSize = 18.sp)
+                            Text(text = song.name.toString(), color = Color.White, fontSize = 18.sp)
                             Spacer(Modifier.height(2.dp))
                             Text(
-                                text = song.author.name.toString(),
+                                text = song.author?.name.toString(),
                                 color = Color.LightGray.copy(alpha = 0.8f),
                                 fontSize = 12.sp
                             )
@@ -372,12 +379,13 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             }
 
             item {
-                Spacer(Modifier.height(10.dp))
-                SectionTitle(text = "Phù hợp với bạn")
-                Spacer(Modifier.height(16.dp))
-            }
-            item {
-                SongSection(songs = songs)
+                if (!HomeState.recommendedSongs.isEmpty()) {
+                    Spacer(Modifier.height(10.dp))
+                    SectionTitle(text = "Phù hợp với bạn")
+
+                    Spacer(Modifier.height(16.dp))
+                    SongSection(songs = HomeState.recommendedSongs)
+                }
             }
 
             item {
@@ -429,18 +437,18 @@ fun SectionTitle(modifier: Modifier = Modifier, text: String) {
 @Composable
 fun SongSection(modifier: Modifier = Modifier, songs: List<Song>) {
     LazyRow() {
-        itemsIndexed(com.example.vibramobile.ui.screens.home.songs) { index, song ->
+        itemsIndexed(songs, key = { index, song -> song.id!! }) { index, song ->
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
+                AsyncImage(
                     modifier = Modifier
                         .size(140.dp)
                         .clip(
                             shape = CircleShape
                         ),
-                    painter = painterResource(R.drawable.default_image),
+                    model = song.thumbnail_path?.encodeURLPath(),
                     contentDescription = "",
                     contentScale = ContentScale.Crop
                 )
@@ -451,10 +459,10 @@ fun SongSection(modifier: Modifier = Modifier, songs: List<Song>) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column() {
-                        Text(text = song.name, color = Color.White, fontSize = 16.sp)
+                        Text(text = song.name.toString(), color = Color.White, fontSize = 16.sp)
                         Spacer(Modifier.height(2.dp))
                         Text(
-                            text = song.author.name.toString(),
+                            text = song.author?.name.toString(),
                             color = Color.LightGray.copy(alpha = 0.8f),
                             fontSize = 12.sp
                         )
@@ -462,7 +470,7 @@ fun SongSection(modifier: Modifier = Modifier, songs: List<Song>) {
                     IconButton(onClick = {}) {
                         Icon(
                             modifier = Modifier.size(20.dp),
-                            imageVector = Icons.Default.Queue,
+                            imageVector = Icons.Default.MoreHoriz,
                             contentDescription = "",
                             tint = Color.LightGray.copy(alpha = 0.8f)
                         )

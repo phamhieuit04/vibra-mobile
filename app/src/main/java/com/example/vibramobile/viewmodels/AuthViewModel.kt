@@ -6,35 +6,39 @@ import androidx.lifecycle.viewModelScope
 import com.example.vibramobile.helpers.JsonHelper
 import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.models.User
-import com.example.vibramobile.repositories.auth.AuthRepository
 import com.example.vibramobile.states.UiState
 import com.example.vibramobile.states.UserState
 import com.example.vibramobile.ui.Destination
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.forms.submitForm
+import io.ktor.http.parameters
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val client: HttpClient
 ) : ViewModel() {
-    fun login() {
+    fun login(email: String, password: String) {
         viewModelScope.launch {
-            val response =
-                authRepository.login(email = "tomnguyenhieu2004@gmail.com", password = "12345678")
-            if (response != null) {
-                val user = JsonHelper.parseJson(from = response.body(), to = User::class)
-                UserState.currentUser = user
-                Navigator.navigate(
-                    destination = Destination.HomeGraph,
-                    navOptions = {
-                        popUpTo(Destination.AuthGraph) {
-                            inclusive = true
-                        }
-                    })
-                UiState.displayNavigationBar.value = true
-            }
+            val response = client.submitForm(
+                url = "login",
+                formParameters = parameters {
+                    append(name = "email", value = email)
+                    append(name = "password", value = password)
+                })
+            UserState.currentUser = JsonHelper.parseJson(from = response.body(), to = User::class)
+
+            Navigator.navigate(
+                destination = Destination.HomeGraph,
+                navOptions = {
+                    popUpTo(Destination.AuthGraph) {
+                        inclusive = true
+                    }
+                })
+            UiState.displayNavigationBar.value = true
         }
     }
 

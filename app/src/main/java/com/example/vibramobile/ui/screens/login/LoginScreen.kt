@@ -166,7 +166,12 @@ fun LoginScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             FormInput(placeholder = "Enter your password")
-                            FormButton(onClick = { viewModel.login() }, text = "Log in")
+                            FormButton(onClick = {
+                                viewModel.login(
+                                    email = "tomnguyenhieu2004@gmail.com",
+                                    password = "12345678"
+                                )
+                            }, text = "Log in")
                         }
                     }
                 }
