@@ -2,14 +2,12 @@ package com.example.vibramobile.ui
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntOffset
@@ -57,7 +55,6 @@ sealed interface Destination {
 fun AppNavigation(modifier: Modifier = Modifier) {
     val animationSpec = tween<IntOffset>(700)
     val navController = rememberNavController()
-    var display by mutableStateOf(false)
 
     ObserverAsEvents(Navigator.channel) { action ->
         when (action) {
@@ -82,51 +79,48 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         }
     }
 
-    LaunchedEffect(UiState.displayNavigationBar.value) {
-        if (UiState.displayNavigationBar.value) display = true
-    }
-
     Scaffold(
         containerColor = Color.Black,
-        bottomBar = { if (display) AppNavigationBar() }
+        bottomBar = {
+            if (UiState.displayNavigationBar.value) AppNavigationBar()
+        }
     ) { paddingValues ->
-        NavHost(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(
-                    top = paddingValues.calculateTopPadding(),
-                    bottom = paddingValues.calculateBottomPadding()
-                ),
-            navController = navController,
-            startDestination = Destination.AuthGraph,
-            enterTransition = {
-                slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec
-                )
-            },
-            popEnterTransition = {
-                slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec
-                )
-            },
-            popExitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec
-                )
+        Box(modifier = Modifier.padding(paddingValues)) {
+            NavHost(
+                modifier = Modifier.fillMaxSize(),
+                navController = navController,
+                startDestination = Destination.AuthGraph,
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec
+                    )
+                }
+            ) {
+                authGraph()
+                homeGraph()
+                searchGraph()
             }
-        ) {
-            authGraph()
-            homeGraph()
-            searchGraph()
+            if (UiState.displayMediaPlayer.value)
+                AppMediaPlayer(modifier = Modifier.align(alignment = Alignment.BottomCenter))
         }
     }
 }

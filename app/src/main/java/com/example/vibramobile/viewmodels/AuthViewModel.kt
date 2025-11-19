@@ -39,6 +39,7 @@ class AuthViewModel @Inject constructor(
                     }
                 })
             UiState.displayNavigationBar.value = true
+            UiState.displayMediaPlayer.value = true
         }
     }
 

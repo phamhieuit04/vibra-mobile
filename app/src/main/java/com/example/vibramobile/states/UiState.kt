@@ -5,5 +5,6 @@ import com.example.vibramobile.ui.NavDestination
 
 object UiState {
     var displayNavigationBar = mutableStateOf(false)
+    var displayMediaPlayer = mutableStateOf(false)
     var currentGraph = mutableStateOf(NavDestination.HOME)
 }

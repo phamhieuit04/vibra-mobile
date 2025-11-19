@@ -2,6 +2,8 @@ package com.example.vibramobile.ui.screens.home
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,17 +21,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material.icons.filled.Queue
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -406,23 +408,25 @@ fun HomeScreen(
                 ArtistSection(artists = artists)
             }
 
-            item {
-                Spacer(Modifier.height(20.dp))
-                SectionTitle(text = "Bài hát có nhiều lượt nghe")
-                Spacer(Modifier.height(16.dp))
-            }
-            item {
-                SongSection(songs = songs)
-            }
+//            item {
+//                Spacer(Modifier.height(20.dp))
+//                SectionTitle(text = "Bài hát có nhiều lượt nghe")
+//                Spacer(Modifier.height(16.dp))
+//            }
+//            item {
+//                SongSection(songs = songs)
+//            }
+
+            item { Spacer(Modifier.height(96.dp)) }
         }
     }
 }
 
-@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
-@Composable
-fun Preview(modifier: Modifier = Modifier) {
-    HomeScreen()
-}
+//@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
+//@Composable
+//fun Preview(modifier: Modifier = Modifier) {
+//    HomeScreen()
+//}
 
 @Composable
 fun SectionTitle(modifier: Modifier = Modifier, text: String) {
@@ -439,7 +443,11 @@ fun SongSection(modifier: Modifier = Modifier, songs: List<Song>) {
     LazyRow() {
         itemsIndexed(songs, key = { index, song -> song.id!! }) { index, song ->
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .noRippleClickable(onClick = {
+//                        TODO: Play song
+                    }),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AsyncImage(
@@ -537,5 +545,15 @@ fun ArtistSection(modifier: Modifier = Modifier, artists: List<User>) {
             }
             Spacer(Modifier.width(16.dp))
         }
+    }
+}
+
+inline fun Modifier.noRippleClickable(
+    crossinline onClick: () -> Unit
+): Modifier = composed {
+    clickable(
+        indication = null,
+        interactionSource = remember { MutableInteractionSource() }) {
+        onClick()
     }
 }
