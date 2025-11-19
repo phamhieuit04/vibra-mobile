@@ -1,6 +1,5 @@
 package com.example.vibramobile.ui.screens.home
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -37,10 +36,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.media3.common.MediaItem
 import coil3.compose.AsyncImage
 import com.example.vibramobile.R
 import com.example.vibramobile.models.Category
@@ -48,6 +48,8 @@ import com.example.vibramobile.models.Playlist
 import com.example.vibramobile.models.Song
 import com.example.vibramobile.models.User
 import com.example.vibramobile.states.HomeState
+import com.example.vibramobile.states.UiState
+import com.example.vibramobile.ui.MediaPlayer
 import com.example.vibramobile.viewmodels.HomeViewModel
 import io.ktor.http.encodeURLPath
 
@@ -386,7 +388,10 @@ fun HomeScreen(
                     SectionTitle(text = "Phù hợp với bạn")
 
                     Spacer(Modifier.height(16.dp))
-                    SongSection(songs = HomeState.recommendedSongs)
+                    SongSection(
+                        onClick = { viewModel.playSong(song = it) },
+                        songs = HomeState.recommendedSongs
+                    )
                 }
             }
 
@@ -439,15 +444,13 @@ fun SectionTitle(modifier: Modifier = Modifier, text: String) {
 }
 
 @Composable
-fun SongSection(modifier: Modifier = Modifier, songs: List<Song>) {
+fun SongSection(onClick: (Song) -> Unit, modifier: Modifier = Modifier, songs: List<Song>) {
     LazyRow() {
         itemsIndexed(songs, key = { index, song -> song.id!! }) { index, song ->
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .noRippleClickable(onClick = {
-//                        TODO: Play song
-                    }),
+                    .noRippleClickable(onClick = { onClick(song) }),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AsyncImage(

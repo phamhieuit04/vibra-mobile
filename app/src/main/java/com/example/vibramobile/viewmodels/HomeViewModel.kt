@@ -1,21 +1,23 @@
 package com.example.vibramobile.viewmodels
 
 import android.util.Log
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.vibramobile.helpers.JsonHelper
+import androidx.media3.common.MediaItem
 import com.example.vibramobile.models.Response
 import com.example.vibramobile.models.Song
 import com.example.vibramobile.states.HomeState
+import com.example.vibramobile.states.SongState
+import com.example.vibramobile.states.UiState
 import com.example.vibramobile.states.UserState
+import com.example.vibramobile.ui.MediaPlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
+import io.ktor.http.encodeURLPath
 import kotlinx.coroutines.launch
-import kotlinx.serialization.builtins.ListSerializer
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,6 +29,24 @@ class HomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             getRecommendedSongs()
+        }
+    }
+
+    fun playSong(song: Song? = null) {
+        if (song == null) return
+
+        UiState.displayMediaPlayer.value = true
+        if (SongState.currentSong.value?.id != song.id) {
+            SongState.currentSong.value = song
+
+            val url = song.song_path?.encodeURLPath()
+            if (url.isNullOrBlank()) return
+
+            MediaPlayer.removeCurrentMediaItem()
+            MediaPlayer.addMediaItem(MediaItem.fromUri(url))
+            MediaPlayer.play()
+        } else {
+            MediaPlayer.playOrPause()
         }
     }
 

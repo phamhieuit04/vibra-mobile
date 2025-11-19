@@ -10,7 +10,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.vibramobile.ui.MediaPlayer
 import com.example.vibramobile.ui.theme.VibraMobileTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -20,6 +22,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val context = LocalContext.current
+            MediaPlayer.createPlayer(context = context)
+
             VibraMobileTheme {
                 AppScreen()
             }
