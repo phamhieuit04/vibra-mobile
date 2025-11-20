@@ -50,14 +50,13 @@ object MediaPlayer {
         player.prepare()
     }
 
-    fun clearAll() {
-        player.clearMediaItems()
+    fun replaceMediaItem(index: Int = 0, mediaItem: MediaItem) {
+        player.replaceMediaItem(index, mediaItem)
+        player.prepare()
     }
 
-    fun removeCurrentMediaItem() {
-        val index = player.currentMediaItemIndex
-        player.removeMediaItem(index)
-        stop()
+    fun clearAll() {
+        player.clearMediaItems()
     }
 
     fun stop() {

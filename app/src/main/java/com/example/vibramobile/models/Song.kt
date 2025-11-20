@@ -15,7 +15,7 @@ data class Song(
     var song_path: String? = null,
     var lyrics_path: String? = null,
     var thumbnail_path: String? = null,
-//    var list_lyric: List<String>? = null,
+    var list_lyric: List<String>? = null,
 
     var author: User? = null,
 )

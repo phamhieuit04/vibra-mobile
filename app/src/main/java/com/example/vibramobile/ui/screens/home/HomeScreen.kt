@@ -39,17 +39,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.media3.common.MediaItem
 import coil3.compose.AsyncImage
 import com.example.vibramobile.R
 import com.example.vibramobile.models.Category
 import com.example.vibramobile.models.Playlist
 import com.example.vibramobile.models.Song
 import com.example.vibramobile.models.User
-import com.example.vibramobile.states.HomeState
-import com.example.vibramobile.states.UiState
-import com.example.vibramobile.ui.MediaPlayer
+import com.example.vibramobile.states.SongState
 import com.example.vibramobile.viewmodels.HomeViewModel
 import io.ktor.http.encodeURLPath
 
@@ -337,60 +333,25 @@ fun HomeScreen(
                 .padding(horizontal = 16.dp)
         ) {
             item {
-                SectionTitle(text = "Lắng nghe gần đây")
-                Spacer(Modifier.height(16.dp))
-            }
-            itemsIndexed(songs) { index, song ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row() {
-                        Image(
-                            modifier = Modifier
-                                .size(42.dp)
-                                .clip(
-                                    shape = RoundedCornerShape(
-                                        4.dp
-                                    )
-                                ),
-                            painter = painterResource(R.drawable.default_image),
-                            contentDescription = "",
-                            contentScale = ContentScale.Crop
-                        )
-                        Spacer(Modifier.width(12.dp))
-                        Column() {
-                            Text(text = song.name.toString(), color = Color.White, fontSize = 18.sp)
-                            Spacer(Modifier.height(2.dp))
-                            Text(
-                                text = song.author?.name.toString(),
-                                color = Color.LightGray.copy(alpha = 0.8f),
-                                fontSize = 12.sp
-                            )
-                        }
-                    }
-                    IconButton(onClick = {}) {
-                        Icon(
-                            modifier = Modifier.size(20.dp),
-                            imageVector = Icons.Default.MoreHoriz,
-                            contentDescription = "",
-                            tint = Color.LightGray.copy(alpha = 0.8f)
-                        )
-                    }
+                if (!SongState.recentRotationSongs.isEmpty()) {
+                    SectionTitle(text = "Lắng nghe gần đây")
+                    Spacer(Modifier.height(16.dp))
+                    RecentRotationSongs(
+                        onPlay = { viewModel.playSong(song = it) },
+                        songs = SongState.recentRotationSongs
+                    )
                 }
-                Spacer(Modifier.height(12.dp))
             }
 
             item {
-                if (!HomeState.recommendedSongs.isEmpty()) {
+                if (!SongState.recommendedSongs.isEmpty()) {
                     Spacer(Modifier.height(10.dp))
                     SectionTitle(text = "Phù hợp với bạn")
 
                     Spacer(Modifier.height(16.dp))
                     SongSection(
-                        onClick = { viewModel.playSong(song = it) },
-                        songs = HomeState.recommendedSongs
+                        onPlay = { viewModel.playSong(song = it) },
+                        songs = SongState.recommendedSongs
                     )
                 }
             }
@@ -444,13 +405,62 @@ fun SectionTitle(modifier: Modifier = Modifier, text: String) {
 }
 
 @Composable
-fun SongSection(onClick: (Song) -> Unit, modifier: Modifier = Modifier, songs: List<Song>) {
+fun RecentRotationSongs(onPlay: (Song) -> Unit, modifier: Modifier = Modifier, songs: List<Song>) {
+    Column() {
+        for (song in songs) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .noRippleClickable(onClick = { onPlay(song) }),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row() {
+                    AsyncImage(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(
+                                shape = RoundedCornerShape(
+                                    4.dp
+                                )
+                            ),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        model = song.thumbnail_path?.encodeURLPath()
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Column() {
+                        Text(text = song.name.toString(), color = Color.White, fontSize = 18.sp)
+                        Spacer(Modifier.height(2.dp))
+                        Text(
+                            text = song.author?.name.toString(),
+                            color = Color.LightGray.copy(alpha = 0.8f),
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+                IconButton(onClick = {}) {
+                    Icon(
+                        modifier = Modifier.size(20.dp),
+                        imageVector = Icons.Default.MoreHoriz,
+                        contentDescription = "",
+                        tint = Color.LightGray.copy(alpha = 0.8f)
+                    )
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+        }
+    }
+}
+
+@Composable
+fun SongSection(onPlay: (Song) -> Unit, modifier: Modifier = Modifier, songs: List<Song>) {
     LazyRow() {
         itemsIndexed(songs, key = { index, song -> song.id!! }) { index, song ->
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .noRippleClickable(onClick = { onClick(song) }),
+                    .noRippleClickable(onClick = { onPlay(song) }),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AsyncImage(

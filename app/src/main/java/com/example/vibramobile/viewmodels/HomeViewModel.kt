@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import com.example.vibramobile.models.Response
 import com.example.vibramobile.models.Song
-import com.example.vibramobile.states.HomeState
 import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UiState
 import com.example.vibramobile.states.UserState
@@ -29,6 +28,7 @@ class HomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             getRecommendedSongs()
+            getRecentRotationSongs()
         }
     }
 
@@ -42,8 +42,7 @@ class HomeViewModel @Inject constructor(
             val url = song.song_path?.encodeURLPath()
             if (url.isNullOrBlank()) return
 
-            MediaPlayer.removeCurrentMediaItem()
-            MediaPlayer.addMediaItem(MediaItem.fromUri(url))
+            MediaPlayer.replaceMediaItem(mediaItem = MediaItem.fromUri(url))
             MediaPlayer.play()
         } else {
             MediaPlayer.playOrPause()
@@ -55,8 +54,20 @@ class HomeViewModel @Inject constructor(
             val response: Response<List<Song>> = client.get("home/get-recommended-songs") {
                 bearerAuth(accessToken)
             }.body()
-            HomeState.recommendedSongs.clear()
-            HomeState.recommendedSongs.addAll(response.data)
+            SongState.recommendedSongs.clear()
+            SongState.recommendedSongs.addAll(response.data)
+        }.onFailure { exception ->
+            Log.e("MyApp", exception.toString())
+        }
+    }
+
+    suspend fun getRecentRotationSongs() {
+        runCatching {
+            val response: Response<List<Song>> = client.get("home/recent-rotation") {
+                bearerAuth(accessToken)
+            }.body()
+            SongState.recentRotationSongs.clear()
+            SongState.recentRotationSongs.addAll(response.data)
         }.onFailure { exception ->
             Log.e("MyApp", exception.toString())
         }
