@@ -15,6 +15,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.http.encodeURLPath
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -65,6 +66,7 @@ class HomeViewModel @Inject constructor(
         runCatching {
             val response: Response<List<Song>> = client.get("home/recent-rotation") {
                 bearerAuth(accessToken)
+                parameter(key = "limit", value = 4)
             }.body()
             SongState.recentRotationSongs.clear()
             SongState.recentRotationSongs.addAll(response.data)

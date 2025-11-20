@@ -27,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +47,9 @@ import com.example.vibramobile.models.Playlist
 import com.example.vibramobile.models.Song
 import com.example.vibramobile.models.User
 import com.example.vibramobile.states.SongState
+import com.example.vibramobile.ui.components.RecentRotationSongsComponent
+import com.example.vibramobile.ui.components.RecentRotationSongsSkeleton
+import com.example.vibramobile.ui.components.SkeletonComponent
 import com.example.vibramobile.viewmodels.HomeViewModel
 import io.ktor.http.encodeURLPath
 
@@ -86,83 +90,6 @@ val categories = listOf(
         description = "Âm nhạc bác học với cấu trúc tinh tế, thường được trình diễn bởi dàn nhạc cổ điển.",
         thumbnail = "http://localhost:8000/assets/categories/thumbnails/classical.jpg"
     )
-)
-val songs = listOf(
-    Song(
-        id = 0,
-        name = "失われた大義",
-        description = "Eilish sử dụng phong cách hát ngân nga. Trong lời bài hát, cô ấy ăn mừng sự chia tay với một người bạn đời cũ kiêu ngạo và thờ ơ, gọi họ là 'lost cause' trong phần điệp khúc .",
-        lyric = "",
-        thumbnail = "http://localhost:8000/uploads/kenshi/thumbnails/Lemon%20thumbnail.jpg",
-        author = User(
-            id = 0,
-            name = "Kenshi Yonezu",
-            description = "Kenshi Yonezu (米津玄師) là một nghệ sĩ đa tài người Nhật Bản: ca sĩ, nhạc sĩ, nhà sản xuất âm nhạc và họa sĩ minh họa...",
-            email = "kenshi@gmail.com",
-            avatar = "http://localhost:8000/uploads/kenshi/avatars/kenshi.jpg",
-            followers = 0
-        )
-    ),
-    Song(
-        id = 1,
-        name = "失われた大義",
-        description = "Eilish sử dụng phong cách hát ngân nga. Trong lời bài hát, cô ấy ăn mừng sự chia tay với một người bạn đời cũ kiêu ngạo và thờ ơ, gọi họ là 'lost cause' trong phần điệp khúc .",
-        lyric = "",
-        thumbnail = "http://localhost:8000/uploads/kenshi/thumbnails/Lemon%20thumbnail.jpg",
-        author = User(
-            id = 0,
-            name = "Kenshi Yonezu",
-            description = "Kenshi Yonezu (米津玄師) là một nghệ sĩ đa tài người Nhật Bản: ca sĩ, nhạc sĩ, nhà sản xuất âm nhạc và họa sĩ minh họa...",
-            email = "kenshi@gmail.com",
-            avatar = "http://localhost:8000/uploads/kenshi/avatars/kenshi.jpg",
-            followers = 0
-        )
-    ),
-    Song(
-        id = 2,
-        name = "失われた大義",
-        description = "Eilish sử dụng phong cách hát ngân nga. Trong lời bài hát, cô ấy ăn mừng sự chia tay với một người bạn đời cũ kiêu ngạo và thờ ơ, gọi họ là 'lost cause' trong phần điệp khúc .",
-        lyric = "",
-        thumbnail = "http://localhost:8000/uploads/kenshi/thumbnails/Lemon%20thumbnail.jpg",
-        author = User(
-            id = 0,
-            name = "Kenshi Yonezu",
-            description = "Kenshi Yonezu (米津玄師) là một nghệ sĩ đa tài người Nhật Bản: ca sĩ, nhạc sĩ, nhà sản xuất âm nhạc và họa sĩ minh họa...",
-            email = "kenshi@gmail.com",
-            avatar = "http://localhost:8000/uploads/kenshi/avatars/kenshi.jpg",
-            followers = 0
-        )
-    ),
-    Song(
-        id = 3,
-        name = "失われた大義",
-        description = "Eilish sử dụng phong cách hát ngân nga. Trong lời bài hát, cô ấy ăn mừng sự chia tay với một người bạn đời cũ kiêu ngạo và thờ ơ, gọi họ là 'lost cause' trong phần điệp khúc .",
-        lyric = "",
-        thumbnail = "http://localhost:8000/uploads/kenshi/thumbnails/Lemon%20thumbnail.jpg",
-        author = User(
-            id = 0,
-            name = "Kenshi Yonezu",
-            description = "Kenshi Yonezu (米津玄師) là một nghệ sĩ đa tài người Nhật Bản: ca sĩ, nhạc sĩ, nhà sản xuất âm nhạc và họa sĩ minh họa...",
-            email = "kenshi@gmail.com",
-            avatar = "http://localhost:8000/uploads/kenshi/avatars/kenshi.jpg",
-            followers = 0
-        )
-    ),
-    Song(
-        id = 4,
-        name = "失われた大義",
-        description = "Eilish sử dụng phong cách hát ngân nga. Trong lời bài hát, cô ấy ăn mừng sự chia tay với một người bạn đời cũ kiêu ngạo và thờ ơ, gọi họ là 'lost cause' trong phần điệp khúc .",
-        lyric = "",
-        thumbnail = "http://localhost:8000/uploads/kenshi/thumbnails/Lemon%20thumbnail.jpg",
-        author = User(
-            id = 0,
-            name = "Kenshi Yonezu",
-            description = "Kenshi Yonezu (米津玄師) là một nghệ sĩ đa tài người Nhật Bản: ca sĩ, nhạc sĩ, nhà sản xuất âm nhạc và họa sĩ minh họa...",
-            email = "kenshi@gmail.com",
-            avatar = "http://localhost:8000/uploads/kenshi/avatars/kenshi.jpg",
-            followers = 0
-        )
-    ),
 )
 val albums = listOf(
     Playlist(
@@ -333,14 +260,19 @@ fun HomeScreen(
                 .padding(horizontal = 16.dp)
         ) {
             item {
-                if (!SongState.recentRotationSongs.isEmpty()) {
-                    SectionTitle(text = "Lắng nghe gần đây")
-                    Spacer(Modifier.height(16.dp))
-                    RecentRotationSongs(
-                        onPlay = { viewModel.playSong(song = it) },
-                        songs = SongState.recentRotationSongs
-                    )
-                }
+                SectionTitle(text = "Lắng nghe gần đây")
+                Spacer(Modifier.height(16.dp))
+
+                SkeletonComponent(
+                    isLoading = SongState.recentRotationSongs.isEmpty(),
+                    skeletonContent = { RecentRotationSongsSkeleton() },
+                    content = {
+                        RecentRotationSongsComponent(
+                            onPlay = { viewModel.playSong(song = it) },
+                            songs = SongState.recentRotationSongs
+                        )
+                    }
+                )
             }
 
             item {
@@ -402,55 +334,6 @@ fun SectionTitle(modifier: Modifier = Modifier, text: String) {
         fontWeight = FontWeight.Bold,
         fontSize = 26.sp
     )
-}
-
-@Composable
-fun RecentRotationSongs(onPlay: (Song) -> Unit, modifier: Modifier = Modifier, songs: List<Song>) {
-    Column() {
-        for (song in songs) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .noRippleClickable(onClick = { onPlay(song) }),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row() {
-                    AsyncImage(
-                        modifier = Modifier
-                            .size(42.dp)
-                            .clip(
-                                shape = RoundedCornerShape(
-                                    4.dp
-                                )
-                            ),
-                        contentDescription = "",
-                        contentScale = ContentScale.Crop,
-                        model = song.thumbnail_path?.encodeURLPath()
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Column() {
-                        Text(text = song.name.toString(), color = Color.White, fontSize = 18.sp)
-                        Spacer(Modifier.height(2.dp))
-                        Text(
-                            text = song.author?.name.toString(),
-                            color = Color.LightGray.copy(alpha = 0.8f),
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-                IconButton(onClick = {}) {
-                    Icon(
-                        modifier = Modifier.size(20.dp),
-                        imageVector = Icons.Default.MoreHoriz,
-                        contentDescription = "",
-                        tint = Color.LightGray.copy(alpha = 0.8f)
-                    )
-                }
-            }
-            Spacer(Modifier.height(12.dp))
-        }
-    }
 }
 
 @Composable
