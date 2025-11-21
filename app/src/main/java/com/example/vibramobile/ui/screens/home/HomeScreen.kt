@@ -45,6 +45,7 @@ import com.example.vibramobile.models.Category
 import com.example.vibramobile.models.Playlist
 import com.example.vibramobile.models.Song
 import com.example.vibramobile.models.User
+import com.example.vibramobile.states.CategoryState
 import com.example.vibramobile.states.SongState
 import com.example.vibramobile.ui.components.ListSongComponent
 import com.example.vibramobile.ui.components.ListSongSkeleton
@@ -54,44 +55,6 @@ import com.example.vibramobile.ui.components.SkeletonComponent
 import com.example.vibramobile.viewmodels.HomeViewModel
 import io.ktor.http.encodeURLPath
 
-val categories = listOf(
-    Category(
-        id = 0,
-        name = "Classical",
-        description = "Âm nhạc bác học với cấu trúc tinh tế, thường được trình diễn bởi dàn nhạc cổ điển.",
-        thumbnail = "http://localhost:8000/assets/categories/thumbnails/classical.jpg"
-    ),
-    Category(
-        id = 1,
-        name = "Classical",
-        description = "Âm nhạc bác học với cấu trúc tinh tế, thường được trình diễn bởi dàn nhạc cổ điển.",
-        thumbnail = "http://localhost:8000/assets/categories/thumbnails/classical.jpg"
-    ),
-    Category(
-        id = 2,
-        name = "Classical",
-        description = "Âm nhạc bác học với cấu trúc tinh tế, thường được trình diễn bởi dàn nhạc cổ điển.",
-        thumbnail = "http://localhost:8000/assets/categories/thumbnails/classical.jpg"
-    ),
-    Category(
-        id = 3,
-        name = "Classical",
-        description = "Âm nhạc bác học với cấu trúc tinh tế, thường được trình diễn bởi dàn nhạc cổ điển.",
-        thumbnail = "http://localhost:8000/assets/categories/thumbnails/classical.jpg"
-    ),
-    Category(
-        id = 4,
-        name = "Classical",
-        description = "Âm nhạc bác học với cấu trúc tinh tế, thường được trình diễn bởi dàn nhạc cổ điển.",
-        thumbnail = "http://localhost:8000/assets/categories/thumbnails/classical.jpg"
-    ),
-    Category(
-        id = 5,
-        name = "Classical",
-        description = "Âm nhạc bác học với cấu trúc tinh tế, thường được trình diễn bởi dàn nhạc cổ điển.",
-        thumbnail = "http://localhost:8000/assets/categories/thumbnails/classical.jpg"
-    )
-)
 val albums = listOf(
     Playlist(
         id = 0,
@@ -243,13 +206,18 @@ fun HomeScreen(
                         Text(text = "All", color = Color.White, fontSize = 14.sp)
                     }
                 }
-                itemsIndexed(categories) { index, category ->
+                itemsIndexed(CategoryState.categories) { index, category ->
                     FilledTonalButton(
                         onClick = {}, colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xff303030)
                         )
                     ) {
-                        Text(text = category.name, color = Color.White, fontSize = 14.sp)
+                        Text(
+                            text = category.name.toString(),
+                            color = Color.White,
+                            fontSize = 14.sp,
+                            lineHeight = 14.sp
+                        )
                     }
                 }
             }

@@ -1,8 +1,11 @@
 package com.example.vibramobile.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Category(
-    var id: Int,
-    var name: String,
-    var description: String,
-    var thumbnail: String
+    var id: Int? = null,
+    var name: String? = null,
+    var description: String? = null,
+    var thumbnail_path: String? = null
 )

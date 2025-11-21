@@ -13,7 +13,7 @@ import kotlinx.serialization.serializer
 import kotlin.reflect.KClass
 
 object JsonHelper {
-    private val json = Json {
+    val json = Json {
         ignoreUnknownKeys = true
         prettyPrint = true
     }

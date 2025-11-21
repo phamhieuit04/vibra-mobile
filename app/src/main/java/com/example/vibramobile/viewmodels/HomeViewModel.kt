@@ -4,8 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
+import com.example.vibramobile.helpers.JsonHelper
+import com.example.vibramobile.models.Category
 import com.example.vibramobile.models.Response
 import com.example.vibramobile.models.Song
+import com.example.vibramobile.states.CategoryState
 import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UiState
 import com.example.vibramobile.states.UserState
@@ -16,6 +19,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.encodeURLPath
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,6 +32,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            getCategories()
             getRecommendedSongs()
             getRecentRotationSongs()
         }
@@ -53,10 +58,12 @@ class HomeViewModel @Inject constructor(
     suspend fun getRecommendedSongs() {
         runCatching {
             SongState.recommendedSongs.clear()
-            val response: Response<List<Song>> = client.get("home/get-recommended-songs") {
+            val response = client.get("home/get-recommended-songs") {
                 bearerAuth(accessToken)
-            }.body()
-            SongState.recommendedSongs.addAll(response.data)
+            }.bodyAsText()
+
+            val result = JsonHelper.json.decodeFromString<Response<List<Song>>>(response)
+            SongState.recommendedSongs.addAll(result.data)
         }.onFailure { exception ->
             Log.e("MyApp", exception.toString())
         }
@@ -65,11 +72,27 @@ class HomeViewModel @Inject constructor(
     suspend fun getRecentRotationSongs() {
         runCatching {
             SongState.recentRotationSongs.clear()
-            val response: Response<List<Song>> = client.get("home/recent-rotation") {
+            val response = client.get("home/recent-rotation") {
                 bearerAuth(accessToken)
                 parameter(key = "limit", value = 4)
-            }.body()
-            SongState.recentRotationSongs.addAll(response.data)
+            }.bodyAsText()
+            val result = JsonHelper.json.decodeFromString<Response<List<Song>>>(response)
+
+            SongState.recentRotationSongs.addAll(result.data)
+        }.onFailure { exception ->
+            Log.e("MyApp", exception.toString())
+        }
+    }
+
+    suspend fun getCategories() {
+        runCatching {
+            CategoryState.categories.clear()
+            val response = client.get("home/list-category") {
+                bearerAuth(accessToken)
+            }.bodyAsText()
+            val result = JsonHelper.json.decodeFromString<Response<List<Category>>>(response)
+
+            CategoryState.categories.addAll(result.data)
         }.onFailure { exception ->
             Log.e("MyApp", exception.toString())
         }
