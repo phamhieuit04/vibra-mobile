@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.R
 import com.example.vibramobile.helpers.Navigator
-import com.example.vibramobile.ui.Destination
+import com.example.vibramobile.Destination
 import com.example.vibramobile.ui.screens.login.FormButton
 import com.example.vibramobile.ui.screens.login.FormInput
 import com.example.vibramobile.ui.screens.login.SocialMethod
@@ -82,6 +82,7 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                         fontSize = 16.sp
                     )
                 }
+                Spacer(Modifier.height(32.dp))
             }
         }
     ) { paddingValues ->

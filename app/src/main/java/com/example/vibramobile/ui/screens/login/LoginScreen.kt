@@ -27,6 +27,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +46,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.vibramobile.R
 import com.example.vibramobile.helpers.Navigator
-import com.example.vibramobile.ui.Destination
+import com.example.vibramobile.states.UserState
+import com.example.vibramobile.Destination
 import com.example.vibramobile.viewmodels.AuthViewModel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -61,10 +63,15 @@ object LoginStep {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
+    onNavigateToMainScreen: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel = hiltViewModel<AuthViewModel>()
 ) {
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(UserState.isLoggedIn.value) {
+        if (UserState.isLoggedIn.value) onNavigateToMainScreen()
+    }
 
     Scaffold(
         containerColor = Color.Black,
@@ -105,6 +112,7 @@ fun LoginScreen(
                         fontSize = 16.sp
                     )
                 }
+                Spacer(Modifier.height(32.dp))
             }
         }
     ) { paddingValues ->

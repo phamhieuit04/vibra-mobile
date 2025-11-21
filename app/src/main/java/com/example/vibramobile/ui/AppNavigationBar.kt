@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.vibramobile.Destination
 import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.screens.home.HomeScreen
@@ -91,10 +92,10 @@ fun AppNavigationBar(modifier: Modifier = Modifier) {
                     onClick = {
                         scope.launch {
                             if (UiState.currentGraph.value != item) {
-                                Navigator.navigate(destination = item.destination)
                                 UiState.currentGraph.value = item
                                 selectedDestination = index
                             }
+                            Navigator.navigate(destination = item.destination, popUpToStart = true)
                         }
                     },
                     isSelected = selectedDestination == index,

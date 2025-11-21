@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.helpers.Navigator
-import com.example.vibramobile.ui.Destination
+import com.example.vibramobile.Destination
 import com.example.vibramobile.ui.screens.login.FormButton
 import kotlinx.coroutines.launch
 

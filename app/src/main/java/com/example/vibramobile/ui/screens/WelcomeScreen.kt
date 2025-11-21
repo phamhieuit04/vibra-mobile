@@ -1,6 +1,7 @@
 package com.example.vibramobile.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,16 +26,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.R
 import com.example.vibramobile.helpers.Navigator
-import com.example.vibramobile.ui.Destination
 import kotlinx.coroutines.launch
 
 @Composable
-fun WelcomeScreen(modifier: Modifier = Modifier) {
-    val scope = rememberCoroutineScope()
-
+fun WelcomeScreen(
+    onNavigateToSignUpScreen: () -> Unit,
+    onNavigateToLogInScreen: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(color = Color.Black)
             .padding(32.dp),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -74,7 +77,7 @@ fun WelcomeScreen(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(
-                onClick = { scope.launch { Navigator.navigate(destination = Destination.SignUpScreen) } },
+                onClick = { onNavigateToSignUpScreen() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -84,7 +87,7 @@ fun WelcomeScreen(modifier: Modifier = Modifier) {
             }
             Spacer(Modifier.height(12.dp))
             OutlinedButton(
-                onClick = { scope.launch { Navigator.navigate(destination = Destination.LoginScreen) } },
+                onClick = { onNavigateToLogInScreen() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -92,6 +95,7 @@ fun WelcomeScreen(modifier: Modifier = Modifier) {
                 Text(text = "Log in", color = Color.White, fontSize = 16.sp)
             }
         }
+        Spacer(Modifier.height(32.dp))
     }
 }
 
