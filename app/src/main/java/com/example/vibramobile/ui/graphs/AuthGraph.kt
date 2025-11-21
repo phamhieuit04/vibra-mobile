@@ -30,14 +30,47 @@ fun NavGraphBuilder.authGraph(navController: NavController) {
                             inclusive = true
                         }
                     }
-                }
+                },
+                onNavigateToSignUpScreen = {
+                    val popped = navController.popBackStack(
+                        route = Destination.SignUpScreen,
+                        inclusive = false
+                    )
+                    if (!popped) navController.navigate(route = Destination.SignUpScreen) {
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateUp = { navController.navigateUp() }
             )
         }
         composable<Destination.SignUpScreen> {
-            SignUpScreen()
+            SignUpScreen(
+                onNavigateToLogInScreen = {
+                    val popped = navController.popBackStack(
+                        route = Destination.LoginScreen,
+                        inclusive = false
+                    )
+                    if (!popped) navController.navigate(route = Destination.LoginScreen) {
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToSignUpPasswordScreen = {
+                    navController.navigate(Destination.SignUpPasswordScreen)
+                },
+                onNavigateUp = { navController.navigateUp() }
+            )
         }
         composable<Destination.SignUpPasswordScreen> {
-            SignUpPasswordScreen()
+            SignUpPasswordScreen(
+                onNavigateToLogInScreen = {
+                    navController.navigate(Destination.LoginScreen) {
+                        popUpTo(Destination.SignUpPasswordScreen) {
+                            inclusive = true
+                        }
+                    }
+                },
+                onNavigateUp = { navController.navigateUp() }
+            )
         }
     }
 }

@@ -35,16 +35,18 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpPasswordScreen(modifier: Modifier = Modifier) {
-    val scope = rememberCoroutineScope()
-
+fun SignUpPasswordScreen(
+    modifier: Modifier = Modifier,
+    onNavigateToLogInScreen: () -> Unit,
+    onNavigateUp: () -> Unit
+) {
     Scaffold(
         containerColor = Color.Black,
         topBar = {
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = { scope.launch { Navigator.navigateUp() } }) {
+                    IconButton(onClick = { onNavigateUp() }) {
                         Icon(
                             contentDescription = "",
                             imageVector = Icons.Default.ArrowBackIosNew,
@@ -76,23 +78,9 @@ fun SignUpPasswordScreen(modifier: Modifier = Modifier) {
                 fontWeight = FontWeight.Bold
             )
             FormPasswordField(placeholder = "********")
-            FormButton(onClick = {
-                scope.launch {
-                    Navigator.navigate(destination = Destination.LoginScreen) {
-                        popUpTo(Destination.SignUpPasswordScreen) {
-                            inclusive = true
-                        }
-                    }
-                }
-            }, text = "Log in")
+            FormButton(onClick = { onNavigateToLogInScreen() }, text = "Log in")
         }
     }
-}
-
-@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
-@Composable
-fun Preview(modifier: Modifier = Modifier) {
-    SignUpPasswordScreen()
 }
 
 @Composable

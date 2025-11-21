@@ -64,11 +64,11 @@ object LoginStep {
 @Composable
 fun LoginScreen(
     onNavigateToMainScreen: () -> Unit,
+    onNavigateToSignUpScreen: () -> Unit,
+    onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel = hiltViewModel<AuthViewModel>()
 ) {
-    val scope = rememberCoroutineScope()
-
     LaunchedEffect(UserState.isLoggedIn.value) {
         if (UserState.isLoggedIn.value) onNavigateToMainScreen()
     }
@@ -79,7 +79,7 @@ fun LoginScreen(
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = { scope.launch { Navigator.navigateUp() } }) {
+                    IconButton(onClick = { onNavigateUp() }) {
                         Icon(
                             contentDescription = "",
                             imageVector = Icons.Default.ArrowBackIosNew,
@@ -97,14 +97,7 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "Don't have an account?", color = Color.White, fontSize = 16.sp)
-                TextButton(onClick = {
-                    scope.launch {
-                        Navigator.popBackStack(
-                            destination = Destination.SignUpScreen,
-                            inclusive = false
-                        )
-                    }
-                }) {
+                TextButton(onClick = { onNavigateToSignUpScreen() }) {
                     Text(
                         text = "Sign up",
                         color = Color.White,

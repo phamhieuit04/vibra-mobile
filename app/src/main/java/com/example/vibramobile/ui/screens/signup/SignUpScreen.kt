@@ -40,16 +40,19 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpScreen(modifier: Modifier = Modifier) {
-    val scope = rememberCoroutineScope()
-
+fun SignUpScreen(
+    modifier: Modifier = Modifier,
+    onNavigateToLogInScreen: () -> Unit,
+    onNavigateToSignUpPasswordScreen: () -> Unit,
+    onNavigateUp: () -> Unit
+) {
     Scaffold(
         containerColor = Color.Black,
         topBar = {
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = { scope.launch { Navigator.navigateUp() } }) {
+                    IconButton(onClick = { onNavigateUp() }) {
                         Icon(
                             contentDescription = "",
                             imageVector = Icons.Default.ArrowBackIosNew,
@@ -67,14 +70,7 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "Already have an account?", color = Color.White, fontSize = 16.sp)
-                TextButton(onClick = {
-                    scope.launch {
-                        Navigator.popBackStack(
-                            destination = Destination.LoginScreen,
-                            inclusive = false
-                        )
-                    }
-                }) {
+                TextButton(onClick = { onNavigateToLogInScreen() }) {
                     Text(
                         text = "Log in",
                         color = Color.White,
@@ -133,7 +129,7 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                     placeholder = "What's your email?",
                 )
                 FormButton(
-                    onClick = { scope.launch { Navigator.navigate(destination = Destination.SignUpPasswordScreen) } },
+                    onClick = { onNavigateToSignUpPasswordScreen() },
                     text = "Continue"
                 )
                 Text(
