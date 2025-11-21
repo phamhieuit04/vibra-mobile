@@ -52,10 +52,10 @@ class HomeViewModel @Inject constructor(
 
     suspend fun getRecommendedSongs() {
         runCatching {
+            SongState.recommendedSongs.clear()
             val response: Response<List<Song>> = client.get("home/get-recommended-songs") {
                 bearerAuth(accessToken)
             }.body()
-            SongState.recommendedSongs.clear()
             SongState.recommendedSongs.addAll(response.data)
         }.onFailure { exception ->
             Log.e("MyApp", exception.toString())
@@ -64,11 +64,11 @@ class HomeViewModel @Inject constructor(
 
     suspend fun getRecentRotationSongs() {
         runCatching {
+            SongState.recentRotationSongs.clear()
             val response: Response<List<Song>> = client.get("home/recent-rotation") {
                 bearerAuth(accessToken)
                 parameter(key = "limit", value = 4)
             }.body()
-            SongState.recentRotationSongs.clear()
             SongState.recentRotationSongs.addAll(response.data)
         }.onFailure { exception ->
             Log.e("MyApp", exception.toString())

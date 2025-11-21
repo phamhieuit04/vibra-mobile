@@ -27,7 +27,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +46,8 @@ import com.example.vibramobile.models.Playlist
 import com.example.vibramobile.models.Song
 import com.example.vibramobile.models.User
 import com.example.vibramobile.states.SongState
+import com.example.vibramobile.ui.components.ListSongComponent
+import com.example.vibramobile.ui.components.ListSongSkeleton
 import com.example.vibramobile.ui.components.RecentRotationSongsComponent
 import com.example.vibramobile.ui.components.RecentRotationSongsSkeleton
 import com.example.vibramobile.ui.components.SkeletonComponent
@@ -265,27 +266,29 @@ fun HomeScreen(
 
                 SkeletonComponent(
                     isLoading = SongState.recentRotationSongs.isEmpty(),
-                    skeletonContent = { RecentRotationSongsSkeleton() },
-                    content = {
-                        RecentRotationSongsComponent(
-                            onPlay = { viewModel.playSong(song = it) },
-                            songs = SongState.recentRotationSongs
-                        )
-                    }
-                )
+                    skeletonContent = { RecentRotationSongsSkeleton() }
+                ) {
+                    RecentRotationSongsComponent(
+                        onPlay = { viewModel.playSong(song = it) },
+                        songs = SongState.recentRotationSongs
+                    )
+                }
             }
 
             item {
-                if (!SongState.recommendedSongs.isEmpty()) {
-                    Spacer(Modifier.height(10.dp))
-                    SectionTitle(text = "Phù hợp với bạn")
+                Spacer(Modifier.height(10.dp))
+                SectionTitle(text = "Phù hợp với bạn")
+                Spacer(Modifier.height(16.dp))
 
-                    Spacer(Modifier.height(16.dp))
-                    SongSection(
+                SkeletonComponent(
+                    isLoading = SongState.recommendedSongs.isEmpty(),
+                    skeletonContent = { ListSongSkeleton() }) {
+                    ListSongComponent(
                         onPlay = { viewModel.playSong(song = it) },
                         songs = SongState.recommendedSongs
                     )
                 }
+                Spacer(Modifier.height(16.dp))
             }
 
             item {
@@ -334,56 +337,6 @@ fun SectionTitle(modifier: Modifier = Modifier, text: String) {
         fontWeight = FontWeight.Bold,
         fontSize = 26.sp
     )
-}
-
-@Composable
-fun SongSection(onPlay: (Song) -> Unit, modifier: Modifier = Modifier, songs: List<Song>) {
-    LazyRow() {
-        itemsIndexed(songs, key = { index, song -> song.id!! }) { index, song ->
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .noRippleClickable(onClick = { onPlay(song) }),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                AsyncImage(
-                    modifier = Modifier
-                        .size(140.dp)
-                        .clip(
-                            shape = CircleShape
-                        ),
-                    model = song.thumbnail_path?.encodeURLPath(),
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column() {
-                        Text(text = song.name.toString(), color = Color.White, fontSize = 16.sp)
-                        Spacer(Modifier.height(2.dp))
-                        Text(
-                            text = song.author?.name.toString(),
-                            color = Color.LightGray.copy(alpha = 0.8f),
-                            fontSize = 12.sp
-                        )
-                    }
-                    IconButton(onClick = {}) {
-                        Icon(
-                            modifier = Modifier.size(20.dp),
-                            imageVector = Icons.Default.MoreHoriz,
-                            contentDescription = "",
-                            tint = Color.LightGray.copy(alpha = 0.8f)
-                        )
-                    }
-                }
-            }
-            Spacer(Modifier.width(16.dp))
-        }
-    }
 }
 
 @Composable
