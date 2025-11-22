@@ -68,6 +68,11 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 homeGraph()
                 searchGraph()
             }
+            SongDetailScreen(
+                isVisible = UiState.displaySongDetail.value,
+                onVisibleChange = { value ->
+                    UiState.displaySongDetail.value = value
+                })
             if (UiState.displayMediaPlayer.value)
                 AppMediaPlayer(modifier = Modifier.align(alignment = Alignment.BottomCenter))
         }

@@ -38,6 +38,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import coil3.compose.AsyncImage
 import com.example.vibramobile.states.SongState
+import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.screens.noRippleClickable
 import io.ktor.http.encodeURLPath
 import kotlinx.coroutines.delay
@@ -113,7 +114,7 @@ fun AppMediaPlayer(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .noRippleClickable(onClick = {})
+            .noRippleClickable(onClick = { UiState.displaySongDetail.value = true })
             .padding(8.dp)
             .clip(shape = RoundedCornerShape(8.dp))
             .background(color = Color(0xff79300f))
