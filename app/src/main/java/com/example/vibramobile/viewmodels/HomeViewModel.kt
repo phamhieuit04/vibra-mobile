@@ -21,6 +21,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.encodeURLPath
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,11 +32,7 @@ class HomeViewModel @Inject constructor(
     private val accessToken: String = UserState.currentUser?.token.toString()
 
     init {
-        viewModelScope.launch {
-            getCategories()
-            getRecommendedSongs()
-            getRecentRotationSongs()
-        }
+        viewModelScope.launch { fetchAll() }
     }
 
     fun playSong(song: Song? = null) {
@@ -53,6 +50,12 @@ class HomeViewModel @Inject constructor(
         } else {
             MediaPlayer.playOrPause()
         }
+    }
+
+    suspend fun fetchAll() {
+        getCategories()
+        getRecommendedSongs()
+        getRecentRotationSongs()
     }
 
     suspend fun getRecommendedSongs() {

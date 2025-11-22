@@ -41,6 +41,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import coil3.compose.AsyncImage
 import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UiState
+import com.example.vibramobile.ui.screens.home.noRippleClickable
 import io.ktor.http.encodeURLPath
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -98,7 +99,7 @@ object MediaPlayer {
     }
 
     fun getProgress(): Float {
-        return player.contentPosition / player.duration.toFloat()
+        return player.contentPosition / player.contentDuration.toFloat()
     }
 }
 
@@ -109,7 +110,6 @@ fun AppMediaPlayer(modifier: Modifier = Modifier) {
     LaunchedEffect(MediaPlayer.isPlaying.value) {
         while (MediaPlayer.isPlaying.value) {
             progress = MediaPlayer.getProgress()
-            Log.i("myapp", progress.toString())
             delay(1000)
         }
     }
@@ -117,6 +117,7 @@ fun AppMediaPlayer(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .noRippleClickable(onClick = {})
             .padding(8.dp)
             .clip(shape = RoundedCornerShape(8.dp))
             .background(color = Color(0xff79300f))
