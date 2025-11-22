@@ -40,13 +40,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.Destination
 import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.states.UiState
-import com.example.vibramobile.ui.screens.home.HomeScreen
 import kotlinx.coroutines.launch
 
 enum class NavDestination(

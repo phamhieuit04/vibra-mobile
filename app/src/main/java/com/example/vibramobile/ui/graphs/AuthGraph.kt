@@ -6,9 +6,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.vibramobile.Destination
 import com.example.vibramobile.ui.screens.WelcomeScreen
-import com.example.vibramobile.ui.screens.login.LoginScreen
-import com.example.vibramobile.ui.screens.signup.SignUpPasswordScreen
-import com.example.vibramobile.ui.screens.signup.SignUpScreen
+import com.example.vibramobile.ui.screens.LoginScreen
+import com.example.vibramobile.ui.screens.SignUpPasswordScreen
+import com.example.vibramobile.ui.screens.SignUpScreen
 
 fun NavGraphBuilder.authGraph(navController: NavController) {
     navigation<Destination.AuthGraph>(startDestination = Destination.WelcomeScreen) {

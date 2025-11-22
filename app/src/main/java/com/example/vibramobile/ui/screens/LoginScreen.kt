@@ -1,4 +1,4 @@
-package com.example.vibramobile.ui.screens.login
+package com.example.vibramobile.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +28,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -45,11 +44,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.vibramobile.R
-import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.states.UserState
-import com.example.vibramobile.Destination
 import com.example.vibramobile.viewmodels.AuthViewModel
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 object LoginStep {

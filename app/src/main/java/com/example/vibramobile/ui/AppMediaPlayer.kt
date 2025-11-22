@@ -1,7 +1,6 @@
 package com.example.vibramobile.ui
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,11 +38,9 @@ import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import coil3.compose.AsyncImage
 import com.example.vibramobile.states.SongState
-import com.example.vibramobile.states.UiState
-import com.example.vibramobile.ui.screens.home.noRippleClickable
+import com.example.vibramobile.ui.screens.noRippleClickable
 import io.ktor.http.encodeURLPath
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 object MediaPlayer {
     private lateinit var player: ExoPlayer

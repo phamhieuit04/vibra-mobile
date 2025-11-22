@@ -1,4 +1,4 @@
-package com.example.vibramobile.ui.screens.signup
+package com.example.vibramobile.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +19,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -31,12 +30,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.R
-import com.example.vibramobile.helpers.Navigator
-import com.example.vibramobile.Destination
-import com.example.vibramobile.ui.screens.login.FormButton
-import com.example.vibramobile.ui.screens.login.FormInput
-import com.example.vibramobile.ui.screens.login.SocialMethod
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -1,4 +1,4 @@
-package com.example.vibramobile.ui.screens.home
+package com.example.vibramobile.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -47,7 +47,6 @@ import com.example.vibramobile.ui.components.RecentRotationSongsComponent
 import com.example.vibramobile.ui.components.RecentRotationSongsSkeleton
 import com.example.vibramobile.ui.components.SkeletonComponent
 import com.example.vibramobile.viewmodels.HomeViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 val albums = listOf(

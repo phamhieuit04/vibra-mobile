@@ -1,4 +1,4 @@
-package com.example.vibramobile.ui.screens.search
+package com.example.vibramobile.ui.screens
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

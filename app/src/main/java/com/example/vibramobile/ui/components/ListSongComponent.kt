@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.example.vibramobile.models.Song
-import com.example.vibramobile.ui.screens.home.noRippleClickable
+import com.example.vibramobile.ui.screens.noRippleClickable
 import io.ktor.http.encodeURLPath
 
 @Composable
