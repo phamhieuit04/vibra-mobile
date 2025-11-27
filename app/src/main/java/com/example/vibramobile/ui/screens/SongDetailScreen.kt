@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.Loop
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.PauseCircleFilled
@@ -158,13 +159,26 @@ fun SongDetailScreen(
                                 fontSize = 15.sp
                             )
                         }
-                        IconButton(onClick = {}) {
-                            Icon(
-                                modifier = Modifier.size(28.dp),
-                                contentDescription = "",
-                                imageVector = Icons.Default.FavoriteBorder,
-                                tint = Color.White
-                            )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            IconButton(onClick = {}) {
+                                Icon(
+                                    modifier = Modifier.size(28.dp),
+                                    contentDescription = "",
+                                    imageVector = Icons.Default.AddCircle,
+                                    tint = Color.White
+                                )
+                            }
+                            IconButton(onClick = {}) {
+                                Icon(
+                                    modifier = Modifier.size(28.dp),
+                                    contentDescription = "",
+                                    imageVector = Icons.Default.FavoriteBorder,
+                                    tint = Color.White
+                                )
+                            }
                         }
                     }
 
@@ -277,11 +291,11 @@ fun SongDetailScreen(
                                 tint = Color.White
                             )
                         }
-                        IconButton(onClick = {}) {
+                        IconButton(onClick = { UiState.displayQueuePlaylist.value = true }) {
                             Icon(
                                 modifier = Modifier.size(28.dp),
                                 contentDescription = "",
-                                imageVector = Icons.Default.AddCircle,
+                                imageVector = Icons.Default.LibraryMusic,
                                 tint = Color.White
                             )
                         }
@@ -300,10 +314,14 @@ fun SongDetailScreen(
             }
         }
     }
+
+    QueuePlaylistScreen(isVisible = UiState.displayQueuePlaylist.value, onVisibleChange = { value ->
+        UiState.displayQueuePlaylist.value = value
+    })
 }
 
-@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
-@Composable
-fun Preview(modifier: Modifier = Modifier) {
-    SongDetailScreen(isVisible = true, onVisibleChange = {})
-}
+//@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
+//@Composable
+//fun Preview(modifier: Modifier = Modifier) {
+//    SongDetailScreen(isVisible = true, onVisibleChange = {})
+//}
