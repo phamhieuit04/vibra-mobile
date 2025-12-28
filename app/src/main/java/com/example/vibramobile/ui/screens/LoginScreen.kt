@@ -67,6 +67,7 @@ fun LoginScreen(
     viewModel: AuthViewModel = hiltViewModel<AuthViewModel>()
 ) {
     LaunchedEffect(Unit) {
+        UiState.setDisplayMediaPlayer(false)
         UiState.setDisplayNavigationBar(false)
     }
 

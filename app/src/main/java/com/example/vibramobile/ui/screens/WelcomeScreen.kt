@@ -34,6 +34,7 @@ fun WelcomeScreen(
     modifier: Modifier = Modifier
 ) {
     LaunchedEffect(Unit) {
+        UiState.setDisplayMediaPlayer(false)
         UiState.setDisplayNavigationBar(false)
     }
 

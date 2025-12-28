@@ -43,6 +43,7 @@ fun SignUpScreen(
     onNavigateUp: () -> Unit
 ) {
     LaunchedEffect(Unit) {
+        UiState.setDisplayMediaPlayer(false)
         UiState.setDisplayNavigationBar(false)
     }
 

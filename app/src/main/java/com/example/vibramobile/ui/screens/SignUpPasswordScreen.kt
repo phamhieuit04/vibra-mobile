@@ -38,6 +38,7 @@ fun SignUpPasswordScreen(
     onNavigateUp: () -> Unit
 ) {
     LaunchedEffect(Unit) {
+        UiState.setDisplayMediaPlayer(false)
         UiState.setDisplayNavigationBar(false)
     }
 

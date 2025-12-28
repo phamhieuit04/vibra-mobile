@@ -2,7 +2,6 @@ package com.example.vibramobile
 
 import android.app.Application
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -22,7 +21,7 @@ import com.example.vibramobile.ui.AppNavigationBar
 import com.example.vibramobile.ui.graphs.authGraph
 import com.example.vibramobile.ui.graphs.homeGraph
 import com.example.vibramobile.ui.graphs.searchGraph
-import com.example.vibramobile.ui.screens.SongDetailScreen
+import com.example.vibramobile.ui.screens.FullscreenPlayer
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.serialization.Serializable
 
@@ -95,10 +94,7 @@ fun AppScreen(modifier: Modifier = Modifier) {
     Scaffold(
         containerColor = Color.Black,
         bottomBar = {
-            Column() {
-                AppMediaPlayer(isVisible = UiState.getDisplayMediaPlayer())
-                AppNavigationBar(isVisible = UiState.getDisplayNavigationBar())
-            }
+            AppNavigationBar(isVisible = UiState.getDisplayNavigationBar())
         }
     ) { padding ->
         Box(
@@ -116,11 +112,16 @@ fun AppScreen(modifier: Modifier = Modifier) {
                 searchGraph()
             }
 
-            SongDetailScreen(
+            FullscreenPlayer(
                 isVisible = UiState.getDisplaySongDetail(),
                 onVisibleChange = { value ->
                     UiState.setDisplaySongDetail(value)
                 })
+
+            AppMediaPlayer(
+                modifier = Modifier.align(alignment = Alignment.BottomEnd),
+                isVisible = UiState.getDisplayMediaPlayer()
+            )
         }
     }
 }
