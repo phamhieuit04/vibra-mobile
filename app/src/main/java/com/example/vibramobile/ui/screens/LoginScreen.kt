@@ -27,6 +27,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +45,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.vibramobile.R
-import com.example.vibramobile.states.UserState
+import com.example.vibramobile.states.UiState
 import com.example.vibramobile.viewmodels.AuthViewModel
 import kotlinx.serialization.Serializable
 
@@ -65,8 +66,8 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel = hiltViewModel<AuthViewModel>()
 ) {
-    LaunchedEffect(UserState.isLoggedIn.value) {
-        if (UserState.isLoggedIn.value) onNavigateToMainScreen()
+    LaunchedEffect(Unit) {
+        UiState.setDisplayNavigationBar(false)
     }
 
     Scaffold(

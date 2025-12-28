@@ -29,7 +29,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val client: HttpClient
 ) : ViewModel() {
-    private val accessToken: String = UserState.currentUser?.token.toString()
+    private val accessToken: String = UserState.getCurrentUser()?.token.toString()
 
     init {
         viewModelScope.launch { fetchAll() }
@@ -38,7 +38,7 @@ class HomeViewModel @Inject constructor(
     fun playSong(song: Song? = null) {
         if (song == null) return
 
-        UiState.displayMediaPlayer.value = true
+        UiState.setDisplayMediaPlayer(true)
         if (SongState.currentSong.value?.id != song.id) {
             SongState.currentSong.value = song
 

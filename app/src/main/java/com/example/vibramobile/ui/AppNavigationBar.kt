@@ -71,38 +71,43 @@ enum class NavDestination(
 }
 
 @Composable
-fun AppNavigationBar(modifier: Modifier = Modifier) {
+fun AppNavigationBar(modifier: Modifier = Modifier, isVisible: Boolean) {
     var selectedDestination by rememberSaveable { mutableIntStateOf(NavDestination.HOME.ordinal) }
     val scope = rememberCoroutineScope()
 
-    NavigationBar(
-        containerColor = Color.Black,
-        windowInsets = NavigationBarDefaults.windowInsets
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+    if (isVisible) {
+        NavigationBar(
+            containerColor = Color.Black,
+            windowInsets = NavigationBarDefaults.windowInsets
         ) {
-            NavDestination.entries.forEachIndexed { index, item ->
-                AppNavigationBarItem(
-                    onClick = {
-                        scope.launch {
-                            if (UiState.currentGraph.value != item) {
-                                UiState.currentGraph.value = item
-                                selectedDestination = index
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                NavDestination.entries.forEachIndexed { index, item ->
+                    AppNavigationBarItem(
+                        onClick = {
+                            scope.launch {
+                                if (UiState.getCurrentGraph() != item) {
+                                    UiState.setCurrentGraph(item)
+                                    selectedDestination = index
+                                }
+                                Navigator.navigate(
+                                    destination = item.destination,
+                                    popUpToStart = true
+                                )
                             }
-                            Navigator.navigate(destination = item.destination, popUpToStart = true)
-                        }
-                    },
-                    isSelected = selectedDestination == index,
-                    icon = item.icon,
-                    iconColor = Color.White,
-                    selectedIcon = item.selectedIcon,
-                    label = item.label,
-                    labelColor = Color.White,
-                )
+                        },
+                        isSelected = selectedDestination == index,
+                        icon = item.icon,
+                        iconColor = Color.White,
+                        selectedIcon = item.selectedIcon,
+                        label = item.label,
+                        labelColor = Color.White,
+                    )
+                }
             }
         }
     }

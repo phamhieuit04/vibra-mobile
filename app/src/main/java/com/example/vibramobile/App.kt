@@ -1,19 +1,28 @@
 package com.example.vibramobile
 
 import android.app.Application
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.vibramobile.helpers.NavigationAction
+import com.example.vibramobile.helpers.Navigator
+import com.example.vibramobile.helpers.ObserverAsEvents
+import com.example.vibramobile.states.UiState
+import com.example.vibramobile.ui.AppMediaPlayer
+import com.example.vibramobile.ui.AppNavigationBar
 import com.example.vibramobile.ui.graphs.authGraph
-import com.example.vibramobile.ui.screens.MainScreen
+import com.example.vibramobile.ui.graphs.homeGraph
+import com.example.vibramobile.ui.graphs.searchGraph
+import com.example.vibramobile.ui.screens.SongDetailScreen
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.serialization.Serializable
 
@@ -50,22 +59,68 @@ sealed interface Destination {
 }
 
 @HiltAndroidApp
-class App : Application() {}
+class App : Application()
 
 @Composable
 fun AppScreen(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
 
-    Scaffold() { padding ->
-        NavHost(
+    ObserverAsEvents(Navigator.channel) { action ->
+        when (action) {
+            is NavigationAction.Navigate -> {
+                navController.navigate(route = action.destination) {
+                    action.navOptions(this)
+                    if (action.popUpToStart) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            }
+
+            is NavigationAction.NavigateUp -> navController.navigateUp()
+            is NavigationAction.PopBackStack -> {
+                if (!navController.popBackStack(action.destination, action.inclusive)) {
+                    navController.navigate(action.destination) {
+                        launchSingleTop = true
+                    }
+                }
+            }
+        }
+    }
+
+    Scaffold(
+        containerColor = Color.Black,
+        bottomBar = {
+            Column() {
+                AppMediaPlayer(isVisible = UiState.getDisplayMediaPlayer())
+                AppNavigationBar(isVisible = UiState.getDisplayNavigationBar())
+            }
+        }
+    ) { padding ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = padding.calculateTopPadding()),
-            navController = navController,
-            startDestination = Destination.AuthGraph
+                .padding(padding)
         ) {
-            authGraph(navController = navController)
-            composable<Destination.MainScreen> { MainScreen() }
+            NavHost(
+                modifier = Modifier.fillMaxSize(),
+                navController = navController,
+                startDestination = Destination.AuthGraph
+            ) {
+                authGraph(navController = navController)
+                homeGraph()
+                searchGraph()
+            }
+
+            SongDetailScreen(
+                isVisible = UiState.getDisplaySongDetail(),
+                onVisibleChange = { value ->
+                    UiState.setDisplaySongDetail(value)
+                })
         }
     }
 }

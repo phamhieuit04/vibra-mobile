@@ -291,7 +291,7 @@ fun SongDetailScreen(
                                 tint = Color.White
                             )
                         }
-                        IconButton(onClick = { UiState.displayQueuePlaylist.value = true }) {
+                        IconButton(onClick = { UiState.setDisplayQueuePlaylist(true) }) {
                             Icon(
                                 modifier = Modifier.size(28.dp),
                                 contentDescription = "",
@@ -315,8 +315,8 @@ fun SongDetailScreen(
         }
     }
 
-    QueuePlaylistScreen(isVisible = UiState.displayQueuePlaylist.value, onVisibleChange = { value ->
-        UiState.displayQueuePlaylist.value = value
+    QueuePlaylistScreen(isVisible = UiState.getDisplayQueuePlaylist(), onVisibleChange = { value ->
+        UiState.setDisplayQueuePlaylist(value)
     })
 }
 

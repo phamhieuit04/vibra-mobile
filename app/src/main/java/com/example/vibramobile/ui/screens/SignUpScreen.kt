@@ -19,6 +19,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -30,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.R
+import com.example.vibramobile.states.UiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,6 +42,10 @@ fun SignUpScreen(
     onNavigateToSignUpPasswordScreen: () -> Unit,
     onNavigateUp: () -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        UiState.setDisplayNavigationBar(false)
+    }
+
     Scaffold(
         containerColor = Color.Black,
         topBar = {
@@ -74,10 +81,9 @@ fun SignUpScreen(
                 Spacer(Modifier.height(32.dp))
             }
         }
-    ) { paddingValues ->
+    ) { padding ->
         Column(
             modifier = Modifier
-                .padding(paddingValues = paddingValues)
                 .fillMaxSize()
                 .padding(32.dp),
             verticalArrangement = Arrangement.Center,

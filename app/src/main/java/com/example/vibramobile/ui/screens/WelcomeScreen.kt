@@ -14,7 +14,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -25,8 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.R
-import com.example.vibramobile.helpers.Navigator
-import kotlinx.coroutines.launch
+import com.example.vibramobile.states.UiState
 
 @Composable
 fun WelcomeScreen(
@@ -34,6 +33,10 @@ fun WelcomeScreen(
     onNavigateToLogInScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    LaunchedEffect(Unit) {
+        UiState.setDisplayNavigationBar(false)
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
