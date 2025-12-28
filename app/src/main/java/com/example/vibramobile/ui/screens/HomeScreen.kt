@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +42,7 @@ import com.example.vibramobile.models.Playlist
 import com.example.vibramobile.models.User
 import com.example.vibramobile.states.CategoryState
 import com.example.vibramobile.states.SongState
+import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.components.ListSongComponent
 import com.example.vibramobile.ui.components.ListSongSkeleton
 import com.example.vibramobile.ui.components.RecentRotationSongsComponent
@@ -184,6 +186,10 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
 ) {
+    LaunchedEffect(Unit) {
+        UiState.setDisplayNavigationBar(true)
+    }
+
     val scope = rememberCoroutineScope()
     var refreshing by remember { mutableStateOf(false) }
 

@@ -101,7 +101,7 @@ object MediaPlayer {
 }
 
 @Composable
-fun AppMediaPlayer(modifier: Modifier = Modifier) {
+fun AppMediaPlayer(modifier: Modifier = Modifier, isVisible: Boolean) {
     var progress by remember { mutableStateOf(0f) }
 
     LaunchedEffect(MediaPlayer.isPlaying.value) {
@@ -110,100 +110,101 @@ fun AppMediaPlayer(modifier: Modifier = Modifier) {
             delay(1000)
         }
     }
-
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .noRippleClickable(onClick = { UiState.displaySongDetail.value = true })
-            .padding(8.dp)
-            .clip(shape = RoundedCornerShape(8.dp))
-            .background(color = Color(0xff79300f))
-            .padding(start = 8.dp, end = 8.dp, top = 8.dp),
-    ) {
-        Row(
-            modifier = Modifier
+    if (isVisible) {
+        Box(
+            modifier = modifier
                 .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .noRippleClickable(onClick = { UiState.setDisplaySongDetail(true) })
+                .padding(8.dp)
+                .clip(shape = RoundedCornerShape(8.dp))
+                .background(color = Color(0xff79300f))
+                .padding(start = 8.dp, end = 8.dp, top = 8.dp),
         ) {
             Row(
-                modifier = Modifier.padding(start = 2.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AsyncImage(
-                    modifier = Modifier
-                        .size(42.dp)
-                        .clip(shape = RoundedCornerShape(4.dp)),
-                    contentDescription = "",
-                    model = SongState.currentSong.value?.thumbnail_path?.encodeURLPath()
-                )
-                Spacer(Modifier.width(8.dp))
-                Column() {
-                    Text(
-                        text = SongState.currentSong.value?.name.toString(),
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        lineHeight = 12.sp
-                    )
-                    Spacer(Modifier.height(2.dp))
-                    Text(
-                        text = SongState.currentSong.value?.author?.name.toString(),
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 10.sp,
-                        lineHeight = 10.sp
-                    )
-                }
-            }
-            Row() {
-                IconButton(onClick = {}) {
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
+                Row(
+                    modifier = Modifier.padding(start = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    AsyncImage(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(shape = RoundedCornerShape(4.dp)),
                         contentDescription = "",
-                        tint = Color.White
+                        model = SongState.currentSong.value?.thumbnail_path?.encodeURLPath()
                     )
+                    Spacer(Modifier.width(8.dp))
+                    Column() {
+                        Text(
+                            text = SongState.currentSong.value?.name.toString(),
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            lineHeight = 12.sp
+                        )
+                        Spacer(Modifier.height(2.dp))
+                        Text(
+                            text = SongState.currentSong.value?.author?.name.toString(),
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 10.sp,
+                            lineHeight = 10.sp
+                        )
+                    }
                 }
-                IconButton(onClick = { MediaPlayer.playOrPause() }) {
-                    if (MediaPlayer.isPlaying.value)
+                Row() {
+                    IconButton(onClick = {}) {
                         Icon(
-                            modifier = Modifier.size(32.dp),
-                            imageVector = Icons.Default.Pause,
+                            imageVector = Icons.Default.Favorite,
                             contentDescription = "",
                             tint = Color.White
                         )
-                    else
-                        Icon(
-                            modifier = Modifier.size(32.dp),
-                            imageVector = Icons.Default.PlayArrow,
-                            contentDescription = "",
-                            tint = Color.White
-                        )
+                    }
+                    IconButton(onClick = { MediaPlayer.playOrPause() }) {
+                        if (MediaPlayer.isPlaying.value)
+                            Icon(
+                                modifier = Modifier.size(32.dp),
+                                imageVector = Icons.Default.Pause,
+                                contentDescription = "",
+                                tint = Color.White
+                            )
+                        else
+                            Icon(
+                                modifier = Modifier.size(32.dp),
+                                imageVector = Icons.Default.PlayArrow,
+                                contentDescription = "",
+                                tint = Color.White
+                            )
+                    }
                 }
             }
-        }
-        Box(
-            modifier = Modifier
-                .height(2.dp)
-                .padding(horizontal = 2.dp)
-                .fillMaxWidth()
-                .clip(shape = RoundedCornerShape(8.dp))
-                .background(color = Color.Gray)
-                .align(alignment = Alignment.BottomCenter)
-        ) {
             Box(
                 modifier = Modifier
                     .height(2.dp)
-                    .fillMaxWidth(progress)
+                    .padding(horizontal = 2.dp)
+                    .fillMaxWidth()
                     .clip(shape = RoundedCornerShape(8.dp))
-                    .background(color = Color.White)
-            )
+                    .background(color = Color.Gray)
+                    .align(alignment = Alignment.BottomCenter)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .height(2.dp)
+                        .fillMaxWidth(progress)
+                        .clip(shape = RoundedCornerShape(8.dp))
+                        .background(color = Color.White)
+                )
+            }
         }
     }
 }
 
-@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
-@Composable
-fun Preview(modifier: Modifier = Modifier) {
-    AppMediaPlayer()
-}
+//@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
+//@Composable
+//fun Preview(modifier: Modifier = Modifier) {
+//    AppMediaPlayer()
+//}
