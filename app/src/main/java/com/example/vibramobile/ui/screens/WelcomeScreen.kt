@@ -15,6 +15,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -24,15 +25,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.vibramobile.Destination
 import com.example.vibramobile.R
+import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.states.UiState
+import com.example.vibramobile.viewmodels.AuthViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun WelcomeScreen(
-    onNavigateToSignUpScreen: () -> Unit,
-    onNavigateToLogInScreen: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun WelcomeScreen(modifier: Modifier = Modifier) {
+    val scope = rememberCoroutineScope()
+
     LaunchedEffect(Unit) {
         UiState.setDisplayMediaPlayer(false)
         UiState.setDisplayNavigationBar(false)
@@ -81,7 +85,7 @@ fun WelcomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(
-                onClick = { onNavigateToSignUpScreen() },
+                onClick = { scope.launch { Navigator.navigate(Destination.SignUpScreen) } },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -91,7 +95,7 @@ fun WelcomeScreen(
             }
             Spacer(Modifier.height(12.dp))
             OutlinedButton(
-                onClick = { onNavigateToLogInScreen() },
+                onClick = { scope.launch { Navigator.navigate(Destination.LoginScreen) } },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -102,9 +106,3 @@ fun WelcomeScreen(
         Spacer(Modifier.height(32.dp))
     }
 }
-
-//@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
-//@Composable
-//fun Preview(modifier: Modifier = Modifier) {
-//    WelcomeScreen(onNavigateToLogin = {}, onNavigateToSignUp = {})
-//}

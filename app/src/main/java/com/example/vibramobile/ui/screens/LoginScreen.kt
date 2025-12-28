@@ -29,6 +29,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -44,9 +45,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.vibramobile.Destination
 import com.example.vibramobile.R
+import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.states.UiState
 import com.example.vibramobile.viewmodels.AuthViewModel
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 object LoginStep {
@@ -60,12 +64,11 @@ object LoginStep {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    onNavigateToMainScreen: () -> Unit,
-    onNavigateToSignUpScreen: () -> Unit,
-    onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel = hiltViewModel<AuthViewModel>()
 ) {
+    val scope = rememberCoroutineScope()
+
     LaunchedEffect(Unit) {
         UiState.setDisplayMediaPlayer(false)
         UiState.setDisplayNavigationBar(false)
@@ -77,7 +80,14 @@ fun LoginScreen(
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = { onNavigateUp() }) {
+                    IconButton(onClick = {
+                        scope.launch {
+                            Navigator.popBackStack(
+                                Destination.WelcomeScreen,
+                                false
+                            )
+                        }
+                    }) {
                         Icon(
                             contentDescription = "",
                             imageVector = Icons.Default.ArrowBackIosNew,
@@ -95,7 +105,14 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "Don't have an account?", color = Color.White, fontSize = 16.sp)
-                TextButton(onClick = { onNavigateToSignUpScreen() }) {
+                TextButton(onClick = {
+                    scope.launch {
+                        Navigator.popBackStack(
+                            Destination.SignUpScreen,
+                            false
+                        )
+                    }
+                }) {
                     Text(
                         text = "Sign up",
                         color = Color.White,

@@ -23,20 +23,22 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.vibramobile.Destination
+import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.states.UiState
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpPasswordScreen(
-    modifier: Modifier = Modifier,
-    onNavigateToLogInScreen: () -> Unit,
-    onNavigateUp: () -> Unit
-) {
+fun SignUpPasswordScreen(modifier: Modifier = Modifier) {
+    val scope = rememberCoroutineScope()
+
     LaunchedEffect(Unit) {
         UiState.setDisplayMediaPlayer(false)
         UiState.setDisplayNavigationBar(false)
@@ -48,7 +50,7 @@ fun SignUpPasswordScreen(
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = { onNavigateUp() }) {
+                    IconButton(onClick = { scope.launch { Navigator.navigateUp() } }) {
                         Icon(
                             contentDescription = "",
                             imageVector = Icons.Default.ArrowBackIosNew,
@@ -59,10 +61,10 @@ fun SignUpPasswordScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
         },
-    ) { paddingValues ->
+    ) { padding ->
         Column(
             modifier = Modifier
-                .padding(paddingValues = paddingValues)
+                .padding(padding)
                 .padding(32.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -80,7 +82,10 @@ fun SignUpPasswordScreen(
                 fontWeight = FontWeight.Bold
             )
             FormPasswordField(placeholder = "********")
-            FormButton(onClick = { onNavigateToLogInScreen() }, text = "Log in")
+            FormButton(
+                onClick = { scope.launch { Navigator.navigate(Destination.LoginScreen) } },
+                text = "Sign up"
+            )
         }
     }
 }
