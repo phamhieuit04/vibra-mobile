@@ -8,7 +8,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 sealed interface NavigationAction {
     data class Navigate(
         val destination: Destination,
-        val popUpToStart: Boolean,
+        val popUpToStart: Boolean = false,
+        val popUpToRoute: Any? = null,
         val navOptions: NavOptionsBuilder.() -> Unit = {}
     ) : NavigationAction
 
@@ -24,6 +25,7 @@ interface NavigatorInterface {
     suspend fun navigate(
         destination: Destination,
         popUpToStart: Boolean = false,
+        popUpToRoute: Any? = null,
         navOptions: NavOptionsBuilder.() -> Unit = {}
     )
 
@@ -38,12 +40,14 @@ object Navigator : NavigatorInterface {
     override suspend fun navigate(
         destination: Destination,
         popUpToStart: Boolean,
+        popUpToRoute: Any?,
         navOptions: NavOptionsBuilder.() -> Unit
     ) {
         _channel.send(
             NavigationAction.Navigate(
                 destination = destination,
                 popUpToStart = popUpToStart,
+                popUpToRoute = popUpToRoute,
                 navOptions = navOptions
             )
         )
