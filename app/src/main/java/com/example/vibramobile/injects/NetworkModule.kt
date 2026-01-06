@@ -1,5 +1,6 @@
 package com.example.vibramobile.injects
 
+import com.example.vibramobile.helpers.SystemUtils
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,6 +19,11 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideHttpClient(): HttpClient {
+        val url = when {
+            SystemUtils.isEmulator -> "http://10.0.2.2:8000/api/"
+            else -> "http://127.0.0.1:8000/api/"
+        }
+
         val client = HttpClient() {
             install(ContentNegotiation) {
                 json(
@@ -27,7 +33,7 @@ object NetworkModule {
                 )
             }
             defaultRequest {
-                url("http://10.0.2.2:8000/api/")
+                url(url)
                 headers.append(HttpHeaders.ContentType, "application/json; charset=UTF-8")
             }
         }
