@@ -10,9 +10,5 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun LibraryScreen(modifier: Modifier = Modifier) {
-    LaunchedEffect(Unit) {
-        Log.d("myapp", "Library")
-    }
-
     Text(text = "Library", fontSize = 96.sp, color = Color.White)
 }

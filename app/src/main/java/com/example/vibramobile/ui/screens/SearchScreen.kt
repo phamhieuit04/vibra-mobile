@@ -10,9 +10,5 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun SearchScreen(modifier: Modifier = Modifier) {
-    LaunchedEffect(Unit) {
-        Log.d("myapp", "Search")
-    }
-
     Text(text = "Search", fontSize = 96.sp, color = Color.White)
 }

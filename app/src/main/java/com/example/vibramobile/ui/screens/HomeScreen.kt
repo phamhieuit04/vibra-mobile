@@ -191,10 +191,6 @@ fun HomeScreen(
         UiState.setDisplayNavigationBar(true)
     }
 
-    LaunchedEffect(Unit) {
-        Log.d("myapp", "Home")
-    }
-
     val scope = rememberCoroutineScope()
     var refreshing by remember { mutableStateOf(false) }
 
