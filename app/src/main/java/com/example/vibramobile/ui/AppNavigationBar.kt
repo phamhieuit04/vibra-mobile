@@ -53,21 +53,21 @@ enum class NavDestination(
     val icon: ImageVector,
     val selectedIcon: ImageVector
 ) {
-    HOME(Destination.HomeGraph, "Home", Icons.Outlined.Home, Icons.Default.Home),
-    SEARCH(Destination.SearchGraph, "Search", Icons.Outlined.Search, Icons.Default.Search),
-    CREATE(Destination.SearchGraph, "Create", Icons.Outlined.Add, Icons.Default.Add),
+    HOME(Destination.HomeScreen, "Home", Icons.Outlined.Home, Icons.Default.Home),
+    SEARCH(Destination.SearchScreen, "Search", Icons.Outlined.Search, Icons.Default.Search),
     LIBRARY(
-        Destination.SearchGraph,
+        Destination.LibraryScreen,
         "Your Library",
         Icons.Outlined.LibraryMusic,
         Icons.Default.LibraryMusic
     ),
     PROFILE(
-        Destination.SearchGraph,
+        Destination.SearchScreen,
         "Profile",
         Icons.Outlined.AccountCircle,
         Icons.Default.AccountCircle
-    )
+    ),
+    CREATE(Destination.SearchScreen, "Create", Icons.Outlined.Add, Icons.Default.Add),
 }
 
 @Composable
@@ -90,10 +90,7 @@ fun AppNavigationBar(modifier: Modifier = Modifier, isVisible: Boolean) {
                     AppNavigationBarItem(
                         onClick = {
                             scope.launch {
-                                if (UiState.getCurrentGraph() != item) {
-                                    UiState.setCurrentGraph(item)
-                                    selectedDestination = index
-                                }
+                                selectedDestination = index
                                 Navigator.navigate(
                                     destination = item.destination,
                                     popUpToStart = true

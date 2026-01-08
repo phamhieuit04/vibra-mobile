@@ -10,7 +10,7 @@ import com.example.vibramobile.ui.screens.LoginScreen
 import com.example.vibramobile.ui.screens.SignUpPasswordScreen
 import com.example.vibramobile.ui.screens.SignUpScreen
 
-fun NavGraphBuilder.authGraph(navController: NavController) {
+fun NavGraphBuilder.authGraph() {
     navigation<Destination.AuthGraph>(startDestination = Destination.WelcomeScreen) {
         composable<Destination.WelcomeScreen> {
             WelcomeScreen()

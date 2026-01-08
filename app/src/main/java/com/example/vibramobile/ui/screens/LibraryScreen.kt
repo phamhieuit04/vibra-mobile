@@ -9,10 +9,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun SearchScreen(modifier: Modifier = Modifier) {
+fun LibraryScreen(modifier: Modifier = Modifier) {
     LaunchedEffect(Unit) {
-        Log.d("myapp", "Search")
+        Log.d("myapp", "Library")
     }
 
-    Text(text = "Search", fontSize = 96.sp, color = Color.White)
+    Text(text = "Library", fontSize = 96.sp, color = Color.White)
 }

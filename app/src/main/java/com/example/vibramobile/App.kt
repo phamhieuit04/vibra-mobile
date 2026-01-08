@@ -20,6 +20,7 @@ import com.example.vibramobile.ui.AppMediaPlayer
 import com.example.vibramobile.ui.AppNavigationBar
 import com.example.vibramobile.ui.graphs.authGraph
 import com.example.vibramobile.ui.graphs.homeGraph
+import com.example.vibramobile.ui.graphs.libraryGraph
 import com.example.vibramobile.ui.graphs.searchGraph
 import com.example.vibramobile.ui.screens.FullscreenPlayer
 import dagger.hilt.android.HiltAndroidApp
@@ -36,10 +37,10 @@ sealed interface Destination {
     object SearchGraph : Destination
 
     @Serializable
-    object WelcomeScreen : Destination
+    object LibraryGraph : Destination
 
     @Serializable
-    object MainScreen : Destination
+    object WelcomeScreen : Destination
 
     @Serializable
     object LoginScreen : Destination
@@ -55,6 +56,9 @@ sealed interface Destination {
 
     @Serializable
     object SearchScreen : Destination
+
+    @Serializable
+    object LibraryScreen : Destination
 }
 
 @HiltAndroidApp
@@ -108,9 +112,10 @@ fun AppScreen(modifier: Modifier = Modifier) {
                 navController = navController,
                 startDestination = Destination.AuthGraph
             ) {
-                authGraph(navController = navController)
+                authGraph()
                 homeGraph()
                 searchGraph()
+                libraryGraph()
             }
 
             FullscreenPlayer(
