@@ -72,16 +72,15 @@ fun AppScreen(modifier: Modifier = Modifier) {
         when (action) {
             is NavigationAction.Navigate -> {
                 navController.navigate(route = action.destination) {
+                    action.navOptions(this)
                     if (action.popUpToStart) {
-                        val popUpToRoute = action.popUpToRoute ?: Destination.HomeScreen
-                        popUpTo(popUpToRoute) {
+                        popUpTo(navController.graph.findStartDestination().id) {
                             saveState = true
                             inclusive = false
                         }
-                        launchSingleTop = true
-                        restoreState = true
                     }
-                    action.navOptions(this)
+                    launchSingleTop = true
+                    restoreState = true
                 }
             }
 
