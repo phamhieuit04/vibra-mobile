@@ -23,6 +23,8 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,16 +35,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.R
-import com.example.vibramobile.ui.MediaPlayer
+import com.example.vibramobile.viewmodels.MediaPlayerViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QueuePlaylistScreen(
     modifier: Modifier = Modifier,
     isVisible: Boolean,
-    onVisibleChange: (Boolean) -> Unit
+    onVisibleChange: (Boolean) -> Unit,
+    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel()
 ) {
     val state = rememberModalBottomSheetState()
+    val isPlaying by mediaPlayerViewModel.isPlaying.collectAsState()
+    val progress by mediaPlayerViewModel.progress.collectAsState()
 
     if (isVisible) {
         ModalBottomSheet(
@@ -106,12 +112,12 @@ fun QueuePlaylistScreen(
                             }
                             IconButton(
                                 modifier = Modifier.size(52.dp),
-                                onClick = { MediaPlayer.playOrPause() }
+                                onClick = { mediaPlayerViewModel.toggle() }
                             ) {
                                 Icon(
                                     modifier = Modifier.fillMaxSize(),
                                     contentDescription = "",
-                                    imageVector = if (MediaPlayer.isPlaying.value) Icons.Default.PauseCircleFilled
+                                    imageVector = if (isPlaying) Icons.Default.PauseCircleFilled
                                     else Icons.Default.PlayCircleFilled,
                                     tint = Color.White
                                 )

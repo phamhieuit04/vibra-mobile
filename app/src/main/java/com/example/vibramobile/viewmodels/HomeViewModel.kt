@@ -3,22 +3,18 @@ package com.example.vibramobile.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.MediaItem
 import com.example.vibramobile.helpers.JsonHelper
 import com.example.vibramobile.models.Category
 import com.example.vibramobile.models.Response
 import com.example.vibramobile.models.Song
 import com.example.vibramobile.states.CategoryState
 import com.example.vibramobile.states.SongState
-import com.example.vibramobile.states.UiState
 import com.example.vibramobile.states.UserState
-import com.example.vibramobile.ui.MediaPlayer
 import io.ktor.client.HttpClient
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.encodeURLPath
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -28,23 +24,6 @@ class HomeViewModel(
 
     init {
         viewModelScope.launch { fetchAll() }
-    }
-
-    fun playSong(song: Song? = null) {
-        if (song == null) return
-
-        UiState.setDisplayMediaPlayer(true)
-        if (SongState.currentSong.value?.id != song.id) {
-            SongState.currentSong.value = song
-
-            val url = song.song_path?.encodeURLPath()
-            if (url.isNullOrBlank()) return
-
-            MediaPlayer.replaceMediaItem(mediaItem = MediaItem.fromUri(url))
-            MediaPlayer.play()
-        } else {
-            MediaPlayer.playOrPause()
-        }
     }
 
     suspend fun fetchAll() {
