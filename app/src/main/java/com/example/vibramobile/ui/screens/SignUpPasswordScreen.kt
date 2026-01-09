@@ -31,8 +31,8 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun SignUpPasswordScreen(
     modifier: Modifier = Modifier,
-    onNavigateToLogInScreen: () -> Unit,
-    onNavigateUp: () -> Unit
+    navigateBack: () -> Unit,
+    navigateToLogin: () -> Unit,
 ) {
     Scaffold(
         containerColor = Color.Black,
@@ -40,7 +40,7 @@ fun SignUpPasswordScreen(
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = { onNavigateUp() }) {
+                    IconButton(onClick = navigateBack) {
                         Icon(
                             contentDescription = "",
                             imageVector = Icons.Default.ArrowBackIosNew,
@@ -51,10 +51,10 @@ fun SignUpPasswordScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
         },
-    ) { paddingValues ->
+    ) { padding ->
         Column(
             modifier = Modifier
-                .padding(paddingValues = paddingValues)
+                .padding(padding)
                 .padding(32.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -72,7 +72,10 @@ fun SignUpPasswordScreen(
                 fontWeight = FontWeight.Bold
             )
             FormPasswordField(placeholder = "********")
-            FormButton(onClick = { onNavigateToLogInScreen() }, text = "Log in")
+            FormButton(
+                onClick = navigateToLogin,
+                text = "Sign up"
+            )
         }
     }
 }

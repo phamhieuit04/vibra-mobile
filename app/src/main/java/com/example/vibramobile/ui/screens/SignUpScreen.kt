@@ -35,9 +35,9 @@ import com.example.vibramobile.R
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
-    onNavigateToLogInScreen: () -> Unit,
-    onNavigateToSignUpPasswordScreen: () -> Unit,
-    onNavigateUp: () -> Unit
+    navigateBack: () -> Unit,
+    navigateToLogin: () -> Unit,
+    navigateToSignUpPassword: () -> Unit
 ) {
     Scaffold(
         containerColor = Color.Black,
@@ -45,7 +45,7 @@ fun SignUpScreen(
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = { onNavigateUp() }) {
+                    IconButton(onClick = navigateBack) {
                         Icon(
                             contentDescription = "",
                             imageVector = Icons.Default.ArrowBackIosNew,
@@ -63,7 +63,7 @@ fun SignUpScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "Already have an account?", color = Color.White, fontSize = 16.sp)
-                TextButton(onClick = { onNavigateToLogInScreen() }) {
+                TextButton(onClick = navigateToLogin) {
                     Text(
                         text = "Log in",
                         color = Color.White,
@@ -74,10 +74,9 @@ fun SignUpScreen(
                 Spacer(Modifier.height(32.dp))
             }
         }
-    ) { paddingValues ->
+    ) { padding ->
         Column(
             modifier = Modifier
-                .padding(paddingValues = paddingValues)
                 .fillMaxSize()
                 .padding(32.dp),
             verticalArrangement = Arrangement.Center,
@@ -122,7 +121,7 @@ fun SignUpScreen(
                     placeholder = "What's your email?",
                 )
                 FormButton(
-                    onClick = { onNavigateToSignUpPasswordScreen() },
+                    onClick = navigateToSignUpPassword,
                     text = "Continue"
                 )
                 Text(
@@ -145,9 +144,3 @@ fun SignUpScreen(
         }
     }
 }
-
-//@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
-//@Composable
-//fun Preview(modifier: Modifier = Modifier) {
-//    SignUpScreen()
-//}

@@ -25,12 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.example.vibramobile.models.Song
-import com.example.vibramobile.ui.screens.noRippleClickable
+import com.example.vibramobile.ui.extends.noRippleClickable
+import com.example.vibramobile.ui.extends.skeletonEffect
 import io.ktor.http.encodeURLPath
 
 @Composable
@@ -142,10 +142,4 @@ fun ListSongSkeleton(modifier: Modifier = Modifier) {
             Spacer(Modifier.width(16.dp))
         }
     }
-}
-
-@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
-@Composable
-fun Preview(modifier: Modifier = Modifier) {
-    ListSongSkeleton()
 }

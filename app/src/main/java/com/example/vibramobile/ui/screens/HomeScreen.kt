@@ -1,12 +1,11 @@
 package com.example.vibramobile.ui.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,13 +20,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -35,19 +35,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.vibramobile.R
 import com.example.vibramobile.models.Playlist
 import com.example.vibramobile.models.User
 import com.example.vibramobile.states.CategoryState
 import com.example.vibramobile.states.SongState
+import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.components.ListSongComponent
 import com.example.vibramobile.ui.components.ListSongSkeleton
 import com.example.vibramobile.ui.components.RecentRotationSongsComponent
 import com.example.vibramobile.ui.components.RecentRotationSongsSkeleton
 import com.example.vibramobile.ui.components.SkeletonComponent
 import com.example.vibramobile.viewmodels.HomeViewModel
+import com.example.vibramobile.viewmodels.MediaPlayerViewModel
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 val albums = listOf(
     Playlist(
@@ -182,10 +184,15 @@ val artists = listOf(
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
+    viewModel: HomeViewModel = koinViewModel(),
+    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel()
 ) {
+    LaunchedEffect(Unit) {
+        UiState.setDisplayNavigationBar(true)
+    }
+
     val scope = rememberCoroutineScope()
-    var refreshing by remember { mutableStateOf(false) }
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     Scaffold(
         containerColor = Color.Black,
@@ -205,7 +212,7 @@ fun HomeScreen(
                 }
                 itemsIndexed(CategoryState.categories) { index, category ->
                     FilledTonalButton(
-                        onClick = {}, colors = ButtonDefaults.buttonColors(
+                        onClick = { }, colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xff303030)
                         )
                     ) {
@@ -222,43 +229,49 @@ fun HomeScreen(
     { paddingValues ->
         PullToRefreshBox(
             modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
-            isRefreshing = refreshing,
+            isRefreshing = isRefreshing,
             onRefresh = {
                 scope.launch {
-                    refreshing = true
                     viewModel.fetchAll()
-                    refreshing = false
                 }
             }
         ) {
             LazyColumn(modifier = Modifier.padding(horizontal = 16.dp)) {
                 item {
-                    SectionTitle(text = "Lắng nghe gần đây")
-                    Spacer(Modifier.height(16.dp))
-
                     SkeletonComponent(
-                        isLoading = SongState.recentRotationSongs.isEmpty(),
+                        isLoading = SongState.isRecentRotationLoading,
                         skeletonContent = { RecentRotationSongsSkeleton() }
                     ) {
-                        RecentRotationSongsComponent(
-                            onPlay = { viewModel.playSong(song = it) },
-                            songs = SongState.recentRotationSongs
-                        )
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            SectionTitle(text = "Lắng nghe gần đây")
+
+                            Spacer(Modifier.height(16.dp))
+
+                            RecentRotationSongsComponent(
+                                onPlay = { mediaPlayerViewModel.playSong(song = it) },
+                                songs = SongState.recentRotationSongs
+                            )
+                        }
                     }
                 }
 
                 item {
                     Spacer(Modifier.height(10.dp))
-                    SectionTitle(text = "Phù hợp với bạn")
-                    Spacer(Modifier.height(16.dp))
 
                     SkeletonComponent(
-                        isLoading = SongState.recommendedSongs.isEmpty(),
+                        isLoading = SongState.isRecommendedSongsLoading,
                         skeletonContent = { ListSongSkeleton() }) {
-                        ListSongComponent(
-                            onPlay = { viewModel.playSong(song = it) },
-                            songs = SongState.recommendedSongs
-                        )
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            SectionTitle(text = "Phù hợp với bạn")
+
+                            Spacer(Modifier.height(16.dp))
+
+                            ListSongComponent(
+                                onPlay = { mediaPlayerViewModel.playSong(song = it) },
+                                songs = SongState.recommendedSongs
+                            )
+                        }
+
                     }
                     Spacer(Modifier.height(16.dp))
                 }
@@ -295,12 +308,6 @@ fun HomeScreen(
         }
     }
 }
-
-//@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
-//@Composable
-//fun Preview(modifier: Modifier = Modifier) {
-//    HomeScreen()
-//}
 
 @Composable
 fun SectionTitle(modifier: Modifier = Modifier, text: String) {
@@ -367,15 +374,5 @@ fun ArtistSection(modifier: Modifier = Modifier, artists: List<User>) {
             }
             Spacer(Modifier.width(16.dp))
         }
-    }
-}
-
-inline fun Modifier.noRippleClickable(
-    crossinline onClick: () -> Unit
-): Modifier = composed {
-    clickable(
-        indication = null,
-        interactionSource = remember { MutableInteractionSource() }) {
-        onClick()
     }
 }

@@ -3,101 +3,104 @@ package com.example.vibramobile.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.MediaItem
-import com.example.vibramobile.helpers.JsonHelper
 import com.example.vibramobile.models.Category
 import com.example.vibramobile.models.Response
 import com.example.vibramobile.models.Song
 import com.example.vibramobile.states.CategoryState
 import com.example.vibramobile.states.SongState
-import com.example.vibramobile.states.UiState
 import com.example.vibramobile.states.UserState
-import com.example.vibramobile.ui.MediaPlayer
-import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.encodeURLPath
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import kotlinx.serialization.json.Json
 
-@HiltViewModel
-class HomeViewModel @Inject constructor(
-    private val client: HttpClient
+class HomeViewModel(
+    private val client: HttpClient,
+    private val json: Json
 ) : ViewModel() {
-    private val accessToken: String = UserState.currentUser?.token.toString()
+    private val accessToken: String = UserState.getCurrentUser()?.token.toString()
+
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
 
     init {
         viewModelScope.launch { fetchAll() }
     }
 
-    fun playSong(song: Song? = null) {
-        if (song == null) return
-
-        UiState.displayMediaPlayer.value = true
-        if (SongState.currentSong.value?.id != song.id) {
-            SongState.currentSong.value = song
-
-            val url = song.song_path?.encodeURLPath()
-            if (url.isNullOrBlank()) return
-
-            MediaPlayer.replaceMediaItem(mediaItem = MediaItem.fromUri(url))
-            MediaPlayer.play()
-        } else {
-            MediaPlayer.playOrPause()
+    suspend fun fetchAll() = coroutineScope {
+        _isRefreshing.value = true
+        try {
+            awaitAll(
+                async { getCategories() },
+                async { getRecommendedSongs() },
+                async { getRecentRotationSongs() }
+            )
+        } finally {
+            _isRefreshing.value = false
         }
     }
 
-    suspend fun fetchAll() {
-        getCategories()
-        getRecommendedSongs()
-        getRecentRotationSongs()
-    }
-
     suspend fun getRecommendedSongs() {
+        SongState.isRecommendedSongsLoading = true
         runCatching {
-            SongState.recommendedSongs.clear()
             val response = client.get("home/get-recommended-songs") {
                 bearerAuth(accessToken)
             }.bodyAsText()
 
-            val result = JsonHelper.json.decodeFromString<Response<List<Song>>>(response)
-            SongState.recommendedSongs.addAll(result.data)
+            val result = json.decodeFromString<Response<List<Song>>>(response)
+            SongState.recommendedSongs.apply {
+                clear()
+                addAll(result.data)
+            }
         }.onFailure { exception ->
             Log.e("MyApp", exception.toString())
         }
+        SongState.isRecommendedSongsLoading = false
     }
 
     suspend fun getRecentRotationSongs() {
+        SongState.isRecentRotationLoading = true
         runCatching {
-            SongState.recentRotationSongs.clear()
             val response = client.get("home/recent-rotation") {
                 bearerAuth(accessToken)
                 parameter(key = "limit", value = 4)
             }.bodyAsText()
-            val result = JsonHelper.json.decodeFromString<Response<List<Song>>>(response)
+            val result = json.decodeFromString<Response<List<Song>>>(response)
 
-            SongState.recentRotationSongs.addAll(result.data)
+            SongState.recentRotationSongs.apply {
+                clear()
+                addAll(result.data)
+            }
         }.onFailure { exception ->
             Log.e("MyApp", exception.toString())
         }
+        SongState.isRecentRotationLoading = false
     }
 
     suspend fun getCategories() {
+        CategoryState.isCategoriesLoading = true
         runCatching {
-            CategoryState.categories.clear()
             val response = client.get("home/list-category") {
                 bearerAuth(accessToken)
             }.bodyAsText()
-            val result = JsonHelper.json.decodeFromString<Response<List<Category>>>(response)
+            val result = json.decodeFromString<Response<List<Category>>>(response)
 
-            CategoryState.categories.addAll(result.data)
+            CategoryState.categories.apply {
+                clear()
+                addAll(result.data)
+            }
         }.onFailure { exception ->
             Log.e("MyApp", exception.toString())
         }
+        CategoryState.isCategoriesLoading = false
     }
 }

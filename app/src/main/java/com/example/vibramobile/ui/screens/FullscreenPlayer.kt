@@ -1,6 +1,5 @@
 package com.example.vibramobile.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,45 +38,34 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.example.vibramobile.R
 import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UiState
-import com.example.vibramobile.ui.MediaPlayer
+import com.example.vibramobile.viewmodels.MediaPlayerViewModel
 import io.ktor.http.encodeURLPath
-import kotlinx.coroutines.delay
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SongDetailScreen(
+fun FullscreenPlayer(
     modifier: Modifier = Modifier,
     isVisible: Boolean,
-    onVisibleChange: (Boolean) -> Unit
+    onVisibleChange: (Boolean) -> Unit,
+    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel()
 ) {
     val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var progress by remember { mutableStateOf(0f) }
-
-    LaunchedEffect(MediaPlayer.isPlaying.value) {
-        while (MediaPlayer.isPlaying.value) {
-            progress = MediaPlayer.getProgress()
-            delay(1000)
-        }
-    }
+    val isPlaying by mediaPlayerViewModel.isPlaying.collectAsState()
+    val progress by mediaPlayerViewModel.progress.collectAsState()
 
     if (isVisible) {
         ModalBottomSheet(
@@ -244,13 +232,15 @@ fun SongDetailScreen(
                         }
                         IconButton(
                             modifier = Modifier.size(96.dp),
-                            onClick = { MediaPlayer.playOrPause() }
+                            onClick = { mediaPlayerViewModel.toggle() }
                         ) {
                             Icon(
                                 modifier = Modifier.fillMaxSize(),
                                 contentDescription = "",
-                                imageVector = if (MediaPlayer.isPlaying.value) Icons.Default.PauseCircleFilled
-                                else Icons.Default.PlayCircleFilled,
+                                imageVector = if (isPlaying)
+                                    Icons.Default.PauseCircleFilled
+                                else
+                                    Icons.Default.PlayCircleFilled,
                                 tint = Color.White
                             )
                         }
@@ -291,7 +281,7 @@ fun SongDetailScreen(
                                 tint = Color.White
                             )
                         }
-                        IconButton(onClick = { UiState.displayQueuePlaylist.value = true }) {
+                        IconButton(onClick = { UiState.setDisplayQueuePlaylist(true) }) {
                             Icon(
                                 modifier = Modifier.size(28.dp),
                                 contentDescription = "",
@@ -315,13 +305,7 @@ fun SongDetailScreen(
         }
     }
 
-    QueuePlaylistScreen(isVisible = UiState.displayQueuePlaylist.value, onVisibleChange = { value ->
-        UiState.displayQueuePlaylist.value = value
+    QueuePlaylistScreen(isVisible = UiState.getDisplayQueuePlaylist(), onVisibleChange = { value ->
+        UiState.setDisplayQueuePlaylist(value)
     })
 }
-
-//@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
-//@Composable
-//fun Preview(modifier: Modifier = Modifier) {
-//    SongDetailScreen(isVisible = true, onVisibleChange = {})
-//}
