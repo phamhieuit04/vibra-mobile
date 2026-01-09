@@ -19,9 +19,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -32,29 +29,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.vibramobile.Destination
 import com.example.vibramobile.R
-import com.example.vibramobile.helpers.Navigator
-import com.example.vibramobile.states.UiState
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpScreen(modifier: Modifier = Modifier) {
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        UiState.setDisplayMediaPlayer(false)
-        UiState.setDisplayNavigationBar(false)
-    }
-
+fun SignUpScreen(
+    modifier: Modifier = Modifier,
+    navigateBack: () -> Unit,
+    navigateToLogin: () -> Unit,
+    navigateToSignUpPassword: () -> Unit
+) {
     Scaffold(
         containerColor = Color.Black,
         topBar = {
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = { scope.launch { Navigator.navigateUp() } }) {
+                    IconButton(onClick = navigateBack) {
                         Icon(
                             contentDescription = "",
                             imageVector = Icons.Default.ArrowBackIosNew,
@@ -72,14 +63,7 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "Already have an account?", color = Color.White, fontSize = 16.sp)
-                TextButton(onClick = {
-                    scope.launch {
-                        Navigator.popBackStack(
-                            Destination.LoginScreen,
-                            false
-                        )
-                    }
-                }) {
+                TextButton(onClick = navigateToLogin) {
                     Text(
                         text = "Log in",
                         color = Color.White,
@@ -137,7 +121,7 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                     placeholder = "What's your email?",
                 )
                 FormButton(
-                    onClick = { scope.launch { Navigator.navigate(Destination.SignUpPasswordScreen) } },
+                    onClick = navigateToSignUpPassword,
                     text = "Continue"
                 )
                 Text(
@@ -160,9 +144,3 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
         }
     }
 }
-
-//@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
-//@Composable
-//fun Preview(modifier: Modifier = Modifier) {
-//    SignUpScreen()
-//}

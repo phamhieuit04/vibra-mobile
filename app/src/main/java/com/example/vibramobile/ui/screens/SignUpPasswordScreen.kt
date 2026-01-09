@@ -19,38 +19,28 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.vibramobile.Destination
-import com.example.vibramobile.helpers.Navigator
-import com.example.vibramobile.states.UiState
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpPasswordScreen(modifier: Modifier = Modifier) {
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        UiState.setDisplayMediaPlayer(false)
-        UiState.setDisplayNavigationBar(false)
-    }
-
+fun SignUpPasswordScreen(
+    modifier: Modifier = Modifier,
+    navigateBack: () -> Unit,
+    navigateToLogin: () -> Unit,
+) {
     Scaffold(
         containerColor = Color.Black,
         topBar = {
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = { scope.launch { Navigator.navigateUp() } }) {
+                    IconButton(onClick = navigateBack) {
                         Icon(
                             contentDescription = "",
                             imageVector = Icons.Default.ArrowBackIosNew,
@@ -83,7 +73,7 @@ fun SignUpPasswordScreen(modifier: Modifier = Modifier) {
             )
             FormPasswordField(placeholder = "********")
             FormButton(
-                onClick = { scope.launch { Navigator.navigate(Destination.LoginScreen) } },
+                onClick = navigateToLogin,
                 text = "Sign up"
             )
         }

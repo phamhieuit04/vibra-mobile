@@ -27,9 +27,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -41,38 +39,45 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.vibramobile.Destination
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.ui.NavDisplay
 import com.example.vibramobile.R
-import com.example.vibramobile.helpers.Navigator
-import com.example.vibramobile.states.UiState
+import com.example.vibramobile.events.LoginEvent
 import com.example.vibramobile.viewmodels.AuthViewModel
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 
-object LoginStep {
+@Serializable
+sealed class LoginStep : NavKey {
     @Serializable
-    object Email
+    object Email : LoginStep()
 
     @Serializable
-    object Password
+    object Password : LoginStep()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
+    navigateBack: () -> Unit,
+    navigateToSignUp: () -> Unit,
+    navigateToMain: () -> Unit,
     viewModel: AuthViewModel = koinViewModel()
 ) {
-    val scope = rememberCoroutineScope()
-
     LaunchedEffect(Unit) {
-        UiState.setDisplayMediaPlayer(false)
-        UiState.setDisplayNavigationBar(false)
+        viewModel.loginEvent.collect { event ->
+            when (event) {
+                is LoginEvent.Success -> navigateToMain()
+
+                is LoginEvent.Error -> {}
+            }
+        }
     }
+
+    val backstack = rememberNavBackStack(LoginStep.Email)
 
     Scaffold(
         containerColor = Color.Black,
@@ -80,14 +85,7 @@ fun LoginScreen(
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            Navigator.popBackStack(
-                                Destination.WelcomeScreen,
-                                false
-                            )
-                        }
-                    }) {
+                    IconButton(onClick = navigateBack) {
                         Icon(
                             contentDescription = "",
                             imageVector = Icons.Default.ArrowBackIosNew,
@@ -105,14 +103,7 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "Don't have an account?", color = Color.White, fontSize = 16.sp)
-                TextButton(onClick = {
-                    scope.launch {
-                        Navigator.popBackStack(
-                            Destination.SignUpScreen,
-                            false
-                        )
-                    }
-                }) {
+                TextButton(onClick = navigateToSignUp) {
                     Text(
                         text = "Sign up",
                         color = Color.White,
@@ -160,37 +151,40 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = LoginStep.Email) {
-                    composable<LoginStep.Email> {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            FormInput(placeholder = "What's your email?")
-                            FormButton(
-                                onClick = { navController.navigate(LoginStep.Password) },
-                                text = "Continue"
-                            )
-                        }
-                    }
-                    composable<LoginStep.Password> {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            FormInput(placeholder = "Enter your password")
-                            FormButton(onClick = {
-                                viewModel.login(
-                                    email = "tomnguyenhieu2004@gmail.com",
-                                    password = "12345678"
+                NavDisplay(
+                    backStack = backstack,
+                    onBack = { backstack.removeLastOrNull() },
+                    entryProvider = entryProvider {
+                        entry<LoginStep.Email> {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                FormInput(placeholder = "What's your email?")
+                                FormButton(
+                                    onClick = { backstack.add(LoginStep.Password) },
+                                    text = "Continue"
                                 )
-                            }, text = "Log in")
+                            }
+                        }
+                        entry<LoginStep.Password> {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                FormInput(placeholder = "Enter your password")
+                                FormButton(onClick = {
+                                    viewModel.login(
+                                        email = "tomnguyenhieu2004@gmail.com",
+                                        password = "12345678"
+                                    )
+                                }, text = "Log in")
+                            }
                         }
                     }
-                }
+                )
                 Text(
                     text = "or",
                     color = Color.LightGray,

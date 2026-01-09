@@ -1,8 +1,6 @@
 package com.example.vibramobile.states
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import com.example.vibramobile.ui.NavDestination
 
 object UiState {
     private var displayNavigationBar = mutableStateOf(false)
@@ -39,14 +37,5 @@ object UiState {
 
     fun setDisplayQueuePlaylist(value: Boolean) {
         displayQueuePlaylist.value = value
-    }
-
-    private var currentGraph = mutableStateOf(NavDestination.HOME)
-    fun getCurrentGraph(): NavDestination {
-        return currentGraph.value
-    }
-
-    fun setCurrentGraph(value: NavDestination) {
-        currentGraph.value = value
     }
 }

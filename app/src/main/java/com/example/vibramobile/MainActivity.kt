@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.platform.LocalContext
 import com.example.vibramobile.ui.MediaPlayer
+import com.example.vibramobile.ui.navigations.graphs.RootGraph
 import com.example.vibramobile.ui.theme.VibraMobileTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,7 +18,7 @@ class MainActivity : ComponentActivity() {
             MediaPlayer.createPlayer(context = context)
 
             VibraMobileTheme {
-                AppScreen()
+                RootGraph()
             }
         }
     }

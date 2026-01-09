@@ -14,8 +14,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -25,21 +23,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.vibramobile.Destination
 import com.example.vibramobile.R
-import com.example.vibramobile.helpers.Navigator
-import com.example.vibramobile.states.UiState
-import kotlinx.coroutines.launch
 
 @Composable
-fun WelcomeScreen(modifier: Modifier = Modifier) {
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        UiState.setDisplayMediaPlayer(false)
-        UiState.setDisplayNavigationBar(false)
-    }
-
+fun WelcomeScreen(
+    modifier: Modifier = Modifier,
+    navigateToLogin: () -> Unit,
+    navigateToSignUp: () -> Unit
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -83,7 +74,7 @@ fun WelcomeScreen(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(
-                onClick = { scope.launch { Navigator.navigate(Destination.SignUpScreen) } },
+                onClick = navigateToSignUp,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -93,7 +84,7 @@ fun WelcomeScreen(modifier: Modifier = Modifier) {
             }
             Spacer(Modifier.height(12.dp))
             OutlinedButton(
-                onClick = { scope.launch { Navigator.navigate(Destination.LoginScreen) } },
+                onClick = navigateToLogin,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)

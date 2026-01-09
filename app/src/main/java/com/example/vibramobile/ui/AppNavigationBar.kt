@@ -13,13 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LibraryMusic
 import androidx.compose.material.icons.outlined.Search
@@ -29,12 +25,7 @@ import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,69 +33,56 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.vibramobile.Destination
-import com.example.vibramobile.helpers.Navigator
-import com.example.vibramobile.states.UiState
-import kotlinx.coroutines.launch
+import androidx.navigation3.runtime.NavKey
+import com.example.vibramobile.ui.navigations.destinations.MainDestination
 
-enum class NavDestination(
-    val destination: Destination,
+data class BottomNavItem(
     val label: String,
     val icon: ImageVector,
     val selectedIcon: ImageVector
-) {
-    HOME(Destination.HomeScreen, "Home", Icons.Outlined.Home, Icons.Default.Home),
-    SEARCH(Destination.SearchScreen, "Search", Icons.Outlined.Search, Icons.Default.Search),
-    LIBRARY(
-        Destination.LibraryScreen,
-        "Your Library",
-        Icons.Outlined.LibraryMusic,
-        Icons.Default.LibraryMusic
+)
+
+val TOP_LEVEL_DESTINATIONS = mapOf(
+    MainDestination.Home to BottomNavItem(
+        "Home", Icons.Outlined.Home, Icons.Default.Home
     ),
-    PROFILE(
-        Destination.SearchScreen,
-        "Profile",
-        Icons.Outlined.AccountCircle,
-        Icons.Default.AccountCircle
+    MainDestination.Search to BottomNavItem(
+        "Search", Icons.Outlined.Search, Icons.Default.Search
     ),
-    CREATE(Destination.SearchScreen, "Create", Icons.Outlined.Add, Icons.Default.Add),
-}
+    MainDestination.Library to BottomNavItem(
+        "Library", Icons.Outlined.LibraryMusic, Icons.Default.LibraryMusic
+    )
+)
 
 @Composable
-fun AppNavigationBar(modifier: Modifier = Modifier, isVisible: Boolean) {
-    var selectedDestination by rememberSaveable { mutableIntStateOf(NavDestination.HOME.ordinal) }
-    val scope = rememberCoroutineScope()
+fun AppNavigationBar(
+    modifier: Modifier = Modifier,
+    isVisible: Boolean,
+    selectedKey: NavKey,
+    onSelectKey: (NavKey) -> Unit,
+) {
+    if (!isVisible) return
 
-    if (isVisible) {
-        NavigationBar(
-            containerColor = Color.Black,
-            windowInsets = NavigationBarDefaults.windowInsets
+    NavigationBar(
+        containerColor = Color.Black,
+        windowInsets = NavigationBarDefaults.windowInsets
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                NavDestination.entries.forEachIndexed { index, item ->
-                    AppNavigationBarItem(
-                        onClick = {
-                            scope.launch {
-                                selectedDestination = index
-                                Navigator.navigate(
-                                    destination = item.destination,
-                                    popUpToStart = true
-                                )
-                            }
-                        },
-                        isSelected = selectedDestination == index,
-                        icon = item.icon,
-                        iconColor = Color.White,
-                        selectedIcon = item.selectedIcon,
-                        label = item.label,
-                        labelColor = Color.White,
-                    )
-                }
+            TOP_LEVEL_DESTINATIONS.forEach { (destination, data) ->
+                AppNavigationBarItem(
+                    onClick = { onSelectKey(destination) },
+                    isSelected = destination == selectedKey,
+                    icon = data.icon,
+                    iconColor = Color.White,
+                    selectedIcon = data.selectedIcon,
+                    label = data.label,
+                    labelColor = Color.White,
+                )
             }
         }
     }
