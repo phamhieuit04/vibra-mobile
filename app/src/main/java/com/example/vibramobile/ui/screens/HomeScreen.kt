@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -190,7 +192,7 @@ fun HomeScreen(
     }
 
     val scope = rememberCoroutineScope()
-    var refreshing by remember { mutableStateOf(false) }
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     Scaffold(
         containerColor = Color.Black,
@@ -227,43 +229,49 @@ fun HomeScreen(
     { paddingValues ->
         PullToRefreshBox(
             modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
-            isRefreshing = refreshing,
+            isRefreshing = isRefreshing,
             onRefresh = {
                 scope.launch {
-                    refreshing = true
                     viewModel.fetchAll()
-                    refreshing = false
                 }
             }
         ) {
             LazyColumn(modifier = Modifier.padding(horizontal = 16.dp)) {
                 item {
-                    SectionTitle(text = "Lắng nghe gần đây")
-                    Spacer(Modifier.height(16.dp))
-
                     SkeletonComponent(
-                        isLoading = SongState.recentRotationSongs.isEmpty(),
+                        isLoading = SongState.isRecentRotationLoading,
                         skeletonContent = { RecentRotationSongsSkeleton() }
                     ) {
-                        RecentRotationSongsComponent(
-                            onPlay = { mediaPlayerViewModel.playSong(song = it) },
-                            songs = SongState.recentRotationSongs
-                        )
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            SectionTitle(text = "Lắng nghe gần đây")
+
+                            Spacer(Modifier.height(16.dp))
+
+                            RecentRotationSongsComponent(
+                                onPlay = { mediaPlayerViewModel.playSong(song = it) },
+                                songs = SongState.recentRotationSongs
+                            )
+                        }
                     }
                 }
 
                 item {
                     Spacer(Modifier.height(10.dp))
-                    SectionTitle(text = "Phù hợp với bạn")
-                    Spacer(Modifier.height(16.dp))
 
                     SkeletonComponent(
-                        isLoading = SongState.recommendedSongs.isEmpty(),
+                        isLoading = SongState.isRecommendedSongsLoading,
                         skeletonContent = { ListSongSkeleton() }) {
-                        ListSongComponent(
-                            onPlay = { mediaPlayerViewModel.playSong(song = it) },
-                            songs = SongState.recommendedSongs
-                        )
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            SectionTitle(text = "Phù hợp với bạn")
+
+                            Spacer(Modifier.height(16.dp))
+
+                            ListSongComponent(
+                                onPlay = { mediaPlayerViewModel.playSong(song = it) },
+                                songs = SongState.recommendedSongs
+                            )
+                        }
+
                     }
                     Spacer(Modifier.height(16.dp))
                 }

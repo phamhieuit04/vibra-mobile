@@ -1,6 +1,7 @@
 package com.example.vibramobile
 
 import android.app.Application
+import com.example.vibramobile.injects.jsonModule
 import com.example.vibramobile.injects.mediaPlayerModule
 import com.example.vibramobile.injects.networkModule
 import com.example.vibramobile.injects.viewModelModule
@@ -16,7 +17,8 @@ class App : Application() {
             modules(
                 networkModule,
                 viewModelModule,
-                mediaPlayerModule
+                mediaPlayerModule,
+                jsonModule
             )
         }
     }

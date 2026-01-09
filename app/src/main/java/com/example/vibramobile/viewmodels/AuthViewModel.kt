@@ -4,19 +4,22 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vibramobile.events.LoginEvent
-import com.example.vibramobile.helpers.JsonHelper
+import com.example.vibramobile.models.Response
 import com.example.vibramobile.models.User
 import com.example.vibramobile.states.UserState
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.submitForm
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.parameters
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 class AuthViewModel(
-    private val client: HttpClient
+    private val client: HttpClient,
+    private val json: Json
 ) : ViewModel() {
     private val _loginEvent = Channel<LoginEvent>(Channel.BUFFERED)
     val loginEvent = _loginEvent.receiveAsFlow()
@@ -29,10 +32,10 @@ class AuthViewModel(
                     formParameters = parameters {
                         append(name = "email", value = email)
                         append(name = "password", value = password)
-                    })
+                    }).bodyAsText()
 
-                val user = JsonHelper.parseJson(from = response.body(), to = User::class)
-                UserState.setCurrentUser(user)
+                val result = json.decodeFromString<Response<User>>(response)
+                UserState.setCurrentUser(result.data)
             }.onSuccess {
                 _loginEvent.send(LoginEvent.Success)
             }.onFailure { exception ->
