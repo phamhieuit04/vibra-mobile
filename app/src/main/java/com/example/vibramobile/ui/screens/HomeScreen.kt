@@ -37,7 +37,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.vibramobile.R
 import com.example.vibramobile.models.Playlist
 import com.example.vibramobile.models.User
@@ -51,6 +50,7 @@ import com.example.vibramobile.ui.components.RecentRotationSongsSkeleton
 import com.example.vibramobile.ui.components.SkeletonComponent
 import com.example.vibramobile.viewmodels.HomeViewModel
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 val albums = listOf(
     Playlist(
@@ -185,7 +185,7 @@ val artists = listOf(
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
+    viewModel: HomeViewModel = koinViewModel()
 ) {
     LaunchedEffect(Unit) {
         UiState.setDisplayNavigationBar(true)

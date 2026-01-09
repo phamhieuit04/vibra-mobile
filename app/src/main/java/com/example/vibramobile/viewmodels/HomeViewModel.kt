@@ -13,20 +13,15 @@ import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UiState
 import com.example.vibramobile.states.UserState
 import com.example.vibramobile.ui.MediaPlayer
-import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.encodeURLPath
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class HomeViewModel @Inject constructor(
+class HomeViewModel(
     private val client: HttpClient
 ) : ViewModel() {
     private val accessToken: String = UserState.getCurrentUser()?.token.toString()

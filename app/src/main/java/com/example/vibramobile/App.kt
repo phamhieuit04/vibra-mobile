@@ -15,6 +15,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.vibramobile.helpers.NavigationAction
 import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.helpers.ObserverAsEvents
+import com.example.vibramobile.injects.networkModule
+import com.example.vibramobile.injects.viewModelModule
 import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.AppMediaPlayer
 import com.example.vibramobile.ui.AppNavigationBar
@@ -23,8 +25,9 @@ import com.example.vibramobile.ui.graphs.homeGraph
 import com.example.vibramobile.ui.graphs.libraryGraph
 import com.example.vibramobile.ui.graphs.searchGraph
 import com.example.vibramobile.ui.screens.FullscreenPlayer
-import dagger.hilt.android.HiltAndroidApp
 import kotlinx.serialization.Serializable
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 
 sealed interface Destination {
     @Serializable
@@ -61,8 +64,19 @@ sealed interface Destination {
     object LibraryScreen : Destination
 }
 
-@HiltAndroidApp
-class App : Application()
+class App : Application() {
+    override fun onCreate() {
+        super.onCreate()
+
+        startKoin {
+            androidContext(this@App)
+            modules(
+                networkModule,
+                viewModelModule
+            )
+        }
+    }
+}
 
 @Composable
 fun AppScreen(modifier: Modifier = Modifier) {

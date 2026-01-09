@@ -25,12 +25,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.vibramobile.Destination
 import com.example.vibramobile.R
 import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.states.UiState
-import com.example.vibramobile.viewmodels.AuthViewModel
 import kotlinx.coroutines.launch
 
 @Composable

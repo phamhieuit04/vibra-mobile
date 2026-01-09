@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt.android)
     alias(libs.plugins.google.gms.google.services)
 }
 
@@ -73,10 +72,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
-    implementation(libs.hilt.navigation.fragment)
-    implementation(libs.hilt.navigation.compose)
     implementation(libs.compose.material.icons.core)
     implementation("androidx.compose.ui:ui-text-google-fonts:1.9.4")
     implementation("androidx.compose.material:material-icons-extended")
@@ -86,4 +81,10 @@ dependencies {
     implementation("androidx.media3:media3-ui:1.8.0")
     implementation("androidx.media3:media3-common:1.8.0")
     implementation("androidx.media3:media3-session:1.8.0")
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.core)
+    implementation("io.insert-koin:koin-ktor")
+    implementation("io.insert-koin:koin-android")
+    implementation("io.insert-koin:koin-androidx-compose")
+    implementation("io.insert-koin:koin-androidx-compose-navigation")
 }

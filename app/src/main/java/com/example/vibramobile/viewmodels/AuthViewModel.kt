@@ -7,18 +7,14 @@ import com.example.vibramobile.Destination
 import com.example.vibramobile.helpers.JsonHelper
 import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.models.User
-import com.example.vibramobile.states.UiState
 import com.example.vibramobile.states.UserState
-import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.submitForm
 import io.ktor.http.parameters
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class AuthViewModel @Inject constructor(
+class AuthViewModel(
     private val client: HttpClient
 ) : ViewModel() {
     fun login(email: String, password: String) {
