@@ -303,12 +303,6 @@ fun HomeScreen(
     }
 }
 
-//@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
-//@Composable
-//fun Preview(modifier: Modifier = Modifier) {
-//    HomeScreen()
-//}
-
 @Composable
 fun SectionTitle(modifier: Modifier = Modifier, text: String) {
     Text(
@@ -374,15 +368,5 @@ fun ArtistSection(modifier: Modifier = Modifier, artists: List<User>) {
             }
             Spacer(Modifier.width(16.dp))
         }
-    }
-}
-
-inline fun Modifier.noRippleClickable(
-    crossinline onClick: () -> Unit
-): Modifier = composed {
-    clickable(
-        indication = null,
-        interactionSource = remember { MutableInteractionSource() }) {
-        onClick()
     }
 }

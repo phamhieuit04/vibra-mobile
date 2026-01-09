@@ -31,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.MediaItem
@@ -39,7 +38,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import coil3.compose.AsyncImage
 import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UiState
-import com.example.vibramobile.ui.screens.noRippleClickable
+import com.example.vibramobile.ui.extends.noRippleClickable
 import io.ktor.http.encodeURLPath
 import kotlinx.coroutines.delay
 
