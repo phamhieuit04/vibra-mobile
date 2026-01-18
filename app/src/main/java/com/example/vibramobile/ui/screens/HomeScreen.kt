@@ -35,9 +35,9 @@ import com.example.vibramobile.ui.components.ListAlbumSkeleton
 import com.example.vibramobile.ui.components.ListArtistComponent
 import com.example.vibramobile.ui.components.ListArtistSkeleton
 import com.example.vibramobile.ui.components.ListSongComponent
-import com.example.vibramobile.ui.components.ListSongSkeleton
 import com.example.vibramobile.ui.components.ListSongRowComponent
 import com.example.vibramobile.ui.components.ListSongRowSkeleton
+import com.example.vibramobile.ui.components.ListSongSkeleton
 import com.example.vibramobile.ui.components.SkeletonComponent
 import com.example.vibramobile.ui.components.TopArtistsComponent
 import com.example.vibramobile.viewmodels.HomeViewModel
@@ -260,7 +260,11 @@ fun HomeScreen(
                     }
                 }
 
-                item { Spacer(Modifier.height(96.dp)) }
+                item {
+                    if (UiState.getDisplayMediaPlayer()) {
+                        Spacer(Modifier.height(96.dp))
+                    }
+                }
             }
         }
     }

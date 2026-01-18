@@ -15,12 +15,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.example.vibramobile.R
 import com.example.vibramobile.models.User
 import com.example.vibramobile.ui.extends.skeletonEffect
@@ -61,7 +64,11 @@ fun TopArtistCard(
     ) {
         AsyncImage(
             modifier = Modifier.fillMaxSize(),
-            model = artist.avatar_path?.encodeURLPath(),
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(artist.avatar_path?.encodeURLPath())
+                .size(400)
+                .crossfade(true)
+                .build(),
             contentDescription = artist.name,
             contentScale = ContentScale.Crop,
             placeholder = painterResource(R.drawable.default_image),

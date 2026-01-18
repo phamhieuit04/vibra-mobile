@@ -21,10 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.example.vibramobile.R
 import com.example.vibramobile.models.Song
 import com.example.vibramobile.ui.extends.noRippleClickable
@@ -57,7 +60,11 @@ fun ListSongRowComponent(
                             ),
                         contentDescription = "",
                         contentScale = ContentScale.Crop,
-                        model = song.thumbnail_path?.encodeURLPath(),
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(song.thumbnail_path?.encodeURLPath())
+                            .size(400)
+                            .crossfade(true)
+                            .build(),
                         placeholder = painterResource(R.drawable.default_image),
                         error = painterResource(R.drawable.default_image)
                     )
