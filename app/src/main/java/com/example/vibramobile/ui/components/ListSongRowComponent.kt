@@ -21,16 +21,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.example.vibramobile.R
 import com.example.vibramobile.models.Song
 import com.example.vibramobile.ui.extends.noRippleClickable
 import com.example.vibramobile.ui.extends.skeletonEffect
 import io.ktor.http.encodeURLPath
 
 @Composable
-fun RecentRotationSongsComponent(
+fun ListSongRowComponent(
     onPlay: (Song) -> Unit,
     modifier: Modifier = Modifier,
     songs: List<Song>
@@ -55,7 +57,9 @@ fun RecentRotationSongsComponent(
                             ),
                         contentDescription = "",
                         contentScale = ContentScale.Crop,
-                        model = song.thumbnail_path?.encodeURLPath()
+                        model = song.thumbnail_path?.encodeURLPath(),
+                        placeholder = painterResource(R.drawable.default_image),
+                        error = painterResource(R.drawable.default_image)
                     )
                     Spacer(Modifier.width(12.dp))
                     Column() {
@@ -89,7 +93,7 @@ fun RecentRotationSongsComponent(
 }
 
 @Composable
-fun RecentRotationSongsSkeleton(modifier: Modifier = Modifier) {
+fun ListSongRowSkeleton(modifier: Modifier = Modifier) {
     Column() {
         for (i in 0..3) {
             Row(

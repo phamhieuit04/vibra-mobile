@@ -25,9 +25,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.example.vibramobile.R
 import com.example.vibramobile.models.Song
 import com.example.vibramobile.ui.extends.noRippleClickable
 import com.example.vibramobile.ui.extends.skeletonEffect
@@ -55,7 +57,9 @@ fun ListSongComponent(
                         ),
                     model = song.thumbnail_path?.encodeURLPath(),
                     contentDescription = "",
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(R.drawable.default_image),
+                    error = painterResource(R.drawable.default_image)
                 )
                 Spacer(Modifier.height(8.dp))
                 Row(

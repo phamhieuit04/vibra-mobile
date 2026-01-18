@@ -1,6 +1,6 @@
 package com.example.vibramobile.ui.components
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,21 +26,32 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.example.vibramobile.R
 import com.example.vibramobile.models.User
+import com.example.vibramobile.ui.extends.noRippleClickable
 import com.example.vibramobile.ui.extends.skeletonEffect
 import io.ktor.http.encodeURLPath
 
 @Composable
-fun ListArtistComponent(modifier: Modifier = Modifier, artists: List<User>) {
+fun ListArtistComponent(
+    modifier: Modifier = Modifier,
+    artists: List<User>,
+    onClick: (User) -> Unit = {}
+) {
     LazyRow() {
         itemsIndexed(artists) { index, artist ->
-            Column(modifier = Modifier.width(140.dp)) {
+            Column(
+                modifier = Modifier
+                    .width(140.dp)
+                    .clickable(onClick = { onClick(artist) })
+            ) {
                 AsyncImage(
                     modifier = Modifier
                         .size(140.dp)
                         .clip(shape = RoundedCornerShape(6.dp)),
                     model = artist.avatar_path?.encodeURLPath(),
                     contentDescription = "",
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(R.drawable.default_image),
+                    error = painterResource(R.drawable.default_image)
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
