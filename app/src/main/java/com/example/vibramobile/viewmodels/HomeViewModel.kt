@@ -4,8 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vibramobile.models.Category
+import com.example.vibramobile.models.Playlist
 import com.example.vibramobile.models.Response
 import com.example.vibramobile.models.Song
+import com.example.vibramobile.models.User
+import com.example.vibramobile.states.ArtistState
 import com.example.vibramobile.states.CategoryState
 import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UserState
@@ -17,7 +20,6 @@ import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -42,7 +44,10 @@ class HomeViewModel(
             awaitAll(
                 async { getCategories() },
                 async { getRecommendedSongs() },
-                async { getRecentRotationSongs() }
+                async { getRecentRotationSongs() },
+                async { getPopularAlbums() },
+                async { getPopularSongs() },
+                async { getPopularArtists() }
             )
         } finally {
             _isRefreshing.value = false
@@ -102,5 +107,59 @@ class HomeViewModel(
             Log.e("MyApp", exception.toString())
         }
         CategoryState.isCategoriesLoading = false
+    }
+
+    suspend fun getPopularAlbums() {
+        SongState.isPopularAlbumsLoading = true
+        runCatching {
+            val response = client.get("home/list-album") {
+                bearerAuth(accessToken)
+            }.bodyAsText()
+
+            val result = json.decodeFromString<Response<List<Playlist>>>(response)
+            SongState.popularAlbums.apply {
+                clear()
+                addAll(result.data)
+            }
+        }.onFailure { exception ->
+            Log.e("MyApp", exception.toString())
+        }
+        SongState.isPopularAlbumsLoading = false
+    }
+
+    suspend fun getPopularSongs() {
+        SongState.isPopularSongsLoading = true
+        runCatching {
+            val response = client.get("home/list-song") {
+                bearerAuth(accessToken)
+            }.bodyAsText()
+
+            val result = json.decodeFromString<Response<List<Song>>>(response)
+            SongState.popularSongs.apply {
+                clear()
+                addAll(result.data)
+            }
+        }.onFailure { exception ->
+            Log.e("MyApp", exception.toString())
+        }
+        SongState.isPopularSongsLoading = false
+    }
+
+    suspend fun getPopularArtists() {
+        ArtistState.isPopularArtistsLoading = true
+        runCatching {
+            val response = client.get("home/list-artist") {
+                bearerAuth(accessToken)
+            }.bodyAsText()
+
+            val result = json.decodeFromString<Response<List<User>>>(response)
+            ArtistState.popularArtists.apply {
+                clear()
+                addAll(result.data)
+            }
+        }.onFailure { exception ->
+            Log.e("MyApp", exception.toString())
+        }
+        ArtistState.isPopularArtistsLoading = false
     }
 }
