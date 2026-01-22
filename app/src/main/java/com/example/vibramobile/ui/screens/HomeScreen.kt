@@ -1,5 +1,7 @@
 package com.example.vibramobile.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,16 +12,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +36,7 @@ import com.example.vibramobile.states.ArtistState
 import com.example.vibramobile.states.CategoryState
 import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UiState
+import com.example.vibramobile.ui.components.HomeSkeleton
 import com.example.vibramobile.ui.components.ListAlbumComponent
 import com.example.vibramobile.ui.components.ListAlbumSkeleton
 import com.example.vibramobile.ui.components.ListArtistComponent
@@ -45,49 +52,6 @@ import com.example.vibramobile.viewmodels.MediaPlayerViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-val artists = listOf(
-    User(
-        id = 0,
-        name = "Kenshi Yonezu",
-        description = "Kenshi Yonezu (米津玄師) là một nghệ sĩ đa tài người Nhật Bản: ca sĩ, nhạc sĩ, nhà sản xuất âm nhạc và họa sĩ minh họa...",
-        email = "kenshi@gmail.com",
-        avatar = "http://localhost:8000/uploads/kenshi/avatars/kenshi.jpg",
-        followers = 0
-    ),
-    User(
-        id = 1,
-        name = "Kenshi Yonezu",
-        description = "Kenshi Yonezu (米津玄師) là một nghệ sĩ đa tài người Nhật Bản: ca sĩ, nhạc sĩ, nhà sản xuất âm nhạc và họa sĩ minh họa...",
-        email = "kenshi@gmail.com",
-        avatar = "http://localhost:8000/uploads/kenshi/avatars/kenshi.jpg",
-        followers = 0
-    ),
-    User(
-        id = 2,
-        name = "Kenshi Yonezu",
-        description = "Kenshi Yonezu (米津玄師) là một nghệ sĩ đa tài người Nhật Bản: ca sĩ, nhạc sĩ, nhà sản xuất âm nhạc và họa sĩ minh họa...",
-        email = "kenshi@gmail.com",
-        avatar = "http://localhost:8000/uploads/kenshi/avatars/kenshi.jpg",
-        followers = 0
-    ),
-    User(
-        id = 3,
-        name = "Kenshi Yonezu",
-        description = "Kenshi Yonezu (米津玄師) là một nghệ sĩ đa tài người Nhật Bản: ca sĩ, nhạc sĩ, nhà sản xuất âm nhạc và họa sĩ minh họa...",
-        email = "kenshi@gmail.com",
-        avatar = "http://localhost:8000/uploads/kenshi/avatars/kenshi.jpg",
-        followers = 0
-    ),
-    User(
-        id = 4,
-        name = "Kenshi Yonezu",
-        description = "Kenshi Yonezu (米津玄師) là một nghệ sĩ đa tài người Nhật Bản: ca sĩ, nhạc sĩ, nhà sản xuất âm nhạc và họa sĩ minh họa...",
-        email = "kenshi@gmail.com",
-        avatar = "http://localhost:8000/uploads/kenshi/avatars/kenshi.jpg",
-        followers = 0
-    ),
-)
-
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -98,8 +62,9 @@ fun HomeScreen(
         UiState.setDisplayNavigationBar(true)
     }
 
-    val scope = rememberCoroutineScope()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val pullToRefreshState = rememberPullToRefreshState()
+    val scrollState = rememberLazyListState()
 
     Scaffold(
         containerColor = Color.Black,
@@ -136,134 +101,118 @@ fun HomeScreen(
     { paddingValues ->
         PullToRefreshBox(
             modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
+            state = pullToRefreshState,
             isRefreshing = isRefreshing,
-            onRefresh = {
-                scope.launch {
-                    viewModel.fetchAll()
-                }
+            onRefresh = { viewModel.fetchAll() },
+            indicator = {
+                PullToRefreshDefaults.Indicator(
+                    state = pullToRefreshState,
+                    isRefreshing = isRefreshing,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                )
             }
         ) {
-            LazyColumn(modifier = Modifier.padding(horizontal = 16.dp)) {
-                item {
-                    SkeletonComponent(
-                        isLoading = SongState.isRecentRotationLoading,
-                        skeletonContent = { ListSongRowSkeleton() }
+            Crossfade(
+                targetState = isRefreshing,
+                label = "HomeContent"
+            ) { loading ->
+                if (!loading) {
+                    LazyColumn(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        state = scrollState,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        if (SongState.recentRotationSongs.isEmpty()) return@SkeletonComponent
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            SectionTitle(text = "Lắng nghe gần đây")
+                        item(key = "recent_rotation") {
+                            AnimatedVisibility(
+                                visible = SongState.recentRotationSongs.isNotEmpty()
+                            ) {
+                                Column(modifier = Modifier.fillMaxWidth()) {
+                                    SectionTitle(text = "Lắng nghe gần đây")
+                                    Spacer(Modifier.height(16.dp))
+                                    ListSongRowComponent(
+                                        onPlay = { mediaPlayerViewModel.playSong(song = it) },
+                                        songs = SongState.recentRotationSongs
+                                    )
+                                }
+                            }
+                        }
 
-                            Spacer(Modifier.height(16.dp))
+                        item(key = "recommended") {
+                            AnimatedVisibility(
+                                visible = SongState.recommendedSongs.isNotEmpty()
+                            ) {
+                                Column(modifier = Modifier.fillMaxWidth()) {
+                                    SectionTitle(text = "Phù hợp với bạn")
+                                    Spacer(Modifier.height(16.dp))
+                                    ListSongComponent(
+                                        onPlay = { mediaPlayerViewModel.playSong(song = it) },
+                                        songs = SongState.recommendedSongs
+                                    )
+                                }
+                            }
+                        }
 
-                            ListSongRowComponent(
-                                onPlay = { mediaPlayerViewModel.playSong(song = it) },
-                                songs = SongState.recentRotationSongs
-                            )
+                        item(key = "top_artists") {
+                            AnimatedVisibility(
+                                visible = ArtistState.popularArtists.isNotEmpty()
+                            ) {
+                                Column(modifier = Modifier.fillMaxWidth()) {
+                                    SectionTitle(text = "Nghệ sĩ nổi bật")
+                                    Spacer(Modifier.height(16.dp))
+                                    TopArtistsComponent(
+                                        artists = ArtistState.popularArtists.take(5),
+                                        onClick = { }
+                                    )
+                                    Spacer(Modifier.height(16.dp))
+                                    ListArtistComponent(
+                                        artists = ArtistState.popularArtists.drop(5),
+                                        onClick = { }
+                                    )
+                                }
+                            }
+                        }
+
+                        item(key = "popular_songs") {
+                            AnimatedVisibility(
+                                visible = SongState.popularSongs.isNotEmpty()
+                            ) {
+                                Column(modifier = Modifier.fillMaxWidth()) {
+                                    SectionTitle(text = "Bài hát có nhiều lượt nghe")
+                                    Spacer(Modifier.height(16.dp))
+                                    ListSongComponent(
+                                        onPlay = { mediaPlayerViewModel.playSong(song = it) },
+                                        songs = SongState.popularSongs.take(5)
+                                    )
+                                    Spacer(Modifier.height(16.dp))
+                                    ListSongRowComponent(
+                                        onPlay = { mediaPlayerViewModel.playSong(song = it) },
+                                        songs = SongState.popularSongs.drop(5).take(10)
+                                    )
+                                }
+                            }
+                        }
+
+                        item(key = "popular_albums") {
+                            AnimatedVisibility(
+                                visible = SongState.popularAlbums.isNotEmpty()
+                            ) {
+                                Column(modifier = Modifier.fillMaxWidth()) {
+                                    SectionTitle(text = "Album phổ biến")
+                                    Spacer(Modifier.height(16.dp))
+                                    ListAlbumComponent(albums = SongState.popularAlbums)
+                                }
+                            }
+                        }
+
+                        item(key = "bottom_spacer") {
+                            if (UiState.getDisplayMediaPlayer()) {
+                                Spacer(Modifier.height(96.dp))
+                            }
                         }
                     }
-                }
-
-                item {
-                    Spacer(Modifier.height(10.dp))
-
-                    SkeletonComponent(
-                        isLoading = SongState.isRecommendedSongsLoading,
-                        skeletonContent = { ListSongSkeleton() }
-                    ) {
-                        if (SongState.recommendedSongs.isEmpty()) return@SkeletonComponent
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            SectionTitle(text = "Phù hợp với bạn")
-
-                            Spacer(Modifier.height(16.dp))
-
-                            ListSongComponent(
-                                onPlay = { mediaPlayerViewModel.playSong(song = it) },
-                                songs = SongState.recommendedSongs
-                            )
-                        }
-                        Spacer(Modifier.height(16.dp))
-                    }
-                }
-
-                item {
-                    Spacer(Modifier.height(10.dp))
-
-                    SkeletonComponent(
-                        isLoading = ArtistState.isPopularArtistsLoading,
-                        skeletonContent = { ListArtistSkeleton() }
-                    ) {
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            SectionTitle(text = "Nghệ sĩ nổi bật")
-
-                            Spacer(Modifier.height(16.dp))
-
-                            TopArtistsComponent(
-                                artists = ArtistState.popularArtists.take(5),
-                                onClick = { }
-                            )
-
-                            Spacer(Modifier.height(16.dp))
-
-                            ListArtistComponent(
-                                artists = ArtistState.popularArtists.drop(5),
-                                onClick = { })
-                        }
-                        Spacer(Modifier.height(16.dp))
-                    }
-                }
-
-                item {
-                    Spacer(Modifier.height(10.dp))
-
-                    SkeletonComponent(
-                        isLoading = SongState.isPopularSongsLoading,
-                        skeletonContent = { ListSongSkeleton() }
-                    ) {
-                        if (SongState.popularSongs.isEmpty()) return@SkeletonComponent
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            SectionTitle(text = "Bài hát có nhiều lượt nghe")
-
-                            Spacer(Modifier.height(16.dp))
-
-                            ListSongComponent(
-                                onPlay = { mediaPlayerViewModel.playSong(song = it) },
-                                songs = SongState.popularSongs.take(5)
-                            )
-
-                            Spacer(Modifier.height(16.dp))
-
-                            ListSongRowComponent(
-                                onPlay = { mediaPlayerViewModel.playSong(song = it) },
-                                songs = SongState.popularSongs.drop(5).take(10)
-                            )
-                        }
-                        Spacer(Modifier.height(16.dp))
-                    }
-                }
-
-                item {
-                    Spacer(Modifier.height(10.dp))
-
-                    SkeletonComponent(
-                        isLoading = SongState.isPopularAlbumsLoading,
-                        skeletonContent = { ListAlbumSkeleton() }
-                    ) {
-                        if (SongState.popularAlbums.isEmpty()) return@SkeletonComponent
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            SectionTitle(text = "Album phổ biến")
-
-                            Spacer(Modifier.height(16.dp))
-
-                            ListAlbumComponent(albums = SongState.popularAlbums)
-                        }
-                        Spacer(Modifier.height(16.dp))
-                    }
-                }
-
-                item {
-                    if (UiState.getDisplayMediaPlayer()) {
-                        Spacer(Modifier.height(96.dp))
-                    }
+                } else {
+                    HomeSkeleton()
                 }
             }
         }

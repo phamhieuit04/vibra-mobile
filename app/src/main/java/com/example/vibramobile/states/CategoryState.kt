@@ -7,7 +7,5 @@ import androidx.compose.runtime.setValue
 import com.example.vibramobile.models.Category
 
 object CategoryState {
-    var isCategoriesLoading by mutableStateOf(false)
-
     var categories = mutableStateListOf<Category>()
 }

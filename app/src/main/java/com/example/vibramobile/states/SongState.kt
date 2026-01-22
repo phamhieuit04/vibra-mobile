@@ -10,11 +10,6 @@ import com.example.vibramobile.models.Song
 import com.example.vibramobile.models.User
 
 object SongState {
-    var isRecommendedSongsLoading by mutableStateOf(false)
-    var isRecentRotationLoading by mutableStateOf(false)
-    var isPopularAlbumsLoading by mutableStateOf(false)
-    var isPopularSongsLoading by mutableStateOf(false)
-
     var currentSong = mutableStateOf<Song?>(null)
     var recommendedSongs = mutableStateListOf<Song>()
     var popularSongs = mutableStateListOf<Song>()
