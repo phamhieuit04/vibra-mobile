@@ -1,11 +1,14 @@
 package com.example.vibramobile.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,9 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LibraryMusic
 import androidx.compose.material.icons.outlined.Search
@@ -28,6 +33,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +58,9 @@ val TOP_LEVEL_DESTINATIONS = mapOf(
     ),
     MainDestination.Library to BottomNavItem(
         "Library", Icons.Outlined.LibraryMusic, Icons.Default.LibraryMusic
+    ),
+    MainDestination.Profile to BottomNavItem(
+        "Profile", Icons.Outlined.AccountCircle, Icons.Default.AccountCircle
     )
 )
 
@@ -63,14 +73,26 @@ fun AppNavigationBar(
 ) {
     if (!isVisible) return
 
-    NavigationBar(
-        containerColor = Color.Black,
-        windowInsets = NavigationBarDefaults.windowInsets
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color.Transparent,
+                        Color.Black.copy(alpha = 0.3f),
+                        Color.Black.copy(alpha = 0.7f),
+                        Color.Black.copy(alpha = 0.9f)
+                    ),
+                    startY = 0f,
+                    endY = Float.POSITIVE_INFINITY
+                )
+            )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 4.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             TOP_LEVEL_DESTINATIONS.forEach { (destination, data) ->
@@ -119,14 +141,14 @@ fun AppNavigationBarItem(
                 modifier = Modifier.size(26.dp),
                 contentDescription = "",
                 imageVector = if (isSelected) selectedIcon else icon,
-                tint = if (isSelected) iconColor.copy(alpha = 0.8f) else iconColor.copy(alpha = 0.6f)
+                tint = if (isSelected) iconColor else iconColor.copy(alpha = 0.8f)
             )
             Spacer(Modifier.height(3.dp))
             Text(
                 text = label,
                 fontSize = 10.sp,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                color = if (isSelected) labelColor.copy(alpha = 0.8f) else labelColor.copy(alpha = 0.6f)
+                color = if (isSelected) labelColor else labelColor.copy(alpha = 0.8f)
             )
         }
     }

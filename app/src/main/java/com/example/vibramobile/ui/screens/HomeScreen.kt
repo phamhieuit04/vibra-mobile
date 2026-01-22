@@ -206,6 +206,8 @@ fun HomeScreen(
                         }
 
                         item(key = "bottom_spacer") {
+                            Spacer(Modifier.height(96.dp))
+
                             if (UiState.getDisplayMediaPlayer()) {
                                 Spacer(Modifier.height(96.dp))
                             }

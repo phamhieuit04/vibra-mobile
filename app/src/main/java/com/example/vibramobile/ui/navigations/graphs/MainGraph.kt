@@ -1,6 +1,7 @@
 package com.example.vibramobile.ui.navigations.graphs
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -22,6 +23,7 @@ import com.example.vibramobile.ui.navigations.destinations.MainDestination
 import com.example.vibramobile.ui.screens.FullscreenPlayer
 import com.example.vibramobile.ui.screens.HomeScreen
 import com.example.vibramobile.ui.screens.LibraryScreen
+import com.example.vibramobile.ui.screens.ProfileScreen
 import com.example.vibramobile.ui.screens.SearchScreen
 
 @Composable
@@ -35,19 +37,25 @@ fun MainGraph() {
     Scaffold(
         containerColor = Color.Black,
         bottomBar = {
-            AppNavigationBar(
-                isVisible = UiState.getDisplayNavigationBar(),
-                selectedKey = navigationState.topLevelRoute,
-                onSelectKey = {
-                    navigator.navigate(it)
-                }
-            )
+            Column() {
+                AppMediaPlayer(
+                    isVisible = UiState.getDisplayMediaPlayer()
+                )
+
+                AppNavigationBar(
+                    isVisible = UiState.getDisplayNavigationBar(),
+                    selectedKey = navigationState.topLevelRoute,
+                    onSelectKey = {
+                        navigator.navigate(it)
+                    }
+                )
+            }
         }
     ) { padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(top = padding.calculateTopPadding())
         ) {
             NavDisplay(
                 onBack = navigator::goBack,
@@ -62,6 +70,9 @@ fun MainGraph() {
                         entry<MainDestination.Library> {
                             LibraryScreen()
                         }
+                        entry<MainDestination.Profile> {
+                            ProfileScreen()
+                        }
                     }
                 )
             )
@@ -70,11 +81,7 @@ fun MainGraph() {
                 isVisible = UiState.getDisplaySongDetail(),
                 onVisibleChange = { value ->
                     UiState.setDisplaySongDetail(value)
-                })
-
-            AppMediaPlayer(
-                modifier = Modifier.align(alignment = Alignment.BottomEnd),
-                isVisible = UiState.getDisplayMediaPlayer()
+                }
             )
         }
     }
