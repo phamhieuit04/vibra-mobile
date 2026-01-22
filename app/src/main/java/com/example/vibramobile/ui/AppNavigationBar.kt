@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -80,19 +81,21 @@ fun AppNavigationBar(
                 brush = Brush.verticalGradient(
                     colors = listOf(
                         Color.Transparent,
-                        Color.Black.copy(alpha = 0.3f),
-                        Color.Black.copy(alpha = 0.7f),
-                        Color.Black.copy(alpha = 0.9f)
+                        Color.Black.copy(alpha = 0.2f),
+                        Color.Black.copy(alpha = 0.5f),
+                        Color.Black.copy(alpha = 0.8f),
+                        Color.Black.copy(alpha = 0.95f)
                     ),
                     startY = 0f,
                     endY = Float.POSITIVE_INFINITY
                 )
             )
+            .navigationBarsPadding()
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 4.dp),
+                .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             TOP_LEVEL_DESTINATIONS.forEach { (destination, data) ->
