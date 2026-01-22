@@ -20,8 +20,8 @@ fun SkeletonComponent(
 }
 
 @Composable
-fun HomeSkeleton() {
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+fun HomeSkeleton(modifier: Modifier = Modifier) {
+    Column(modifier = modifier.padding(horizontal = 16.dp)) {
         ListSongRowSkeleton()
         Spacer(Modifier.height(16.dp))
         ListSongSkeleton()

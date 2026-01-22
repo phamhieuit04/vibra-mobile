@@ -2,10 +2,13 @@ package com.example.vibramobile.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,11 +27,19 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,9 +61,17 @@ import com.example.vibramobile.ui.components.SkeletonComponent
 import com.example.vibramobile.ui.components.TopArtistsComponent
 import com.example.vibramobile.viewmodels.HomeViewModel
 import com.example.vibramobile.viewmodels.MediaPlayerViewModel
+import dev.chrisbanes.haze.HazeProgressive
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.materials.CupertinoMaterials
+import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
+import dev.chrisbanes.haze.materials.HazeMaterials
+import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalHazeMaterialsApi::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -66,6 +85,19 @@ fun HomeScreen(
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val pullToRefreshState = rememberPullToRefreshState()
     val scrollState = rememberLazyListState()
+    val hazeState = rememberHazeState()
+
+    var topBarHeight by remember { mutableStateOf(0.dp) }
+    val density = LocalDensity.current
+    val blurProgress by remember {
+        derivedStateOf {
+            val firstVisibleItemIndex = scrollState.firstVisibleItemIndex
+            val firstVisibleItemScrollOffset = scrollState.firstVisibleItemScrollOffset
+            val totalScroll = (firstVisibleItemIndex * 500f) + firstVisibleItemScrollOffset
+            (totalScroll / 300f).coerceIn(0f, 1f)
+        }
+    }
+
 
     val categories by CategoryState.categories.collectAsState()
     val recentRotationSongs by SongState.recentRotationSongs.collectAsState()
@@ -74,41 +106,9 @@ fun HomeScreen(
     val popularAlbums by SongState.popularAlbums.collectAsState()
     val popularArtists by ArtistState.popularArtists.collectAsState()
 
-    Scaffold(
-        containerColor = Color.Black,
-        topBar = {
-            LazyRow(
-                contentPadding = PaddingValues(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                item {
-                    FilledTonalButton(
-                        onClick = {}, colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xffbc4d15)
-                        )
-                    ) {
-                        Text(text = "All", color = Color.White, fontSize = 14.sp)
-                    }
-                }
-                items(items = categories, key = { it.id!! }) { category ->
-                    FilledTonalButton(
-                        onClick = { }, colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xff303030)
-                        )
-                    ) {
-                        Text(
-                            text = category.name.toString(),
-                            color = Color.White,
-                            fontSize = 14.sp,
-                            lineHeight = 14.sp
-                        )
-                    }
-                }
-            }
-        })
-    { paddingValues ->
+    Box(modifier = Modifier.fillMaxSize()) {
         PullToRefreshBox(
-            modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
+            modifier = Modifier.hazeSource(hazeState),
             state = pullToRefreshState,
             isRefreshing = isRefreshing,
             onRefresh = { viewModel.fetchAll() },
@@ -118,6 +118,7 @@ fun HomeScreen(
                     isRefreshing = isRefreshing,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
+                        .padding(top = topBarHeight)
                 )
             }
         ) {
@@ -128,6 +129,7 @@ fun HomeScreen(
                 if (!loading) {
                     LazyColumn(
                         modifier = Modifier.padding(horizontal = 16.dp),
+                        contentPadding = PaddingValues(top = topBarHeight),
                         state = scrollState,
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
@@ -222,7 +224,57 @@ fun HomeScreen(
                         }
                     }
                 } else {
-                    HomeSkeleton()
+                    HomeSkeleton(modifier = Modifier.padding(top = topBarHeight))
+                }
+            }
+        }
+
+        LazyRow(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .background(color = Color.Transparent)
+                .onGloballyPositioned { coordinates ->
+                    topBarHeight = with(density) {
+                        coordinates.size.height.toDp()
+                    }
+                }
+                .hazeEffect(
+                    state = hazeState,
+                    style = HazeMaterials.thin()
+                ) {
+                    blurEnabled = true
+                    progressive =
+                        HazeProgressive.verticalGradient(
+                            startIntensity = 1f,
+                            endIntensity = 0f,
+                            preferPerformance = true
+                        )
+                    alpha = blurProgress
+                },
+            contentPadding = PaddingValues(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            item {
+                FilledTonalButton(
+                    onClick = {}, colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xffbc4d15)
+                    )
+                ) {
+                    Text(text = "All", color = Color.White, fontSize = 14.sp)
+                }
+            }
+            items(items = categories, key = { it.id!! }) { category ->
+                FilledTonalButton(
+                    onClick = { }, colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xff303030)
+                    )
+                ) {
+                    Text(
+                        text = category.name.toString(),
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        lineHeight = 14.sp
+                    )
                 }
             }
         }
