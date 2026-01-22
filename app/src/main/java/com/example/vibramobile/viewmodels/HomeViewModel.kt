@@ -67,9 +67,7 @@ class HomeViewModel(
                 }.bodyAsText()
                 val result = json.decodeFromString<Response<List<Song>>>(response)
 
-                withContext(Dispatchers.Main) {
-                    SongState.recommendedSongs = result.data.toMutableStateList()
-                }
+                SongState.setRecommendedSongs(result.data)
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
@@ -85,9 +83,7 @@ class HomeViewModel(
                 }.bodyAsText()
                 val result = json.decodeFromString<Response<List<Song>>>(response)
 
-                withContext(Dispatchers.Main) {
-                    SongState.recentRotationSongs = result.data.toMutableStateList()
-                }
+                SongState.setRecentRotationSongs(result.data)
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
@@ -102,9 +98,7 @@ class HomeViewModel(
                 }.bodyAsText()
                 val result = json.decodeFromString<Response<List<Category>>>(response)
 
-                withContext(Dispatchers.Main) {
-                    CategoryState.categories = result.data.toMutableStateList()
-                }
+                CategoryState.setCategories(result.data)
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
@@ -119,9 +113,7 @@ class HomeViewModel(
                 }.bodyAsText()
                 val result = json.decodeFromString<Response<List<Playlist>>>(response)
 
-                withContext(Dispatchers.Main) {
-                    SongState.popularAlbums = result.data.toMutableStateList()
-                }
+                SongState.setPopularAlbums(result.data)
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
@@ -136,9 +128,7 @@ class HomeViewModel(
                 }.bodyAsText()
                 val result = json.decodeFromString<Response<List<Song>>>(response)
 
-                withContext(Dispatchers.Main) {
-                    SongState.popularSongs = result.data.toMutableStateList()
-                }
+                SongState.setPopularSongs(result.data)
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
@@ -153,9 +143,7 @@ class HomeViewModel(
                 }.bodyAsText()
                 val result = json.decodeFromString<Response<List<User>>>(response)
 
-                withContext(Dispatchers.Main) {
-                    ArtistState.popularArtists = result.data.toMutableStateList()
-                }
+                ArtistState.setPopularArtists(result.data)
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }

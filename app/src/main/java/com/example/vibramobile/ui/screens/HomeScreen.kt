@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ButtonDefaults
@@ -66,6 +67,13 @@ fun HomeScreen(
     val pullToRefreshState = rememberPullToRefreshState()
     val scrollState = rememberLazyListState()
 
+    val categories by CategoryState.categories.collectAsState()
+    val recentRotationSongs by SongState.recentRotationSongs.collectAsState()
+    val recommendedSongs by SongState.recommendedSongs.collectAsState()
+    val popularSongs by SongState.popularSongs.collectAsState()
+    val popularAlbums by SongState.popularAlbums.collectAsState()
+    val popularArtists by ArtistState.popularArtists.collectAsState()
+
     Scaffold(
         containerColor = Color.Black,
         topBar = {
@@ -82,7 +90,7 @@ fun HomeScreen(
                         Text(text = "All", color = Color.White, fontSize = 14.sp)
                     }
                 }
-                itemsIndexed(CategoryState.categories) { index, category ->
+                items(items = categories, key = { it.id!! }) { category ->
                     FilledTonalButton(
                         onClick = { }, colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xff303030)
@@ -125,14 +133,14 @@ fun HomeScreen(
                     ) {
                         item(key = "recent_rotation") {
                             AnimatedVisibility(
-                                visible = SongState.recentRotationSongs.isNotEmpty()
+                                visible = recentRotationSongs.isNotEmpty()
                             ) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
                                     SectionTitle(text = "Lắng nghe gần đây")
                                     Spacer(Modifier.height(16.dp))
                                     ListSongRowComponent(
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
-                                        songs = SongState.recentRotationSongs
+                                        songs = recentRotationSongs
                                     )
                                 }
                             }
@@ -140,14 +148,14 @@ fun HomeScreen(
 
                         item(key = "recommended") {
                             AnimatedVisibility(
-                                visible = SongState.recommendedSongs.isNotEmpty()
+                                visible = recommendedSongs.isNotEmpty()
                             ) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
                                     SectionTitle(text = "Phù hợp với bạn")
                                     Spacer(Modifier.height(16.dp))
                                     ListSongComponent(
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
-                                        songs = SongState.recommendedSongs
+                                        songs = recommendedSongs
                                     )
                                 }
                             }
@@ -155,18 +163,18 @@ fun HomeScreen(
 
                         item(key = "top_artists") {
                             AnimatedVisibility(
-                                visible = ArtistState.popularArtists.isNotEmpty()
+                                visible = popularArtists.isNotEmpty()
                             ) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
                                     SectionTitle(text = "Nghệ sĩ nổi bật")
                                     Spacer(Modifier.height(16.dp))
                                     TopArtistsComponent(
-                                        artists = ArtistState.popularArtists.take(5),
+                                        artists = popularArtists.take(5),
                                         onClick = { }
                                     )
                                     Spacer(Modifier.height(16.dp))
                                     ListArtistComponent(
-                                        artists = ArtistState.popularArtists.drop(5),
+                                        artists = popularArtists.drop(5),
                                         onClick = { }
                                     )
                                 }
@@ -175,19 +183,19 @@ fun HomeScreen(
 
                         item(key = "popular_songs") {
                             AnimatedVisibility(
-                                visible = SongState.popularSongs.isNotEmpty()
+                                visible = popularSongs.isNotEmpty()
                             ) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
                                     SectionTitle(text = "Bài hát có nhiều lượt nghe")
                                     Spacer(Modifier.height(16.dp))
                                     ListSongComponent(
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
-                                        songs = SongState.popularSongs.take(5)
+                                        songs = popularSongs.take(5)
                                     )
                                     Spacer(Modifier.height(16.dp))
                                     ListSongRowComponent(
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
-                                        songs = SongState.popularSongs.drop(5).take(10)
+                                        songs = popularSongs.drop(5).take(10)
                                     )
                                 }
                             }
@@ -195,12 +203,12 @@ fun HomeScreen(
 
                         item(key = "popular_albums") {
                             AnimatedVisibility(
-                                visible = SongState.popularAlbums.isNotEmpty()
+                                visible = popularAlbums.isNotEmpty()
                             ) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
                                     SectionTitle(text = "Album phổ biến")
                                     Spacer(Modifier.height(16.dp))
-                                    ListAlbumComponent(albums = SongState.popularAlbums)
+                                    ListAlbumComponent(albums = popularAlbums)
                                 }
                             }
                         }
