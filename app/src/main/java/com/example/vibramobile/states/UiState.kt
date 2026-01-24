@@ -38,4 +38,13 @@ object UiState {
     fun setDisplayQueuePlaylist(value: Boolean) {
         displayQueuePlaylist.value = value
     }
+
+    private var displayContextMenu = mutableStateOf(false)
+    fun getDisplayContextMenu(): Boolean {
+        return displayContextMenu.value
+    }
+
+    fun setDisplayContextMenu(value: Boolean) {
+        displayContextMenu.value = value
+    }
 }

@@ -98,7 +98,6 @@ fun HomeScreen(
         }
     }
 
-
     val categories by CategoryState.categories.collectAsState()
     val recentRotationSongs by SongState.recentRotationSongs.collectAsState()
     val recommendedSongs by SongState.recommendedSongs.collectAsState()
@@ -141,6 +140,7 @@ fun HomeScreen(
                                     SectionTitle(text = "Lắng nghe gần đây")
                                     Spacer(Modifier.height(16.dp))
                                     ListSongRowComponent(
+                                        onClick = { UiState.setDisplayContextMenu(true) },
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
                                         songs = recentRotationSongs
                                     )
@@ -196,6 +196,7 @@ fun HomeScreen(
                                     )
                                     Spacer(Modifier.height(16.dp))
                                     ListSongRowComponent(
+                                        onClick = { UiState.setDisplayContextMenu(true) },
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
                                         songs = popularSongs.drop(5).take(10)
                                     )
