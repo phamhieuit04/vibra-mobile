@@ -2,6 +2,10 @@
 agp = "8.13.1"
 coilCompose = "3.3.0"
 coilNetworkOkhttp = "3.3.0"
+composeunstyled = "1.49.6"
+composeunstyledPlatformtheme = "1.49.6"
+composeunstyledPrimitives = "1.49.6"
+composeunstyledTheming = "1.49.6"
 haze = "1.7.1"
 hazeMaterials = "1.7.1"
 kotlin = "2.2.10"
@@ -45,6 +49,10 @@ androidx-media3-session = { module = "androidx.media3:media3-session", version.r
 androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3Ui" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
+composeunstyled = { module = "com.composables:composeunstyled", version.ref = "composeunstyled" }
+composeunstyled-platformtheme = { module = "com.composables:composeunstyled-platformtheme", version.ref = "composeunstyledPlatformtheme" }
+composeunstyled-primitives = { module = "com.composables:composeunstyled-primitives", version.ref = "composeunstyledPrimitives" }
+composeunstyled-theming = { module = "com.composables:composeunstyled-theming", version.ref = "composeunstyledTheming" }
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 haze-materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "hazeMaterials" }
 insert-koin-koin-android = { module = "io.insert-koin:koin-android" }

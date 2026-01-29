@@ -59,6 +59,7 @@ import com.example.vibramobile.ui.components.ListSongRowSkeleton
 import com.example.vibramobile.ui.components.ListSongSkeleton
 import com.example.vibramobile.ui.components.SkeletonComponent
 import com.example.vibramobile.ui.components.TopArtistsComponent
+import com.example.vibramobile.viewmodels.ContextMenuViewModel
 import com.example.vibramobile.viewmodels.HomeViewModel
 import com.example.vibramobile.viewmodels.MediaPlayerViewModel
 import dev.chrisbanes.haze.HazeProgressive
@@ -76,7 +77,8 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel(),
-    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel()
+    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
+    contextMenuViewModel: ContextMenuViewModel = koinViewModel()
 ) {
     LaunchedEffect(Unit) {
         UiState.setDisplayNavigationBar(true)
@@ -140,7 +142,7 @@ fun HomeScreen(
                                     SectionTitle(text = "Lắng nghe gần đây")
                                     Spacer(Modifier.height(16.dp))
                                     ListSongRowComponent(
-                                        onClick = { UiState.setDisplayContextMenu(true) },
+                                        onClick = { contextMenuViewModel.show() },
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
                                         songs = recentRotationSongs
                                     )
@@ -156,6 +158,7 @@ fun HomeScreen(
                                     SectionTitle(text = "Phù hợp với bạn")
                                     Spacer(Modifier.height(16.dp))
                                     ListSongComponent(
+                                        onClick = { contextMenuViewModel.show() },
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
                                         songs = recommendedSongs
                                     )
@@ -191,12 +194,13 @@ fun HomeScreen(
                                     SectionTitle(text = "Bài hát có nhiều lượt nghe")
                                     Spacer(Modifier.height(16.dp))
                                     ListSongComponent(
+                                        onClick = { contextMenuViewModel.show() },
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
                                         songs = popularSongs.take(5)
                                     )
                                     Spacer(Modifier.height(16.dp))
                                     ListSongRowComponent(
-                                        onClick = { UiState.setDisplayContextMenu(true) },
+                                        onClick = { contextMenuViewModel.show() },
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
                                         songs = popularSongs.drop(5).take(10)
                                     )

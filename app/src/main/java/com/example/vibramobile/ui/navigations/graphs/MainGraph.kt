@@ -88,12 +88,7 @@ fun MainGraph() {
                     onClickContextMenu = { UiState.setDisplayContextMenu(true) }
                 )
 
-                AppContextMenu(
-                    isVisible = UiState.getDisplayContextMenu(),
-                    onVisibleChange = { value ->
-                        UiState.setDisplayContextMenu(value)
-                    }
-                )
+                AppContextMenu()
             }
         }
     }
