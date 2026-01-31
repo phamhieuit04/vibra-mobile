@@ -10,8 +10,14 @@ class ContextMenuViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(ContextMenuState())
     val uiState = _uiState.asStateFlow()
 
-    fun show() {
-        _uiState.update { it.copy(visible = true) }
+    fun show(thumbnailPath: String?, songTitle: String?, artistName: String?) {
+        _uiState.update {
+            it.copy(
+                visible = true, thumbnailPath = thumbnailPath ?: "",
+                songTitle = songTitle ?: "",
+                artistName = artistName ?: ""
+            )
+        }
     }
 
     fun hide() {

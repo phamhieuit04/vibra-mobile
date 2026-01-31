@@ -39,17 +39,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.composables.core.DragIndication
 import com.composables.core.ModalBottomSheet
 import com.composables.core.Scrim
 import com.composables.core.Sheet
 import com.composables.core.SheetDetent
 import com.composables.core.rememberModalBottomSheetState
+import com.example.vibramobile.R
 import com.example.vibramobile.ui.extends.noRippleClickable
 import com.example.vibramobile.viewmodels.ContextMenuViewModel
+import io.ktor.http.encodeURLPath
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -127,6 +135,7 @@ fun AppContextMenu(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 ContextMenuContent(
+                    thumbnailPath = uiState.thumbnailPath,
                     songTitle = uiState.songTitle,
                     artistName = uiState.artistName,
                     onMenuItemClick = { action ->
@@ -153,6 +162,7 @@ fun AppContextMenu(
 
 @Composable
 private fun ContextMenuContent(
+    thumbnailPath: String,
     songTitle: String,
     artistName: String,
     onMenuItemClick: (MenuAction) -> Unit
@@ -165,6 +175,7 @@ private fun ContextMenuContent(
             .padding(horizontal = 16.dp)
     ) {
         SongHeader(
+            thumbnailPath = thumbnailPath,
             songTitle = songTitle,
             artistName = artistName
         )
@@ -257,6 +268,7 @@ private fun ContextMenuContent(
 
 @Composable
 private fun SongHeader(
+    thumbnailPath: String,
     songTitle: String,
     artistName: String
 ) {
@@ -266,12 +278,20 @@ private fun SongHeader(
             .padding(bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
+        AsyncImage(
             modifier = Modifier
-                .size(56.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .background(Color(0xFF404040))
-        ) { }
+                .size(42.dp)
+                .clip(shape = RoundedCornerShape(4.dp)),
+            contentDescription = "",
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(thumbnailPath.encodeURLPath())
+                .size(400)
+                .crossfade(true)
+                .build(),
+            placeholder = painterResource(R.drawable.default_image),
+            error = painterResource(R.drawable.default_image),
+            contentScale = ContentScale.Crop
+        )
 
         Spacer(modifier = Modifier.width(16.dp))
 
@@ -348,6 +368,7 @@ sealed class MenuAction {
 
 data class ContextMenuState(
     val visible: Boolean = false,
+    val thumbnailPath: String = "",
     val songTitle: String = "Six Feet Under",
     val artistName: String = "Billie Eilish"
 )

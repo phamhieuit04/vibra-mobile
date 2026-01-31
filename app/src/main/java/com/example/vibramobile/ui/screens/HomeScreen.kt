@@ -15,11 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
@@ -29,11 +27,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,21 +38,15 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.vibramobile.models.User
 import com.example.vibramobile.states.ArtistState
 import com.example.vibramobile.states.CategoryState
 import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.components.HomeSkeleton
 import com.example.vibramobile.ui.components.ListAlbumComponent
-import com.example.vibramobile.ui.components.ListAlbumSkeleton
 import com.example.vibramobile.ui.components.ListArtistComponent
-import com.example.vibramobile.ui.components.ListArtistSkeleton
 import com.example.vibramobile.ui.components.ListSongComponent
 import com.example.vibramobile.ui.components.ListSongRowComponent
-import com.example.vibramobile.ui.components.ListSongRowSkeleton
-import com.example.vibramobile.ui.components.ListSongSkeleton
-import com.example.vibramobile.ui.components.SkeletonComponent
 import com.example.vibramobile.ui.components.TopArtistsComponent
 import com.example.vibramobile.viewmodels.ContextMenuViewModel
 import com.example.vibramobile.viewmodels.HomeViewModel
@@ -65,11 +54,9 @@ import com.example.vibramobile.viewmodels.MediaPlayerViewModel
 import dev.chrisbanes.haze.HazeProgressive
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
-import dev.chrisbanes.haze.materials.CupertinoMaterials
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalHazeMaterialsApi::class)
@@ -142,8 +129,16 @@ fun HomeScreen(
                                     SectionTitle(text = "Lắng nghe gần đây")
                                     Spacer(Modifier.height(16.dp))
                                     ListSongRowComponent(
-                                        onClick = { contextMenuViewModel.show() },
-                                        onPlay = { mediaPlayerViewModel.playSong(song = it) },
+                                        onClick = {
+                                            contextMenuViewModel.show(
+                                                thumbnailPath = it.thumbnail_path,
+                                                songTitle = it.name,
+                                                artistName = it.author?.name
+                                            )
+                                        },
+                                        onPlay = {
+                                            mediaPlayerViewModel.playSong(song = it);
+                                        },
                                         songs = recentRotationSongs
                                     )
                                 }
@@ -158,7 +153,13 @@ fun HomeScreen(
                                     SectionTitle(text = "Phù hợp với bạn")
                                     Spacer(Modifier.height(16.dp))
                                     ListSongComponent(
-                                        onClick = { contextMenuViewModel.show() },
+                                        onClick = {
+                                            contextMenuViewModel.show(
+                                                thumbnailPath = it.thumbnail_path,
+                                                songTitle = it.name,
+                                                artistName = it.author?.name
+                                            )
+                                        },
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
                                         songs = recommendedSongs
                                     )
@@ -194,13 +195,25 @@ fun HomeScreen(
                                     SectionTitle(text = "Bài hát có nhiều lượt nghe")
                                     Spacer(Modifier.height(16.dp))
                                     ListSongComponent(
-                                        onClick = { contextMenuViewModel.show() },
+                                        onClick = {
+                                            contextMenuViewModel.show(
+                                                thumbnailPath = it.thumbnail_path,
+                                                songTitle = it.name,
+                                                artistName = it.author?.name
+                                            )
+                                        },
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
                                         songs = popularSongs.take(5)
                                     )
                                     Spacer(Modifier.height(16.dp))
                                     ListSongRowComponent(
-                                        onClick = { contextMenuViewModel.show() },
+                                        onClick = {
+                                            contextMenuViewModel.show(
+                                                thumbnailPath = it.thumbnail_path,
+                                                songTitle = it.name,
+                                                artistName = it.author?.name
+                                            )
+                                        },
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
                                         songs = popularSongs.drop(5).take(10)
                                     )

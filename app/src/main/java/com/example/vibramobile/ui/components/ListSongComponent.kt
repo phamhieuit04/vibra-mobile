@@ -40,7 +40,7 @@ import io.ktor.http.encodeURLPath
 
 @Composable
 fun ListSongComponent(
-    onClick: () -> Unit,
+    onClick: (Song) -> Unit,
     onPlay: (Song) -> Unit,
     modifier: Modifier = Modifier,
     songs: List<Song>
@@ -90,7 +90,7 @@ fun ListSongComponent(
                             lineHeight = 12.sp
                         )
                     }
-                    IconButton(onClick = onClick) {
+                    IconButton(onClick = { onClick(song) }) {
                         Icon(
                             modifier = Modifier.size(20.dp),
                             imageVector = Icons.Default.MoreHoriz,
