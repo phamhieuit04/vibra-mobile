@@ -71,7 +71,8 @@ fun GenreDetailScreen(
     genreDetailViewModel: GenreDetailViewModel = koinViewModel(),
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
     contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    navigateToSearch: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val isRefreshing by genreDetailViewModel.isRefreshing.collectAsState()
@@ -118,7 +119,7 @@ fun GenreDetailScreen(
                 } else {
                     if (songsByCategory.isEmpty()) {
                         item(key = "empty_state") {
-                            EmptyStateView()
+                            EmptyStateView(onExploreClick = navigateToSearch)
                         }
                     } else {
                         item(key = "featured_songs") {

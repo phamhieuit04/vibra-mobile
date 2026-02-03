@@ -84,7 +84,10 @@ fun MainGraph() {
                             entry<MainDestination.GenreDetail> { route ->
                                 GenreDetailScreen(
                                     category = route.category,
-                                    navigateBack = navigator::goBack
+                                    navigateBack = navigator::goBack,
+                                    navigateToSearch = {
+                                        navigator.navigate(MainDestination.Search)
+                                    }
                                 )
                             }
                         }
