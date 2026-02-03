@@ -43,7 +43,7 @@ import com.example.vibramobile.states.ArtistState
 import com.example.vibramobile.states.CategoryState
 import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UiState
-import com.example.vibramobile.ui.components.HomeSkeleton
+import com.example.vibramobile.ui.components.HomeShimmer
 import com.example.vibramobile.ui.components.ListAlbumComponent
 import com.example.vibramobile.ui.components.ListArtistComponent
 import com.example.vibramobile.ui.components.ListSongComponent
@@ -244,7 +244,7 @@ fun HomeScreen(
                         }
                     }
                 } else {
-                    HomeSkeleton(modifier = Modifier.padding(top = topBarHeight))
+                    HomeShimmer(modifier = Modifier.padding(top = topBarHeight))
                 }
             }
         }

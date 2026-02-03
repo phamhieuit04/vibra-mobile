@@ -82,7 +82,10 @@ fun MainGraph() {
                                 ProfileScreen()
                             }
                             entry<MainDestination.GenreDetail> { route ->
-                                GenreDetailScreen(category = route.category)
+                                GenreDetailScreen(
+                                    category = route.category,
+                                    navigateBack = navigator::goBack
+                                )
                             }
                         }
                     )

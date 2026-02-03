@@ -12,6 +12,7 @@ import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -31,6 +32,7 @@ class GenreDetailViewModel(
         withContext(Dispatchers.IO) {
             _isRefreshing.value = true
 
+            delay(1000)
             runCatching {
                 val response = client.get("category/show/$categoryId") {
                     bearerAuth(accessToken)
