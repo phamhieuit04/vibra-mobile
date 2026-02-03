@@ -13,4 +13,7 @@ sealed class MainDestination : NavKey {
 
     @Serializable
     object Library : MainDestination()
+
+    @Serializable
+    object Profile : MainDestination()
 }

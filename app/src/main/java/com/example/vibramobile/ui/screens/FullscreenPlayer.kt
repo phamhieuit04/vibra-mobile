@@ -61,6 +61,7 @@ fun FullscreenPlayer(
     modifier: Modifier = Modifier,
     isVisible: Boolean,
     onVisibleChange: (Boolean) -> Unit,
+    onClickContextMenu: () -> Unit,
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel()
 ) {
     val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -85,7 +86,7 @@ fun FullscreenPlayer(
                             containerColor = Color.Transparent
                         ),
                         navigationIcon = {
-                            IconButton(onClick = { }) {
+                            IconButton(onClick = {}) {
                                 Icon(
                                     modifier = Modifier.size(32.dp),
                                     contentDescription = "",
@@ -95,7 +96,7 @@ fun FullscreenPlayer(
                             }
                         },
                         actions = {
-                            IconButton(onClick = {}) {
+                            IconButton(onClick = onClickContextMenu) {
                                 Icon(
                                     modifier = Modifier.size(24.dp),
                                     imageVector = Icons.Default.MoreHoriz,

@@ -4,16 +4,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.example.vibramobile.models.Category
+import com.example.vibramobile.models.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-object CategoryState {
-    private val _categories = MutableStateFlow<List<Category>>(emptyList())
-    val categories: StateFlow<List<Category>> = _categories.asStateFlow()
-    
-    fun setCategories(newCategories: List<Category>) {
-        _categories.value = newCategories
+object ArtistState {
+    private val _popularArtists = MutableStateFlow<List<User>>(emptyList())
+    val popularArtists: StateFlow<List<User>> = _popularArtists.asStateFlow()
+
+    fun setPopularArtists(artists: List<User>) {
+        _popularArtists.value = artists
     }
 }

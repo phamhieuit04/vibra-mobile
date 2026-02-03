@@ -1,11 +1,16 @@
 package com.example.vibramobile.viewmodels
 
 import android.util.Log
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vibramobile.models.Category
+import com.example.vibramobile.models.Playlist
+import com.example.vibramobile.models.RecommendedSongs
 import com.example.vibramobile.models.Response
 import com.example.vibramobile.models.Song
+import com.example.vibramobile.models.User
+import com.example.vibramobile.states.ArtistState
 import com.example.vibramobile.states.CategoryState
 import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UserState
@@ -14,6 +19,7 @@ import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -21,7 +27,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import okhttp3.Dispatcher
 
 class HomeViewModel(
     private val client: HttpClient,
@@ -36,71 +44,110 @@ class HomeViewModel(
         viewModelScope.launch { fetchAll() }
     }
 
-    suspend fun fetchAll() = coroutineScope {
-        _isRefreshing.value = true
-        try {
-            awaitAll(
-                async { getCategories() },
-                async { getRecommendedSongs() },
-                async { getRecentRotationSongs() }
-            )
-        } finally {
-            _isRefreshing.value = false
+    fun fetchAll() {
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            try {
+                getCategories()
+                getRecommendedSongs()
+                getRecentRotationSongs()
+                getPopularAlbums()
+                getPopularSongs()
+                getPopularArtists()
+            } finally {
+                _isRefreshing.value = false
+            }
         }
     }
 
     suspend fun getRecommendedSongs() {
-        SongState.isRecommendedSongsLoading = true
-        runCatching {
-            val response = client.get("home/get-recommended-songs") {
-                bearerAuth(accessToken)
-            }.bodyAsText()
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val response = client.get("home/get-recommended-songs") {
+                    bearerAuth(accessToken)
+                }.bodyAsText()
+                val result = json.decodeFromString<Response<RecommendedSongs>>(response)
 
-            val result = json.decodeFromString<Response<List<Song>>>(response)
-            SongState.recommendedSongs.apply {
-                clear()
-                addAll(result.data)
+                SongState.setRecommendedSongs(result.data.songs)
+            }.onFailure { exception ->
+                Log.e("MyApp", exception.toString())
             }
-        }.onFailure { exception ->
-            Log.e("MyApp", exception.toString())
         }
-        SongState.isRecommendedSongsLoading = false
     }
 
     suspend fun getRecentRotationSongs() {
-        SongState.isRecentRotationLoading = true
-        runCatching {
-            val response = client.get("home/recent-rotation") {
-                bearerAuth(accessToken)
-                parameter(key = "limit", value = 4)
-            }.bodyAsText()
-            val result = json.decodeFromString<Response<List<Song>>>(response)
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val response = client.get("home/recent-rotation") {
+                    bearerAuth(accessToken)
+                    parameter(key = "limit", value = 4)
+                }.bodyAsText()
+                val result = json.decodeFromString<Response<List<Song>>>(response)
 
-            SongState.recentRotationSongs.apply {
-                clear()
-                addAll(result.data)
+                SongState.setRecentRotationSongs(result.data)
+            }.onFailure { exception ->
+                Log.e("MyApp", exception.toString())
             }
-        }.onFailure { exception ->
-            Log.e("MyApp", exception.toString())
         }
-        SongState.isRecentRotationLoading = false
     }
 
     suspend fun getCategories() {
-        CategoryState.isCategoriesLoading = true
-        runCatching {
-            val response = client.get("home/list-category") {
-                bearerAuth(accessToken)
-            }.bodyAsText()
-            val result = json.decodeFromString<Response<List<Category>>>(response)
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val response = client.get("home/list-category") {
+                    bearerAuth(accessToken)
+                }.bodyAsText()
+                val result = json.decodeFromString<Response<List<Category>>>(response)
 
-            CategoryState.categories.apply {
-                clear()
-                addAll(result.data)
+                CategoryState.setCategories(result.data)
+            }.onFailure { exception ->
+                Log.e("MyApp", exception.toString())
             }
-        }.onFailure { exception ->
-            Log.e("MyApp", exception.toString())
         }
-        CategoryState.isCategoriesLoading = false
+    }
+
+    suspend fun getPopularAlbums() {
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val response = client.get("home/list-album") {
+                    bearerAuth(accessToken)
+                }.bodyAsText()
+                val result = json.decodeFromString<Response<List<Playlist>>>(response)
+
+                SongState.setPopularAlbums(result.data)
+            }.onFailure { exception ->
+                Log.e("MyApp", exception.toString())
+            }
+        }
+    }
+
+    suspend fun getPopularSongs() {
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val response = client.get("home/list-song") {
+                    bearerAuth(accessToken)
+                }.bodyAsText()
+                val result = json.decodeFromString<Response<List<Song>>>(response)
+
+                SongState.setPopularSongs(result.data)
+            }.onFailure { exception ->
+                Log.e("MyApp", exception.toString())
+            }
+        }
+    }
+
+    suspend fun getPopularArtists() {
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val response = client.get("home/list-artist") {
+                    bearerAuth(accessToken)
+                }.bodyAsText()
+                val result = json.decodeFromString<Response<List<User>>>(response)
+
+                ArtistState.setPopularArtists(result.data)
+            }.onFailure { exception ->
+                Log.e("MyApp", exception.toString())
+            }
+        }
     }
 }

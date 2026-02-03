@@ -1,5 +1,6 @@
 package com.example.vibramobile.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,10 +27,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import com.example.vibramobile.R
 import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.extends.noRippleClickable
@@ -47,90 +54,99 @@ fun AppMediaPlayer(
 
     val isPlaying by viewModel.isPlaying.collectAsState()
     val progress by viewModel.progress.collectAsState()
-    val currentSong by SongState.currentSong
+    val currentSong by viewModel.currentSong.collectAsState()
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .noRippleClickable(onClick = { UiState.setDisplaySongDetail(true) })
-            .padding(8.dp)
-            .clip(shape = RoundedCornerShape(8.dp))
-            .background(color = Color(0xff79300f))
-            .padding(start = 8.dp, end = 8.dp, top = 8.dp),
-    ) {
-        Row(
-            modifier = Modifier
+    AnimatedVisibility(visible = UiState.getDisplayMediaPlayer()) {
+        Box(
+            modifier = modifier
                 .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .noRippleClickable(onClick = { UiState.setDisplaySongDetail(true) })
+                .padding(8.dp)
+                .clip(shape = RoundedCornerShape(8.dp))
+                .background(color = Color(0xff79300f))
+                .padding(start = 8.dp, end = 8.dp, top = 8.dp),
         ) {
             Row(
-                modifier = Modifier.padding(start = 2.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AsyncImage(
-                    modifier = Modifier
-                        .size(42.dp)
-                        .clip(shape = RoundedCornerShape(4.dp)),
-                    contentDescription = "",
-                    model = currentSong?.thumbnail_path?.encodeURLPath()
-                )
-                Spacer(Modifier.width(8.dp))
-                Column() {
-                    Text(
-                        text = currentSong?.name.toString(),
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        lineHeight = 12.sp
+                Row(
+                    modifier = Modifier.padding(start = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    AsyncImage(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(shape = RoundedCornerShape(4.dp)),
+                        contentDescription = "",
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(currentSong?.thumbnail_path?.encodeURLPath())
+                            .size(400)
+                            .crossfade(true)
+                            .build(),
+                        placeholder = painterResource(R.drawable.default_image),
+                        error = painterResource(R.drawable.default_image),
+                        contentScale = ContentScale.Crop
                     )
-                    Spacer(Modifier.height(2.dp))
-                    Text(
-                        text = currentSong?.author?.name.toString(),
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 10.sp,
-                        lineHeight = 10.sp
-                    )
+                    Spacer(Modifier.width(8.dp))
+                    Column() {
+                        Text(
+                            text = currentSong?.name.toString(),
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            lineHeight = 12.sp
+                        )
+                        Spacer(Modifier.height(2.dp))
+                        Text(
+                            text = currentSong?.author?.name.toString(),
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 10.sp,
+                            lineHeight = 10.sp
+                        )
+                    }
+                }
+                Row() {
+                    IconButton(onClick = { }) {
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = "",
+                            tint = Color.White
+                        )
+                    }
+                    IconButton(onClick = viewModel::toggle) {
+                        Icon(
+                            modifier = Modifier.size(32.dp),
+                            imageVector = if (isPlaying)
+                                Icons.Default.Pause
+                            else
+                                Icons.Default.PlayArrow,
+                            contentDescription = "",
+                            tint = Color.White
+                        )
+                    }
                 }
             }
-            Row() {
-                IconButton(onClick = { }) {
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        contentDescription = "",
-                        tint = Color.White
-                    )
-                }
-                IconButton(onClick = viewModel::toggle) {
-                    Icon(
-                        modifier = Modifier.size(32.dp),
-                        imageVector = if (isPlaying)
-                            Icons.Default.Pause
-                        else
-                            Icons.Default.PlayArrow,
-                        contentDescription = "",
-                        tint = Color.White
-                    )
-                }
-            }
-        }
-        Box(
-            modifier = Modifier
-                .height(2.dp)
-                .padding(horizontal = 2.dp)
-                .fillMaxWidth()
-                .clip(shape = RoundedCornerShape(8.dp))
-                .background(color = Color.Gray)
-                .align(alignment = Alignment.BottomCenter)
-        ) {
             Box(
                 modifier = Modifier
                     .height(2.dp)
-                    .fillMaxWidth(progress)
+                    .padding(horizontal = 2.dp)
+                    .fillMaxWidth()
                     .clip(shape = RoundedCornerShape(8.dp))
-                    .background(color = Color.White)
-            )
+                    .background(color = Color.Gray)
+                    .align(alignment = Alignment.BottomCenter)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .height(2.dp)
+                        .fillMaxWidth(progress)
+                        .clip(shape = RoundedCornerShape(8.dp))
+                        .background(color = Color.White)
+                )
+            }
         }
     }
 }
