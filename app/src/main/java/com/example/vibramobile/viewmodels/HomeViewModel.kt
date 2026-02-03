@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vibramobile.models.Category
 import com.example.vibramobile.models.Playlist
+import com.example.vibramobile.models.RecommendedSongs
 import com.example.vibramobile.models.Response
 import com.example.vibramobile.models.Song
 import com.example.vibramobile.models.User
@@ -65,9 +66,9 @@ class HomeViewModel(
                 val response = client.get("home/get-recommended-songs") {
                     bearerAuth(accessToken)
                 }.bodyAsText()
-                val result = json.decodeFromString<Response<List<Song>>>(response)
+                val result = json.decodeFromString<Response<RecommendedSongs>>(response)
 
-                SongState.setRecommendedSongs(result.data)
+                SongState.setRecommendedSongs(result.data.songs)
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
