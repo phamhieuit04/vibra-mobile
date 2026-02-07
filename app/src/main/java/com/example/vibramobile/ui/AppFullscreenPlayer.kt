@@ -1,4 +1,4 @@
-package com.example.vibramobile.ui.screens
+package com.example.vibramobile.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UiState
+import com.example.vibramobile.ui.screens.QueuePlaylistScreen
 import com.example.vibramobile.viewmodels.MediaPlayerViewModel
 import io.ktor.http.encodeURLPath
 import org.koin.androidx.compose.koinViewModel

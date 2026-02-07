@@ -22,7 +22,7 @@ import com.example.vibramobile.ui.AppMediaPlayer
 import com.example.vibramobile.ui.AppNavigationBar
 import com.example.vibramobile.ui.TOP_LEVEL_DESTINATIONS
 import com.example.vibramobile.ui.navigations.destinations.MainDestination
-import com.example.vibramobile.ui.screens.FullscreenPlayer
+import com.example.vibramobile.ui.FullscreenPlayer
 import com.example.vibramobile.ui.screens.GenreDetailScreen
 import com.example.vibramobile.ui.screens.HomeScreen
 import com.example.vibramobile.ui.screens.LibraryScreen
