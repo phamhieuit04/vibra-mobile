@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SkeletonComponent(
+fun ShimmerComponent(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     skeletonContent: @Composable () -> Unit,
@@ -20,12 +20,21 @@ fun SkeletonComponent(
 }
 
 @Composable
-fun HomeSkeleton(modifier: Modifier = Modifier) {
+fun HomeShimmer(modifier: Modifier = Modifier) {
     Column(modifier = modifier.padding(horizontal = 16.dp)) {
         ListSongRowSkeleton()
         Spacer(Modifier.height(16.dp))
         ListSongSkeleton()
         Spacer(Modifier.height(16.dp))
         ListAlbumSkeleton()
+    }
+}
+
+@Composable
+fun GenreDetailShimmer(modifier: Modifier = Modifier) {
+    Column(modifier = modifier.padding(horizontal = 16.dp)) {
+        ListSongRowSkeleton()
+        Spacer(Modifier.height(16.dp))
+        ListSongRowSkeleton()
     }
 }

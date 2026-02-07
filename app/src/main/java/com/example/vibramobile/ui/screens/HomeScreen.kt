@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
@@ -38,11 +39,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.vibramobile.models.Category
 import com.example.vibramobile.states.ArtistState
 import com.example.vibramobile.states.CategoryState
 import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UiState
-import com.example.vibramobile.ui.components.HomeSkeleton
+import com.example.vibramobile.ui.components.HomeShimmer
 import com.example.vibramobile.ui.components.ListAlbumComponent
 import com.example.vibramobile.ui.components.ListArtistComponent
 import com.example.vibramobile.ui.components.ListSongComponent
@@ -63,15 +65,17 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = koinViewModel(),
+    homeViewModel: HomeViewModel = koinViewModel(),
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
-    contextMenuViewModel: ContextMenuViewModel = koinViewModel()
+    contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
+    navigateToGenreDetail: (Category) -> Unit,
+    navigateToSearch: () -> Unit
 ) {
     LaunchedEffect(Unit) {
         UiState.setDisplayNavigationBar(true)
     }
 
-    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val isRefreshing by homeViewModel.isRefreshing.collectAsState()
     val pullToRefreshState = rememberPullToRefreshState()
     val scrollState = rememberLazyListState()
     val hazeState = rememberHazeState()
@@ -99,7 +103,7 @@ fun HomeScreen(
             modifier = Modifier.hazeSource(hazeState),
             state = pullToRefreshState,
             isRefreshing = isRefreshing,
-            onRefresh = { viewModel.fetchAll() },
+            onRefresh = { homeViewModel.fetchAll() },
             indicator = {
                 PullToRefreshDefaults.Indicator(
                     state = pullToRefreshState,
@@ -242,11 +246,14 @@ fun HomeScreen(
                         }
                     }
                 } else {
-                    HomeSkeleton(modifier = Modifier.padding(top = topBarHeight))
+                    HomeShimmer(modifier = Modifier.padding(top = topBarHeight))
                 }
             }
         }
 
+        val selectedCategoryColor: Color = Color(0xffbc4d15)
+        val defaultCategoryColor: Color = Color(0xff303030)
+        var selectedCategoryId by remember { mutableStateOf<Int?>(null) }
         LazyRow(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -274,17 +281,30 @@ fun HomeScreen(
         ) {
             item {
                 FilledTonalButton(
-                    onClick = {}, colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xffbc4d15)
+                    onClick = { selectedCategoryId = null },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (selectedCategoryId == null) {
+                            selectedCategoryColor
+                        } else {
+                            defaultCategoryColor
+                        }
                     )
                 ) {
                     Text(text = "All", color = Color.White, fontSize = 14.sp)
                 }
             }
-            items(items = categories, key = { it.id!! }) { category ->
+            items(items = categories.take(5), key = { it.id!! }) { category ->
                 FilledTonalButton(
-                    onClick = { }, colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xff303030)
+                    onClick = {
+                        selectedCategoryId = category.id
+                        navigateToGenreDetail(category)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (selectedCategoryId == category.id) {
+                            selectedCategoryColor
+                        } else {
+                            defaultCategoryColor
+                        }
                     )
                 ) {
                     Text(
@@ -293,6 +313,13 @@ fun HomeScreen(
                         fontSize = 14.sp,
                         lineHeight = 14.sp
                     )
+                }
+            }
+            item {
+                OutlinedButton(
+                    onClick = { selectedCategoryId = null; navigateToSearch() }
+                ) {
+                    Text(text = "See more", color = Color.White, fontSize = 14.sp)
                 }
             }
         }

@@ -1,14 +1,169 @@
 package com.example.vibramobile.ui.screens
 
-import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.request.crossfade
+import com.example.vibramobile.R
+import com.example.vibramobile.models.Category
+import com.example.vibramobile.states.CategoryState
+import com.example.vibramobile.states.UiState
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchScreen(
+    modifier: Modifier = Modifier,
+    navigateToGenreDetail: (Category) -> Unit
+) {
+    val categories by CategoryState.categories.collectAsState()
+    val searchBarState = rememberSearchBarState()
+    var expanded by rememberSaveable { mutableStateOf(false) }
+
+    Scaffold(
+        topBar = {
+            SearchBar(
+                modifier = Modifier.padding(16.dp),
+                state = searchBarState,
+                inputField = {
+                    SearchBarDefaults.InputField(
+                        query = "",
+                        onQueryChange = { },
+                        onSearch = { },
+                        expanded = expanded,
+                        onExpandedChange = { },
+                        placeholder = { Text("Bạn muốn khám phá điều gì?") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "",
+                                tint = Color.Gray
+                            )
+                        }
+                    )
+                }
+            )
+        }
+    ) { padding ->
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = padding.calculateTopPadding())
+        ) {
+            item(span = {
+                GridItemSpan(maxLineSpan)
+            }) {
+                SectionTitle(text = "Thể loại nổi bật")
+                Spacer(Modifier.height(16.dp))
+            }
+
+            items(items = categories, key = { it.id!! }) { category ->
+                CategoryCard(
+                    category = category,
+                    onClick = { navigateToGenreDetail(category) }
+                )
+            }
+
+            item(key = "bottom_spacer") {
+                Spacer(Modifier.height(96.dp))
+                if (UiState.getDisplayMediaPlayer()) {
+                    Spacer(Modifier.height(96.dp))
+                }
+            }
+        }
+    }
+}
 
 @Composable
-fun SearchScreen(modifier: Modifier = Modifier) {
-    Text(text = "Search", fontSize = 96.sp, color = Color.White)
+private fun CategoryCard(
+    category: Category,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .height(120.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(category.thumbnail_path)
+                .size(400)
+                .allowHardware(true)
+                .crossfade(false)
+                .build(),
+            contentDescription = category.name,
+            placeholder = painterResource(R.drawable.default_image),
+            error = painterResource(R.drawable.default_image),
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Black.copy(alpha = 0.3f),
+                            Color.Black.copy(alpha = 0.7f)
+                        )
+                    )
+                )
+        )
+
+        Text(
+            text = category.name ?: "",
+            color = Color.White,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(16.dp)
+        )
+    }
 }

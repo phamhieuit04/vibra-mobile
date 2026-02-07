@@ -17,12 +17,13 @@ import com.example.vibramobile.helpers.Navigator
 import com.example.vibramobile.states.UiState
 import com.example.vibramobile.states.rememberNavigationState
 import com.example.vibramobile.states.toEntries
+import com.example.vibramobile.ui.AppContextMenu
 import com.example.vibramobile.ui.AppMediaPlayer
 import com.example.vibramobile.ui.AppNavigationBar
 import com.example.vibramobile.ui.TOP_LEVEL_DESTINATIONS
-import com.example.vibramobile.ui.AppContextMenu
 import com.example.vibramobile.ui.navigations.destinations.MainDestination
 import com.example.vibramobile.ui.screens.FullscreenPlayer
+import com.example.vibramobile.ui.screens.GenreDetailScreen
 import com.example.vibramobile.ui.screens.HomeScreen
 import com.example.vibramobile.ui.screens.LibraryScreen
 import com.example.vibramobile.ui.screens.ProfileScreen
@@ -65,16 +66,35 @@ fun MainGraph() {
                     entries = navigationState.toEntries(
                         entryProvider {
                             entry<MainDestination.Home> {
-                                HomeScreen()
+                                HomeScreen(
+                                    navigateToGenreDetail = { category ->
+                                        navigator.navigate(MainDestination.GenreDetail(category))
+                                    },
+                                    navigateToSearch = {
+                                        navigator.navigate(MainDestination.Search)
+                                    }
+                                )
                             }
                             entry<MainDestination.Search> {
-                                SearchScreen()
+                                SearchScreen(
+                                    navigateToGenreDetail = { category ->
+                                        navigator.navigate(MainDestination.GenreDetail(category))
+                                    })
                             }
                             entry<MainDestination.Library> {
                                 LibraryScreen()
                             }
                             entry<MainDestination.Profile> {
                                 ProfileScreen()
+                            }
+                            entry<MainDestination.GenreDetail> { route ->
+                                GenreDetailScreen(
+                                    category = route.category,
+                                    navigateBack = navigator::goBack,
+                                    navigateToSearch = {
+                                        navigator.navigate(MainDestination.Search)
+                                    }
+                                )
                             }
                         }
                     )

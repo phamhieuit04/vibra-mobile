@@ -41,4 +41,11 @@ object SongState {
     fun setRecentRotationSongs(songs: List<Song>) {
         _recentRotationSongs.value = songs
     }
+
+    private val _songsByCategory = MutableStateFlow<List<Song>>(emptyList())
+    val songsByCategory: StateFlow<List<Song>> = _songsByCategory.asStateFlow()
+
+    fun setSongsByCategory(songs: List<Song>) {
+        _songsByCategory.value = songs
+    }
 }
