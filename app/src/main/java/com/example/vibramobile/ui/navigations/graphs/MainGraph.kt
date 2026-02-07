@@ -27,6 +27,7 @@ import com.example.vibramobile.ui.screens.GenreDetailScreen
 import com.example.vibramobile.ui.screens.HomeScreen
 import com.example.vibramobile.ui.screens.LibraryScreen
 import com.example.vibramobile.ui.screens.ProfileScreen
+import com.example.vibramobile.ui.screens.SearchResultScreen
 import com.example.vibramobile.ui.screens.SearchScreen
 
 @Composable
@@ -79,7 +80,16 @@ fun MainGraph() {
                                 SearchScreen(
                                     navigateToGenreDetail = { category ->
                                         navigator.navigate(MainDestination.GenreDetail(category))
-                                    })
+                                    },
+                                    navigateToSearchResult = {
+                                        navigator.navigate(MainDestination.SearchResult)
+                                    }
+                                )
+                            }
+                            entry<MainDestination.SearchResult> {
+                                SearchResultScreen(
+                                    navigateBack = navigator::goBack
+                                )
                             }
                             entry<MainDestination.Library> {
                                 LibraryScreen()

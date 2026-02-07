@@ -64,8 +64,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
-    searchViewModel: SearchViewModel = koinViewModel(),
-    navigateToGenreDetail: (Category) -> Unit
+    navigateToGenreDetail: (Category) -> Unit,
+    navigateToSearchResult: () -> Unit
 ) {
     val categories by CategoryState.categories.collectAsState()
 
@@ -76,7 +76,7 @@ fun SearchScreen(
                     .padding(16.dp)
                     .fillMaxWidth()
                     .height(56.dp)
-                    .clickable(onClick = { }),
+                    .clickable(onClick = navigateToSearchResult),
                 shape = RoundedCornerShape(28.dp),
                 color = Color(0xff2b2930)
             ) {
