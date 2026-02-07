@@ -18,8 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -64,15 +62,13 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.composeunstyled.Text
 import com.example.vibramobile.R
-import com.example.vibramobile.models.Playlist
 import com.example.vibramobile.models.Song
-import com.example.vibramobile.models.User
 import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.components.ListAlbumComponent
 import com.example.vibramobile.ui.components.ListArtistComponent
 import com.example.vibramobile.ui.components.ListSongRowComponent
+import com.example.vibramobile.ui.components.SearchResultShimmer
 import com.example.vibramobile.ui.components.TopArtistsComponent
-import com.example.vibramobile.ui.extends.noRippleClickable
 import com.example.vibramobile.viewmodels.ContextMenuViewModel
 import com.example.vibramobile.viewmodels.MediaPlayerViewModel
 import com.example.vibramobile.viewmodels.SearchViewModel
@@ -96,6 +92,7 @@ fun SearchResultScreen(
     val focusManager = LocalFocusManager.current
 
     val searchResult by searchViewModel.searchResult.collectAsState()
+    val isLoading by searchViewModel.isLoading.collectAsState()
 
     val currentSong by mediaPlayerViewModel.currentSong.collectAsState()
     val mediaPlayerIsPlaying by mediaPlayerViewModel.isPlaying.collectAsState()
@@ -162,87 +159,96 @@ fun SearchResultScreen(
             }
         }
     ) { padding ->
-        Crossfade(targetState = searchResult, modifier = Modifier.padding(padding)) { state ->
-            when (state) {
-                null -> {
-                    EmptySearchState()
-                }
+        if (isLoading) {
+            SearchResultShimmer(
+                modifier = Modifier.padding(padding)
+            )
+        } else {
+            Crossfade(
+                targetState = searchResult,
+                modifier = Modifier.padding(padding)
+            ) { state ->
+                when (state) {
+                    null -> {
+                        EmptySearchState()
+                    }
 
-                else -> {
-                    LazyColumn(
-                        modifier = modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(24.dp)
-                    ) {
-                        item {
-                            AnimatedVisibility(visible = searchResult!!.songs.isNotEmpty()) {
-                                TopResultCard(
-                                    isPlaying = isPlaying,
-                                    song = searchResult!!.songs.first(),
-                                    onClick = { mediaPlayerViewModel.playSong(topSong) }
-                                )
-                            }
-                        }
-
-                        item(key = "songs") {
-                            AnimatedVisibility(
-                                visible = searchResult!!.songs.isNotEmpty()
-                            ) {
-                                Column(modifier = Modifier.fillMaxWidth()) {
-                                    SectionTitle(text = "Bài hát nổi bật")
-                                    Spacer(Modifier.height(16.dp))
-                                    ListSongRowComponent(
-                                        onClick = {
-                                            contextMenuViewModel.show(
-                                                thumbnailPath = it.thumbnail_path,
-                                                songTitle = it.name,
-                                                artistName = it.author?.name
-                                            )
-                                        },
-                                        onPlay = { mediaPlayerViewModel.playSong(it) },
-                                        songs = searchResult!!.songs.drop(1).take(20)
+                    else -> {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(24.dp)
+                        ) {
+                            item(key = "top") {
+                                AnimatedVisibility(visible = searchResult!!.songs.isNotEmpty()) {
+                                    TopResultCard(
+                                        isPlaying = isPlaying,
+                                        song = searchResult!!.songs.first(),
+                                        onClick = { mediaPlayerViewModel.playSong(topSong) }
                                     )
                                 }
                             }
-                        }
 
-                        item(key = "artists") {
-                            AnimatedVisibility(
-                                visible = searchResult!!.artists.isNotEmpty()
-                            ) {
-                                Column(modifier = Modifier.fillMaxWidth()) {
-                                    SectionTitle(text = "Nghệ sĩ")
-                                    Spacer(Modifier.height(16.dp))
-                                    TopArtistsComponent(
-                                        artists = searchResult!!.artists.take(5),
-                                        onClick = { }
-                                    )
-                                    Spacer(Modifier.height(16.dp))
-                                    ListArtistComponent(
-                                        artists = searchResult!!.artists.drop(5),
-                                        onClick = { }
-                                    )
+                            item(key = "songs") {
+                                AnimatedVisibility(
+                                    visible = searchResult!!.songs.drop(1).isNotEmpty()
+                                ) {
+                                    Column(modifier = Modifier.fillMaxWidth()) {
+                                        SectionTitle(text = "Bài hát")
+                                        Spacer(Modifier.height(16.dp))
+                                        ListSongRowComponent(
+                                            onClick = {
+                                                contextMenuViewModel.show(
+                                                    thumbnailPath = it.thumbnail_path,
+                                                    songTitle = it.name,
+                                                    artistName = it.author?.name
+                                                )
+                                            },
+                                            onPlay = { mediaPlayerViewModel.playSong(it) },
+                                            songs = searchResult!!.songs.drop(1).take(20)
+                                        )
+                                    }
                                 }
                             }
-                        }
 
-                        item(key = "albums") {
-                            AnimatedVisibility(
-                                visible = searchResult!!.albums.isNotEmpty()
-                            ) {
-                                Column(modifier = Modifier.fillMaxWidth()) {
-                                    SectionTitle(text = "Albums")
-                                    Spacer(Modifier.height(16.dp))
-                                    ListAlbumComponent(albums = searchResult!!.albums)
+                            item(key = "artists") {
+                                AnimatedVisibility(
+                                    visible = searchResult!!.artists.isNotEmpty()
+                                ) {
+                                    Column(modifier = Modifier.fillMaxWidth()) {
+                                        SectionTitle(text = "Nghệ sĩ")
+                                        Spacer(Modifier.height(16.dp))
+                                        TopArtistsComponent(
+                                            artists = searchResult!!.artists.take(5),
+                                            onClick = { }
+                                        )
+                                        Spacer(Modifier.height(16.dp))
+                                        ListArtistComponent(
+                                            artists = searchResult!!.artists.drop(5),
+                                            onClick = { }
+                                        )
+                                    }
                                 }
                             }
-                        }
 
-                        item(key = "bottom_spacer") {
-                            Spacer(Modifier.height(96.dp))
+                            item(key = "albums") {
+                                AnimatedVisibility(
+                                    visible = searchResult!!.albums.isNotEmpty()
+                                ) {
+                                    Column(modifier = Modifier.fillMaxWidth()) {
+                                        SectionTitle(text = "Albums")
+                                        Spacer(Modifier.height(16.dp))
+                                        ListAlbumComponent(albums = searchResult!!.albums)
+                                    }
+                                }
+                            }
 
-                            if (UiState.getDisplayMediaPlayer()) {
+                            item(key = "bottom_spacer") {
                                 Spacer(Modifier.height(96.dp))
+
+                                if (UiState.getDisplayMediaPlayer()) {
+                                    Spacer(Modifier.height(96.dp))
+                                }
                             }
                         }
                     }

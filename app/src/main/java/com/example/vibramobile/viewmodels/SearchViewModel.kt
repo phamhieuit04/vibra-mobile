@@ -13,6 +13,7 @@ import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +29,12 @@ class SearchViewModel(
     private val _searchResult = MutableStateFlow<SearchResult?>(null)
     val searchResult = _searchResult.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
     suspend fun search(keyword: String) {
+        _isLoading.value = true
+        delay(1000)
         withContext(Dispatchers.IO) {
             runCatching {
                 val response = client.get("home/search?search-key=$keyword") {
@@ -41,5 +47,6 @@ class SearchViewModel(
                 Log.e("MyApp", exception.toString())
             }
         }
+        _isLoading.value = false
     }
 }

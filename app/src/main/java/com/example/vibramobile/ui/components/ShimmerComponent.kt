@@ -38,3 +38,14 @@ fun GenreDetailShimmer(modifier: Modifier = Modifier) {
         ListSongRowSkeleton()
     }
 }
+
+@Composable
+fun SearchResultShimmer(modifier: Modifier = Modifier) {
+    Column(modifier = modifier.padding(horizontal = 16.dp)) {
+        ListSongRowSkeleton()
+        Spacer(Modifier.height(16.dp))
+        ListSongRowSkeleton()
+        Spacer(Modifier.height(16.dp))
+        ListSongRowSkeleton()
+    }
+}
