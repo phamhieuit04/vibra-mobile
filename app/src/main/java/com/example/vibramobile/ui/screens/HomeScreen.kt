@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
@@ -67,7 +68,8 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = koinViewModel(),
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
     contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
-    navigateToGenreDetail: (Category) -> Unit
+    navigateToGenreDetail: (Category) -> Unit,
+    navigateToSearch: () -> Unit
 ) {
     LaunchedEffect(Unit) {
         UiState.setDisplayNavigationBar(true)
@@ -291,7 +293,7 @@ fun HomeScreen(
                     Text(text = "All", color = Color.White, fontSize = 14.sp)
                 }
             }
-            items(items = categories, key = { it.id!! }) { category ->
+            items(items = categories.take(5), key = { it.id!! }) { category ->
                 FilledTonalButton(
                     onClick = {
                         selectedCategoryId = category.id
@@ -311,6 +313,13 @@ fun HomeScreen(
                         fontSize = 14.sp,
                         lineHeight = 14.sp
                     )
+                }
+            }
+            item {
+                OutlinedButton(
+                    onClick = { selectedCategoryId = null; navigateToSearch() }
+                ) {
+                    Text(text = "See more", color = Color.White, fontSize = 14.sp)
                 }
             }
         }

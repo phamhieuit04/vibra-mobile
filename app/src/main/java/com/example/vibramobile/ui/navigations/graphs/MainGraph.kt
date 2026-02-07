@@ -69,11 +69,17 @@ fun MainGraph() {
                                 HomeScreen(
                                     navigateToGenreDetail = { category ->
                                         navigator.navigate(MainDestination.GenreDetail(category))
+                                    },
+                                    navigateToSearch = {
+                                        navigator.navigate(MainDestination.Search)
                                     }
                                 )
                             }
                             entry<MainDestination.Search> {
-                                SearchScreen()
+                                SearchScreen(
+                                    navigateToGenreDetail = { category ->
+                                        navigator.navigate(MainDestination.GenreDetail(category))
+                                    })
                             }
                             entry<MainDestination.Library> {
                                 LibraryScreen()
