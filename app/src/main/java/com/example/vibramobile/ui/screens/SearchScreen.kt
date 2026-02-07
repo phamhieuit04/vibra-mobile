@@ -5,10 +5,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -18,15 +21,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -48,40 +55,51 @@ import com.example.vibramobile.R
 import com.example.vibramobile.models.Category
 import com.example.vibramobile.states.CategoryState
 import com.example.vibramobile.states.UiState
+import com.example.vibramobile.ui.extends.noRippleClickable
+import com.example.vibramobile.viewmodels.SearchViewModel
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
+    searchViewModel: SearchViewModel = koinViewModel(),
     navigateToGenreDetail: (Category) -> Unit
 ) {
     val categories by CategoryState.categories.collectAsState()
-    val searchBarState = rememberSearchBarState()
-    var expanded by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
-            SearchBar(
-                modifier = Modifier.padding(16.dp),
-                state = searchBarState,
-                inputField = {
-                    SearchBarDefaults.InputField(
-                        query = "",
-                        onQueryChange = { },
-                        onSearch = { },
-                        expanded = expanded,
-                        onExpandedChange = { },
-                        placeholder = { Text("Bạn muốn khám phá điều gì?") },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "",
-                                tint = Color.Gray
-                            )
-                        }
+            Surface(
+                modifier = modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .clickable(onClick = { }),
+                shape = RoundedCornerShape(28.dp),
+                color = Color(0xff2b2930)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null,
+                        tint = Color.Gray
+                    )
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Text(
+                        text = "Bạn muốn khám phá điều gì?",
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontSize = 16.sp
                     )
                 }
-            )
+            }
         }
     ) { padding ->
         LazyVerticalGrid(

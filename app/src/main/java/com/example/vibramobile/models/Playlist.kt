@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class Playlist(
     var id: Int,
     var name: String,
-    var description: String,
+    var description: String?,
     var thumbnail_path: String,
     var type: Int,
     var total_song: Int,

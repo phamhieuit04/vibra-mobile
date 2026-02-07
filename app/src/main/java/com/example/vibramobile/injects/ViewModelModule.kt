@@ -5,6 +5,7 @@ import com.example.vibramobile.viewmodels.ContextMenuViewModel
 import com.example.vibramobile.viewmodels.HomeViewModel
 import com.example.vibramobile.viewmodels.MediaPlayerViewModel
 import com.example.vibramobile.viewmodels.GenreDetailViewModel
+import com.example.vibramobile.viewmodels.SearchViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -14,4 +15,5 @@ val viewModelModule = module {
     viewModelOf(::MediaPlayerViewModel)
     viewModelOf(::ContextMenuViewModel)
     viewModelOf(::GenreDetailViewModel)
+    viewModelOf(::SearchViewModel)
 }
