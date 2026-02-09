@@ -13,6 +13,9 @@ sealed class MainDestination : NavKey {
     object Search : MainDestination()
 
     @Serializable
+    object SearchResult : MainDestination()
+
+    @Serializable
     object Library : MainDestination()
 
     @Serializable

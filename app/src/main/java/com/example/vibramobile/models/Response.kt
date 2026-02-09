@@ -13,3 +13,10 @@ data class Response<T>(
 data class RecommendedSongs(
     var songs: List<Song>
 )
+
+@Serializable
+data class SearchResult(
+    var albums: List<Playlist>,
+    var artists: List<User>,
+    var songs: List<Song>
+)

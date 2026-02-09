@@ -238,11 +238,13 @@ fun HomeScreen(
                         }
 
                         item(key = "bottom_spacer") {
-                            Spacer(Modifier.height(96.dp))
-
-                            if (UiState.getDisplayMediaPlayer()) {
-                                Spacer(Modifier.height(96.dp))
-                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(
+                                        if (UiState.getDisplayMediaPlayer()) 192.dp else 96.dp
+                                    )
+                            )
                         }
                     }
                 } else {
