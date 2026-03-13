@@ -11,10 +11,7 @@ import org.koin.dsl.module
 
 val networkModule = module {
     single<HttpClient> {
-        val url = when {
-            SystemUtils.isEmulator -> "http://10.0.2.2:8000/api/"
-            else -> "http://127.0.0.1:8000/api/"
-        }
+        val url = "http://100.113.48.99:8000/api/"
 
         HttpClient() {
             install(ContentNegotiation) {
