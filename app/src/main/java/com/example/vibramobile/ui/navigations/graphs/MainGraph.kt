@@ -5,12 +5,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.vibramobile.helpers.Navigator
@@ -31,7 +31,12 @@ import com.example.vibramobile.ui.screens.SearchResultScreen
 import com.example.vibramobile.ui.screens.SearchScreen
 
 @Composable
-fun MainGraph() {
+fun MainGraph(
+    isDarkMode: Boolean,
+    onDarkModeChange: (Boolean) -> Unit,
+    accentColorHex: String,
+    onAccentColorChange: (String) -> Unit
+) {
     val navigationState = rememberNavigationState(
         startRoute = MainDestination.Home,
         topLevelRoutes = TOP_LEVEL_DESTINATIONS.keys
@@ -40,7 +45,7 @@ fun MainGraph() {
 
     CompositionLocalProvider(LocalOverscrollFactory provides null) {
         Scaffold(
-            containerColor = Color.Black,
+            containerColor = MaterialTheme.colorScheme.background,
             bottomBar = {
                 Column() {
                     AppMediaPlayer(
@@ -95,7 +100,12 @@ fun MainGraph() {
                                 LibraryScreen()
                             }
                             entry<MainDestination.Profile> {
-                                ProfileScreen()
+                                ProfileScreen(
+                                    isDarkMode,
+                                    onDarkModeChange,
+                                    accentColorHex,
+                                    onAccentColorChange
+                                )
                             }
                             entry<MainDestination.GenreDetail> { route ->
                                 GenreDetailScreen(

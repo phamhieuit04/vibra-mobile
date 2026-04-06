@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -37,7 +38,6 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.vibramobile.R
-import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.extends.noRippleClickable
 import com.example.vibramobile.viewmodels.MediaPlayerViewModel
@@ -63,7 +63,7 @@ fun AppMediaPlayer(
                 .noRippleClickable(onClick = { UiState.setDisplaySongDetail(true) })
                 .padding(8.dp)
                 .clip(shape = RoundedCornerShape(8.dp))
-                .background(color = Color(0xff79300f))
+                .background(color = MaterialTheme.colorScheme.primary)
                 .padding(start = 8.dp, end = 8.dp, top = 8.dp),
         ) {
             Row(
@@ -95,7 +95,7 @@ fun AppMediaPlayer(
                     Column() {
                         Text(
                             text = currentSong?.name.toString(),
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             lineHeight = 12.sp
@@ -103,7 +103,7 @@ fun AppMediaPlayer(
                         Spacer(Modifier.height(2.dp))
                         Text(
                             text = currentSong?.author?.name.toString(),
-                            color = Color.White.copy(alpha = 0.8f),
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                             fontSize = 10.sp,
                             lineHeight = 10.sp
                         )
@@ -114,7 +114,7 @@ fun AppMediaPlayer(
                         Icon(
                             imageVector = Icons.Default.Favorite,
                             contentDescription = "",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                     IconButton(onClick = viewModel::toggle) {
@@ -125,7 +125,7 @@ fun AppMediaPlayer(
                             else
                                 Icons.Default.PlayArrow,
                             contentDescription = "",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -136,7 +136,7 @@ fun AppMediaPlayer(
                     .padding(horizontal = 2.dp)
                     .fillMaxWidth()
                     .clip(shape = RoundedCornerShape(8.dp))
-                    .background(color = Color.Gray)
+                    .background(color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.28f))
                     .align(alignment = Alignment.BottomCenter)
             ) {
                 Box(
@@ -144,7 +144,7 @@ fun AppMediaPlayer(
                         .height(2.dp)
                         .fillMaxWidth(progress)
                         .clip(shape = RoundedCornerShape(8.dp))
-                        .background(color = Color.White)
+                        .background(color = MaterialTheme.colorScheme.onPrimary)
                 )
             }
         }

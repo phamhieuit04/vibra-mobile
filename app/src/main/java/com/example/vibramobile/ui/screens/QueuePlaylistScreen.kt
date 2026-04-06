@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.PlayCircleFilled
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -27,7 +28,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -52,10 +52,10 @@ fun QueuePlaylistScreen(
 
     if (isVisible) {
         ModalBottomSheet(
-            modifier = Modifier.fillMaxHeight(),
+            modifier = modifier.fillMaxHeight(),
             sheetState = state,
             onDismissRequest = { onVisibleChange(false) },
-            containerColor = Color(0xff1f1f1f)
+            containerColor = MaterialTheme.colorScheme.surface
         ) {
             LazyColumn(
                 modifier = Modifier.padding(top = 16.dp),
@@ -65,7 +65,7 @@ fun QueuePlaylistScreen(
                     Column() {
                         Text(
                             text = "Danh sách phát",
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold,
                             fontSize = 24.sp,
                             lineHeight = 24.sp
@@ -75,7 +75,7 @@ fun QueuePlaylistScreen(
 
                         Text(
                             text = "Đăng phát",
-                            color = Color.LightGray.copy(alpha = 0.8f),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 14.sp,
                             lineHeight = 14.sp
                         )
@@ -97,14 +97,14 @@ fun QueuePlaylistScreen(
                                 Column() {
                                     Text(
                                         text = "Tên bài hát",
-                                        color = Color.White,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 16.sp,
                                         lineHeight = 16.sp
                                     )
                                     Spacer(Modifier.height(2.dp))
                                     Text(
                                         text = "Tên nghệ sĩ",
-                                        color = Color.LightGray.copy(alpha = 0.8f),
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 12.sp,
                                         lineHeight = 12.sp
                                     )
@@ -119,7 +119,7 @@ fun QueuePlaylistScreen(
                                     contentDescription = "",
                                     imageVector = if (isPlaying) Icons.Default.PauseCircleFilled
                                     else Icons.Default.PlayCircleFilled,
-                                    tint = Color.White
+                                    tint = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }

@@ -29,9 +29,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -60,7 +62,6 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.composeunstyled.Text
 import com.example.vibramobile.R
 import com.example.vibramobile.models.Song
 import com.example.vibramobile.states.UiState
@@ -109,6 +110,7 @@ fun SearchResultScreen(
     }
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             Row(
                 modifier = Modifier
@@ -135,12 +137,16 @@ fun SearchResultScreen(
                             placeholder = {
                                 Text(
                                     "Nội dung...",
-                                    color = Color.Gray,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 16.sp
                                 )
                             },
                             leadingIcon = {
-                                Icon(Icons.Default.Search, null, tint = Color.Gray)
+                                Icon(
+                                    Icons.Default.Search,
+                                    null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
                         )
                     }
@@ -151,10 +157,14 @@ fun SearchResultScreen(
                 IconButton(
                     onClick = navigateBack,
                     colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = Color(0xff2b2930)
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 ) {
-                    Icon(Icons.Default.Close, null, tint = Color.Gray)
+                    Icon(
+                        Icons.Default.Close,
+                        null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         }
@@ -272,7 +282,7 @@ private fun EmptySearchState(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .size(100.dp)
                 .background(
-                    color = Color.White.copy(alpha = 0.1f),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -281,7 +291,7 @@ private fun EmptySearchState(modifier: Modifier = Modifier) {
                 imageVector = Icons.Default.Search,
                 contentDescription = null,
                 modifier = Modifier.size(50.dp),
-                tint = Color.White.copy(alpha = 0.5f)
+                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
             )
         }
 
@@ -289,7 +299,7 @@ private fun EmptySearchState(modifier: Modifier = Modifier) {
 
         Text(
             text = "Tìm kiếm bài hát, nghệ sĩ, album",
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold
         )
@@ -298,7 +308,7 @@ private fun EmptySearchState(modifier: Modifier = Modifier) {
 
         Text(
             text = "Khám phá âm nhạc yêu thích của bạn",
-            color = Color.White.copy(alpha = 0.6f),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             fontSize = 14.sp
         )
     }
@@ -336,8 +346,8 @@ private fun TopResultCard(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color.Black.copy(alpha = 0.4f),
-                            Color.Black.copy(alpha = 0.8f)
+                            Color.Black.copy(alpha = 0.25f),
+                            Color.Black.copy(alpha = 0.78f)
                         )
                     )
                 )
@@ -351,7 +361,7 @@ private fun TopResultCard(
         ) {
             Text(
                 text = "Top tìm kiếm",
-                color = Color.White.copy(alpha = 0.9f),
+                color = Color.White.copy(alpha = 0.92f),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -372,18 +382,18 @@ private fun TopResultCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "Bài hát",
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = Color.White.copy(alpha = 0.82f),
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
                         text = " • ",
-                        color = Color.White.copy(alpha = 0.6f),
+                        color = Color.White.copy(alpha = 0.7f),
                         fontSize = 13.sp
                     )
                     Text(
                         text = song.author?.name ?: "",
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = Color.White.copy(alpha = 0.82f),
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
                         maxLines = 1,
@@ -398,7 +408,7 @@ private fun TopResultCard(
                 .align(Alignment.BottomEnd)
                 .padding(20.dp)
                 .size(56.dp)
-                .background(Color(0xFF1DB954), CircleShape)
+                .background(MaterialTheme.colorScheme.primary, CircleShape)
                 .clickable(onClick = onClick),
             contentAlignment = Alignment.Center
         ) {

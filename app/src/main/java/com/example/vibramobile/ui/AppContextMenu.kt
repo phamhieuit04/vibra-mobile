@@ -3,7 +3,6 @@ package com.example.vibramobile.ui
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,6 +27,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Theaters
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -102,16 +102,16 @@ fun AppContextMenu(
 
     ModalBottomSheet(state = sheetState) {
         Scrim(
-            scrimColor = Color.Black.copy(alpha = scrimAlpha),
-            modifier = Modifier.noRippleClickable(onClick = { viewModel.hide() })
+            modifier = Modifier.noRippleClickable(
+                onClick = { viewModel.hide() })
         )
 
         Sheet(
-            modifier = Modifier
+            modifier = modifier
                 .padding(top = 48.dp)
                 .shadow(4.dp, RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                .background(Color(0xFF282828))
+                .background(MaterialTheme.colorScheme.surface)
                 .fillMaxWidth()
                 .imePadding()
         ) {
@@ -124,7 +124,7 @@ fun AppContextMenu(
                     modifier = Modifier
                         .padding(top = 8.dp)
                         .background(
-                            Color(0xFF404040),
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f),
                             RoundedCornerShape(100.dp)
                         )
                         .width(40.dp)
@@ -202,7 +202,7 @@ private fun ContextMenuContent(
                     icon = Icons.Default.Diamond,
                     text = "Listen to music ad-free",
                     trailingText = "Premium",
-                    trailingColor = Color(0xFF1DB954),
+                    trailingColor = MaterialTheme.colorScheme.primary,
                     onClick = { onMenuItemClick(MenuAction.Premium) }
                 )
             }
@@ -298,14 +298,14 @@ private fun SongHeader(
         Column {
             Text(
                 text = songTitle,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = artistName,
-                color = Color(0xFFB3B3B3),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 14.sp
             )
         }
@@ -317,9 +317,11 @@ private fun MenuItem(
     icon: ImageVector,
     text: String,
     trailingText: String? = null,
-    trailingColor: Color = Color(0xFF1DB954),
+    trailingColor: Color? = null,
     onClick: () -> Unit = {}
 ) {
+    val resolvedTrailingColor = trailingColor ?: MaterialTheme.colorScheme.primary
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -330,7 +332,7 @@ private fun MenuItem(
         Icon(
             imageVector = icon,
             contentDescription = text,
-            tint = Color(0xFFB3B3B3),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(24.dp)
         )
 
@@ -338,7 +340,7 @@ private fun MenuItem(
 
         Text(
             text = text,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp,
             modifier = Modifier.weight(1f)
         )
@@ -346,7 +348,7 @@ private fun MenuItem(
         if (trailingText != null) {
             Text(
                 text = trailingText,
-                color = trailingColor,
+                color = resolvedTrailingColor,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )

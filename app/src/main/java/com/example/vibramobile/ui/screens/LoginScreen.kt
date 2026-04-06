@@ -19,6 +19,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -90,7 +91,7 @@ fun LoginScreen(
     }
 
     Scaffold(
-        containerColor = Color.Black,
+        containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
@@ -102,11 +103,13 @@ fun LoginScreen(
                         Icon(
                             contentDescription = "",
                             imageVector = Icons.Default.ArrowBackIosNew,
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0f)
+                )
             )
         },
         bottomBar = {
@@ -115,11 +118,15 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Don't have an account?", color = Color.White, fontSize = 16.sp)
+                Text(
+                    text = "Don't have an account?",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 16.sp
+                )
                 TextButton(onClick = navigateToSignUp) {
                     Text(
                         text = "Sign up",
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )
@@ -147,12 +154,12 @@ fun LoginScreen(
                         .fillMaxWidth(),
                     painter = painterResource(R.drawable.logo),
                     contentDescription = "",
-                    colorFilter = ColorFilter.tint(color = Color.White)
+                    colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onBackground)
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = "Login to Vibra",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp,
                     lineHeight = 32.sp
@@ -200,7 +207,7 @@ fun LoginScreen(
                 )
                 Text(
                     text = "or",
-                    color = Color.LightGray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     fontSize = 12.sp
                 )
@@ -229,7 +236,7 @@ fun SocialMethod(
     OutlinedButton(
         onClick = onClick,
         contentPadding = PaddingValues(top = 14.dp, bottom = 14.dp, start = 24.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         Box(
             contentAlignment = Alignment.CenterStart
@@ -246,7 +253,7 @@ fun SocialMethod(
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -258,9 +265,11 @@ fun FormInput(
     placeholder: String,
 ) {
     OutlinedTextField(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         state = rememberTextFieldState(),
-        placeholder = { Text(text = placeholder, color = Color.White) }
+        placeholder = {
+            Text(text = placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     )
 }
 
@@ -268,11 +277,11 @@ fun FormInput(
 fun FormButton(onClick: () -> Unit, modifier: Modifier = Modifier, text: String) {
     Button(
         onClick = onClick,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(50.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffbc4d15))
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
     ) {
-        Text(text = text, color = Color.White, fontSize = 16.sp)
+        Text(text = text, color = MaterialTheme.colorScheme.onPrimary, fontSize = 16.sp)
     }
 }

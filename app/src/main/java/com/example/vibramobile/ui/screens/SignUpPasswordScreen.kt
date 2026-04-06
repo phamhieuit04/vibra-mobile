@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,7 +35,8 @@ fun SignUpPasswordScreen(
     navigateToLogin: () -> Unit,
 ) {
     Scaffold(
-        containerColor = Color.Black,
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {},
@@ -44,11 +45,13 @@ fun SignUpPasswordScreen(
                         Icon(
                             contentDescription = "",
                             imageVector = Icons.Default.ArrowBackIosNew,
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0f)
+                )
             )
         },
     ) { padding ->
@@ -60,14 +63,14 @@ fun SignUpPasswordScreen(
         ) {
             Text(
                 text = "Create a password",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
             FormPasswordField(placeholder = "********")
             Text(
                 text = "Enter password again",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -84,15 +87,17 @@ fun SignUpPasswordScreen(
 fun FormPasswordField(modifier: Modifier = Modifier, placeholder: String) {
     val passwordHidden = remember { mutableStateOf(true) }
     OutlinedSecureTextField(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         state = rememberTextFieldState(),
-        placeholder = { Text(text = placeholder, color = Color.White) },
+        placeholder = {
+            Text(text = placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        },
         trailingIcon = {
             IconButton(onClick = { passwordHidden.value = !passwordHidden.value }) {
                 Icon(
                     imageVector = if (passwordHidden.value) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                     contentDescription = "",
-                    tint = Color.White
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         },

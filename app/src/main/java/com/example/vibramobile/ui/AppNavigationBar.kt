@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -26,15 +25,13 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LibraryMusic
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -74,17 +71,20 @@ fun AppNavigationBar(
 ) {
     if (!isVisible) return
 
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+    val gradientBase = MaterialTheme.colorScheme.background
+
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
                         Color.Transparent,
-                        Color.Black.copy(alpha = 0.2f),
-                        Color.Black.copy(alpha = 0.5f),
-                        Color.Black.copy(alpha = 0.8f),
-                        Color.Black.copy(alpha = 0.95f)
+                        gradientBase.copy(alpha = 0.2f),
+                        gradientBase.copy(alpha = 0.5f),
+                        gradientBase.copy(alpha = 0.8f),
+                        gradientBase.copy(alpha = 0.95f)
                     ),
                     startY = 0f,
                     endY = Float.POSITIVE_INFINITY
@@ -103,10 +103,10 @@ fun AppNavigationBar(
                     onClick = { onSelectKey(destination) },
                     isSelected = destination == selectedKey,
                     icon = data.icon,
-                    iconColor = Color.White,
+                    iconColor = onSurfaceColor,
                     selectedIcon = data.selectedIcon,
                     label = data.label,
-                    labelColor = Color.White,
+                    labelColor = onSurfaceColor,
                 )
             }
         }
@@ -125,7 +125,7 @@ fun AppNavigationBarItem(
     labelColor: Color,
 ) {
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .widthIn(min = 64.dp)
             .clickable(
                 indication = null,
