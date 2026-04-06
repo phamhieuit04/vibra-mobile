@@ -23,19 +23,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,10 +47,6 @@ import com.example.vibramobile.R
 import com.example.vibramobile.models.Category
 import com.example.vibramobile.states.CategoryState
 import com.example.vibramobile.states.UiState
-import com.example.vibramobile.ui.extends.noRippleClickable
-import com.example.vibramobile.viewmodels.SearchViewModel
-import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,7 +66,7 @@ fun SearchScreen(
                     .height(56.dp)
                     .clickable(onClick = navigateToSearchResult),
                 shape = RoundedCornerShape(28.dp),
-                color = Color(0xff2b2930)
+                color = MaterialTheme.colorScheme.surfaceVariant
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -87,14 +75,14 @@ fun SearchScreen(
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = null,
-                        tint = Color.Gray
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
                     Spacer(modifier = Modifier.width(12.dp))
 
                     Text(
                         text = "Bạn muốn khám phá điều gì?",
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium,
                         fontSize = 16.sp
                     )
@@ -173,8 +161,8 @@ private fun CategoryCard(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color.Black.copy(alpha = 0.3f),
-                            Color.Black.copy(alpha = 0.7f)
+                            Color.Black.copy(alpha = 0.22f),
+                            Color.Black.copy(alpha = 0.72f)
                         )
                     )
                 )

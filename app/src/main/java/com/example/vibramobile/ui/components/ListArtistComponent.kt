@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -63,7 +64,7 @@ fun ListArtistComponent(
                 Spacer(Modifier.height(8.dp))
                 Text(
                     text = artist.name.toString(),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 16.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -71,7 +72,7 @@ fun ListArtistComponent(
                 Spacer(Modifier.height(2.dp))
                 Text(
                     text = "${artist.followers} người theo dõi",
-                    color = Color.LightGray.copy(alpha = 0.8f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 12.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis

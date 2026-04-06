@@ -25,8 +25,11 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -40,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -48,14 +52,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.composeunstyled.Icon
-import com.composeunstyled.Text
 import com.example.vibramobile.R
 import com.example.vibramobile.models.Category
 import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.components.GenreDetailShimmer
-import com.example.vibramobile.ui.components.HomeShimmer
 import com.example.vibramobile.ui.components.ListSongComponent
 import com.example.vibramobile.ui.components.ListSongRowComponent
 import com.example.vibramobile.viewmodels.ContextMenuViewModel
@@ -114,6 +115,8 @@ fun GenreDetailScreen(
 
                 if (loading) {
                     item(key = "loading") {
+                        Spacer(modifier.height(24.dp))
+
                         GenreDetailShimmer()
                     }
                 } else {
@@ -207,7 +210,7 @@ private fun GenreHeader(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                    brush = Brush.verticalGradient(
                         colors = listOf(
                             Color.Transparent,
                             Color.Black.copy(alpha = 0.8f)
@@ -223,13 +226,13 @@ private fun GenreHeader(
                 .padding(8.dp)
                 .align(Alignment.TopStart),
             colors = IconButtonDefaults.iconButtonColors(
-                containerColor = Color.Black.copy(alpha = 0.5f)
+                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
             )
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
-                tint = Color.White
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -260,7 +263,7 @@ private fun GenreHeader(
             ) {
                 Text(
                     text = "Thể loại",
-                    color = Color.White.copy(alpha = 0.7f),
+                    color = Color.White.copy(alpha = 0.85f),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -305,7 +308,7 @@ private fun EmptyStateView(
             modifier = Modifier
                 .size(80.dp)
                 .background(
-                    color = Color.White.copy(alpha = 0.1f),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -314,7 +317,7 @@ private fun EmptyStateView(
                 imageVector = Icons.Default.MusicNote,
                 contentDescription = null,
                 modifier = Modifier.size(40.dp),
-                tint = Color.White.copy(alpha = 0.5f)
+                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
             )
         }
 
@@ -322,7 +325,7 @@ private fun EmptyStateView(
 
         Text(
             text = "Chưa có bài hát",
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold
         )
@@ -331,7 +334,7 @@ private fun EmptyStateView(
 
         Text(
             text = "Giai điệu cho từng khoảnh khắc",
-            color = Color.White.copy(alpha = 0.6f),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             fontSize = 14.sp
         )
 

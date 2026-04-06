@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -22,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,7 +40,7 @@ fun SignUpScreen(
     navigateToSignUpPassword: () -> Unit
 ) {
     Scaffold(
-        containerColor = Color.Black,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {},
@@ -49,11 +49,13 @@ fun SignUpScreen(
                         Icon(
                             contentDescription = "",
                             imageVector = Icons.Default.ArrowBackIosNew,
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0f)
+                )
             )
         },
         bottomBar = {
@@ -62,11 +64,15 @@ fun SignUpScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Already have an account?", color = Color.White, fontSize = 16.sp)
+                Text(
+                    text = "Already have an account?",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 16.sp
+                )
                 TextButton(onClick = navigateToLogin) {
                     Text(
                         text = "Log in",
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )
@@ -78,6 +84,7 @@ fun SignUpScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(padding)
                 .padding(32.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -93,19 +100,19 @@ fun SignUpScreen(
                         .fillMaxWidth(),
                     painter = painterResource(R.drawable.logo),
                     contentDescription = "",
-                    colorFilter = ColorFilter.tint(color = Color.White)
+                    colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onBackground)
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = "Sign up to",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp,
                     lineHeight = 32.sp
                 )
                 Text(
                     text = "start listening",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp,
                     lineHeight = 32.sp
@@ -126,7 +133,7 @@ fun SignUpScreen(
                 )
                 Text(
                     text = "or",
-                    color = Color.LightGray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     fontSize = 12.sp
                 )

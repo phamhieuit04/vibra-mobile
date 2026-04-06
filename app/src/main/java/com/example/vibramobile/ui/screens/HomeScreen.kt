@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -141,7 +142,7 @@ fun HomeScreen(
                                             )
                                         },
                                         onPlay = {
-                                            mediaPlayerViewModel.playSong(song = it);
+                                            mediaPlayerViewModel.playSong(song = it)
                                         },
                                         songs = recentRotationSongs
                                     )
@@ -254,7 +255,7 @@ fun HomeScreen(
         }
 
         val selectedCategoryColor: Color = Color(0xffbc4d15)
-        val defaultCategoryColor: Color = Color(0xff303030)
+        val defaultCategoryColor: Color = MaterialTheme.colorScheme.surfaceVariant
         var selectedCategoryId by remember { mutableStateOf<Int?>(null) }
         LazyRow(
             modifier = Modifier
@@ -292,7 +293,17 @@ fun HomeScreen(
                         }
                     )
                 ) {
-                    Text(text = "All", color = Color.White, fontSize = 14.sp)
+                    val allTextColor = if (selectedCategoryId == null) {
+                        Color.White
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    }
+
+                    Text(
+                        text = "All",
+                        color = allTextColor,
+                        fontSize = 14.sp
+                    )
                 }
             }
             items(items = categories.take(5), key = { it.id!! }) { category ->
@@ -309,9 +320,15 @@ fun HomeScreen(
                         }
                     )
                 ) {
+                    val categoryTextColor = if (selectedCategoryId == category.id) {
+                        Color.White
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    }
+
                     Text(
                         text = category.name.toString(),
-                        color = Color.White,
+                        color = categoryTextColor,
                         fontSize = 14.sp,
                         lineHeight = 14.sp
                     )
@@ -321,7 +338,11 @@ fun HomeScreen(
                 OutlinedButton(
                     onClick = { selectedCategoryId = null; navigateToSearch() }
                 ) {
-                    Text(text = "See more", color = Color.White, fontSize = 14.sp)
+                    Text(
+                        text = "See more",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 14.sp
+                    )
                 }
             }
         }
@@ -331,8 +352,9 @@ fun HomeScreen(
 @Composable
 fun SectionTitle(modifier: Modifier = Modifier, text: String) {
     Text(
+        modifier = modifier,
         text = text,
-        color = Color.White,
+        color = MaterialTheme.colorScheme.onBackground,
         fontWeight = FontWeight.Bold,
         fontSize = 26.sp
     )

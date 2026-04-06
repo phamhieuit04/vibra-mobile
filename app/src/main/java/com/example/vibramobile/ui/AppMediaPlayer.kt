@@ -37,7 +37,6 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.vibramobile.R
-import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.extends.noRippleClickable
 import com.example.vibramobile.viewmodels.MediaPlayerViewModel

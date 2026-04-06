@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -81,8 +82,8 @@ fun TopArtistCard(
                     brush = Brush.verticalGradient(
                         colors = listOf(
                             Color.Transparent,
-                            Color.Black.copy(alpha = 0.4f),
-                            Color.Black.copy(alpha = 0.8f)
+                            Color.Black.copy(alpha = 0.22f),
+                            Color.Black.copy(alpha = 0.74f)
                         )
                     )
                 )
@@ -93,7 +94,7 @@ fun TopArtistCard(
                 .padding(12.dp)
                 .size(40.dp)
                 .background(
-                    color = Color(0xFFFFE5D6),
+                    color = MaterialTheme.colorScheme.secondaryContainer,
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -102,7 +103,7 @@ fun TopArtistCard(
                 text = rank.toString(),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF18181B)
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             )
         }
         Column(
@@ -122,7 +123,7 @@ fun TopArtistCard(
             Text(
                 text = "${artist.followers} người theo dõi",
                 fontSize = 13.sp,
-                color = Color.White.copy(alpha = 0.8f),
+                color = Color.White.copy(alpha = 0.82f),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -157,7 +158,7 @@ fun TopArtistCardSkeleton(rank: Int) {
                 .padding(12.dp)
                 .size(40.dp)
                 .background(
-                    color = Color(0xFFFFE5D6),
+                    color = MaterialTheme.colorScheme.secondaryContainer,
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -166,7 +167,7 @@ fun TopArtistCardSkeleton(rank: Int) {
                 text = rank.toString(),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF18181B)
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             )
         }
         Column(
@@ -178,14 +179,20 @@ fun TopArtistCardSkeleton(rank: Int) {
                 modifier = Modifier
                     .width(140.dp)
                     .height(18.dp)
-                    .background(Color.White.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
+                    .background(
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.20f),
+                        RoundedCornerShape(4.dp)
+                    )
             )
             Spacer(Modifier.height(4.dp))
             Box(
                 modifier = Modifier
                     .width(100.dp)
                     .height(13.dp)
-                    .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
+                    .background(
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.14f),
+                        RoundedCornerShape(4.dp)
+                    )
             )
         }
     }

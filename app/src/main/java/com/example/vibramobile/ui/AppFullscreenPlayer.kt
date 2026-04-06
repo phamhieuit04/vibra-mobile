@@ -44,12 +44,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.example.vibramobile.states.SongState
 import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.screens.QueuePlaylistScreen
 import com.example.vibramobile.viewmodels.MediaPlayerViewModel
@@ -68,14 +68,16 @@ fun FullscreenPlayer(
     val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val isPlaying by mediaPlayerViewModel.isPlaying.collectAsState()
     val progress by mediaPlayerViewModel.progress.collectAsState()
+    val currentSong by mediaPlayerViewModel.currentSong.collectAsState()
 
     if (isVisible) {
         ModalBottomSheet(
-            modifier = Modifier.fillMaxHeight(),
+            modifier = modifier.fillMaxHeight(),
             sheetState = state,
             onDismissRequest = { onVisibleChange(false) },
             dragHandle = {},
-            containerColor = Color(0xff79300f)
+            containerColor = Color(0xff79300f),
+            shape = RectangleShape
         ) {
             LazyColumn(
                 modifier = Modifier.padding(top = 16.dp),
@@ -121,7 +123,7 @@ fun FullscreenPlayer(
                                 .size(320.dp)
                                 .clip(shape = RoundedCornerShape(12.dp)),
                             contentDescription = "",
-                            model = SongState.currentSong.value?.thumbnail_path?.encodeURLPath(),
+                            model = currentSong?.thumbnail_path?.encodeURLPath(),
                             contentScale = ContentScale.Crop
                         )
                     }
@@ -137,14 +139,14 @@ fun FullscreenPlayer(
                     ) {
                         Column() {
                             Text(
-                                text = SongState.currentSong.value?.name.toString(),
+                                text = currentSong?.name.toString(),
                                 color = Color.White,
                                 fontSize = 24.sp,
                                 lineHeight = 24.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = SongState.currentSong.value?.author?.name.toString(),
+                                text = currentSong?.author?.name.toString(),
                                 color = Color.LightGray,
                                 fontSize = 15.sp
                             )
@@ -199,8 +201,14 @@ fun FullscreenPlayer(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "0:08", color = Color.LightGray.copy(alpha = 0.8f))
-                            Text(text = "3:15", color = Color.LightGray.copy(alpha = 0.8f))
+                            Text(
+                                text = "0:08",
+                                color = Color.LightGray.copy(alpha = 0.8f)
+                            )
+                            Text(
+                                text = "3:15",
+                                color = Color.LightGray.copy(alpha = 0.8f)
+                            )
                         }
                     }
 

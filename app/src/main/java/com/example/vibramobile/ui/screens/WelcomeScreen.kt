@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +35,7 @@ fun WelcomeScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(color = Color.Black)
+            .background(color = MaterialTheme.colorScheme.background)
             .padding(32.dp),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -50,19 +51,19 @@ fun WelcomeScreen(
                 modifier = Modifier.scale(1.2f),
                 painter = painterResource(R.drawable.logo),
                 contentDescription = "",
-                colorFilter = ColorFilter.tint(color = Color.White)
+                colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onBackground)
             )
             Spacer(Modifier.height(4.dp))
             Text(
                 text = "Millions of songs.",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold,
                 fontSize = 28.sp,
                 lineHeight = 32.sp
             )
             Text(
                 text = "Free on Vibra.",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold,
                 fontSize = 28.sp,
                 lineHeight = 32.sp
@@ -80,7 +81,11 @@ fun WelcomeScreen(
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xffbc4d15))
             ) {
-                Text(text = "Sign up free", color = Color.White, fontSize = 16.sp)
+                Text(
+                    text = "Sign up free",
+                    color = Color.White,
+                    fontSize = 16.sp
+                )
             }
             Spacer(Modifier.height(12.dp))
             OutlinedButton(
@@ -89,7 +94,11 @@ fun WelcomeScreen(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Log in", color = Color.White, fontSize = 16.sp)
+                Text(
+                    text = "Log in",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 16.sp
+                )
             }
         }
         Spacer(Modifier.height(32.dp))

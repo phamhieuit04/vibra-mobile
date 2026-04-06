@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -73,14 +74,14 @@ fun ListSongRowComponent(
                     Column() {
                         Text(
                             text = song.name.toString(),
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 18.sp,
                             lineHeight = 18.sp
                         )
                         Spacer(Modifier.height(2.dp))
                         Text(
                             text = song.author?.name.toString(),
-                            color = Color.LightGray.copy(alpha = 0.8f),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 12.sp,
                             lineHeight = 12.sp
                         )
@@ -91,7 +92,7 @@ fun ListSongRowComponent(
                         modifier = Modifier.size(20.dp),
                         imageVector = Icons.Default.MoreHoriz,
                         contentDescription = "",
-                        tint = Color.LightGray.copy(alpha = 0.8f)
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -140,7 +141,7 @@ fun ListSongRowSkeleton(modifier: Modifier = Modifier) {
                         modifier = Modifier.size(20.dp),
                         imageVector = Icons.Default.MoreHoriz,
                         contentDescription = "",
-                        tint = Color(0xFF303030)
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
                     )
                 }
             }
