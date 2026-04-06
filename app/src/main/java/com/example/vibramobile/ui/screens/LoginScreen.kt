@@ -280,8 +280,8 @@ fun FormButton(onClick: () -> Unit, modifier: Modifier = Modifier, text: String)
         modifier = modifier
             .fillMaxWidth()
             .height(50.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffbc4d15))
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
     ) {
-        Text(text = text, color = Color.White, fontSize = 16.sp)
+        Text(text = text, color = MaterialTheme.colorScheme.onPrimary, fontSize = 16.sp)
     }
 }

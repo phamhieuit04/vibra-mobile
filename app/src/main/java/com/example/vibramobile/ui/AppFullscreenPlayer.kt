@@ -33,6 +33,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -44,7 +45,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -76,8 +76,8 @@ fun FullscreenPlayer(
             sheetState = state,
             onDismissRequest = { onVisibleChange(false) },
             dragHandle = {},
-            containerColor = Color(0xff79300f),
-            shape = RectangleShape
+            containerColor = MaterialTheme.colorScheme.primary,
+            shape = RoundedCornerShape(0.dp)
         ) {
             LazyColumn(
                 modifier = Modifier.padding(top = 16.dp),
@@ -94,7 +94,7 @@ fun FullscreenPlayer(
                                     modifier = Modifier.size(32.dp),
                                     contentDescription = "",
                                     imageVector = Icons.Default.KeyboardArrowDown,
-                                    tint = Color.White
+                                    tint = MaterialTheme.colorScheme.onPrimary
                                 )
                             }
                         },
@@ -104,7 +104,7 @@ fun FullscreenPlayer(
                                     modifier = Modifier.size(24.dp),
                                     imageVector = Icons.Default.MoreHoriz,
                                     contentDescription = "",
-                                    tint = Color.White
+                                    tint = MaterialTheme.colorScheme.onPrimary
                                 )
                             }
                         },
@@ -140,14 +140,14 @@ fun FullscreenPlayer(
                         Column() {
                             Text(
                                 text = currentSong?.name.toString(),
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 fontSize = 24.sp,
                                 lineHeight = 24.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 text = currentSong?.author?.name.toString(),
-                                color = Color.LightGray,
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                                 fontSize = 15.sp
                             )
                         }
@@ -160,7 +160,7 @@ fun FullscreenPlayer(
                                     modifier = Modifier.size(28.dp),
                                     contentDescription = "",
                                     imageVector = Icons.Default.AddCircle,
-                                    tint = Color.White
+                                    tint = MaterialTheme.colorScheme.onPrimary
                                 )
                             }
                             IconButton(onClick = {}) {
@@ -168,7 +168,7 @@ fun FullscreenPlayer(
                                     modifier = Modifier.size(28.dp),
                                     contentDescription = "",
                                     imageVector = Icons.Default.FavoriteBorder,
-                                    tint = Color.White
+                                    tint = MaterialTheme.colorScheme.onPrimary
                                 )
                             }
                         }
@@ -185,14 +185,14 @@ fun FullscreenPlayer(
                                 .padding(horizontal = 2.dp)
                                 .fillMaxWidth()
                                 .clip(shape = RoundedCornerShape(8.dp))
-                                .background(color = Color.Gray)
+                                .background(color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.28f))
                         ) {
                             Box(
                                 modifier = Modifier
                                     .height(4.dp)
                                     .fillMaxWidth(progress)
                                     .clip(shape = RoundedCornerShape(8.dp))
-                                    .background(color = Color.White)
+                                    .background(color = MaterialTheme.colorScheme.onPrimary)
                             )
                         }
                         Spacer(Modifier.height(8.dp))
@@ -203,11 +203,11 @@ fun FullscreenPlayer(
                         ) {
                             Text(
                                 text = "0:08",
-                                color = Color.LightGray.copy(alpha = 0.8f)
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                             )
                             Text(
                                 text = "3:15",
-                                color = Color.LightGray.copy(alpha = 0.8f)
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                             )
                         }
                     }
@@ -226,7 +226,7 @@ fun FullscreenPlayer(
                                 modifier = Modifier.size(28.dp),
                                 contentDescription = "",
                                 imageVector = Icons.Default.Shuffle,
-                                tint = Color.White
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                         IconButton(
@@ -237,7 +237,7 @@ fun FullscreenPlayer(
                                 modifier = Modifier.fillMaxSize(),
                                 contentDescription = "",
                                 imageVector = Icons.Default.SkipPrevious,
-                                tint = Color.White
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                         IconButton(
@@ -251,7 +251,7 @@ fun FullscreenPlayer(
                                     Icons.Default.PauseCircleFilled
                                 else
                                     Icons.Default.PlayCircleFilled,
-                                tint = Color.White
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                         IconButton(
@@ -262,7 +262,7 @@ fun FullscreenPlayer(
                                 modifier = Modifier.fillMaxSize(),
                                 contentDescription = "",
                                 imageVector = Icons.Default.SkipNext,
-                                tint = Color.White
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                         IconButton(onClick = {}) {
@@ -270,7 +270,7 @@ fun FullscreenPlayer(
                                 modifier = Modifier.size(28.dp),
                                 contentDescription = "",
                                 imageVector = Icons.Default.Loop,
-                                tint = Color.White
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
@@ -288,7 +288,7 @@ fun FullscreenPlayer(
                                 modifier = Modifier.size(28.dp),
                                 contentDescription = "",
                                 imageVector = Icons.Default.Queue,
-                                tint = Color.White
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                         IconButton(onClick = { UiState.setDisplayQueuePlaylist(true) }) {
@@ -296,7 +296,7 @@ fun FullscreenPlayer(
                                 modifier = Modifier.size(28.dp),
                                 contentDescription = "",
                                 imageVector = Icons.Default.LibraryMusic,
-                                tint = Color.White
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }

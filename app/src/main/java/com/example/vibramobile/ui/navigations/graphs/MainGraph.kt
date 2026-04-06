@@ -33,7 +33,9 @@ import com.example.vibramobile.ui.screens.SearchScreen
 @Composable
 fun MainGraph(
     isDarkMode: Boolean,
-    onDarkModeChange: (Boolean) -> Unit
+    onDarkModeChange: (Boolean) -> Unit,
+    accentColorHex: String,
+    onAccentColorChange: (String) -> Unit
 ) {
     val navigationState = rememberNavigationState(
         startRoute = MainDestination.Home,
@@ -98,7 +100,12 @@ fun MainGraph(
                                 LibraryScreen()
                             }
                             entry<MainDestination.Profile> {
-                                ProfileScreen(isDarkMode, onDarkModeChange)
+                                ProfileScreen(
+                                    isDarkMode,
+                                    onDarkModeChange,
+                                    accentColorHex,
+                                    onAccentColorChange
+                                )
                             }
                             entry<MainDestination.GenreDetail> { route ->
                                 GenreDetailScreen(

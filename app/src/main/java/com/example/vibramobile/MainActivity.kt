@@ -1,27 +1,57 @@
 package com.example.vibramobile
 
 import android.os.Bundle
+import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.toArgb
 import com.example.vibramobile.ui.navigations.graphs.RootGraph
+import com.example.vibramobile.ui.theme.DEFAULT_ACCENT_COLOR_HEX
 import com.example.vibramobile.ui.theme.VibraMobileTheme
 
 class MainActivity : ComponentActivity() {
+    companion object {
+        private const val APP_SETTINGS = "app_settings"
+        private const val KEY_DARK_MODE = "dark_mode"
+        private const val KEY_ACCENT_HEX = "accent_hex"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            var isDarkMode by rememberSaveable { mutableStateOf(true) }
+        val sharedPreferences = getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE)
 
-            VibraMobileTheme(darkTheme = isDarkMode) {
+        setContent {
+            var isDarkMode by remember {
+                mutableStateOf(sharedPreferences.getBoolean(KEY_DARK_MODE, true))
+            }
+            var accentColorHex by remember {
+                mutableStateOf(
+                    sharedPreferences.getString(KEY_ACCENT_HEX, DEFAULT_ACCENT_COLOR_HEX)
+                        ?: DEFAULT_ACCENT_COLOR_HEX
+                )
+            }
+
+            LaunchedEffect(isDarkMode, accentColorHex) {
+                sharedPreferences
+                    .edit()
+                    .putBoolean(KEY_DARK_MODE, isDarkMode)
+                    .putString(KEY_ACCENT_HEX, accentColorHex)
+                    .apply()
+            }
+
+            VibraMobileTheme(
+                darkTheme = isDarkMode,
+                accentColorHex = accentColorHex
+            ) {
                 val backgroundColor = MaterialTheme.colorScheme.background.toArgb()
 
                 SideEffect {
@@ -40,8 +70,10 @@ class MainActivity : ComponentActivity() {
                 }
 
                 RootGraph(
-                    isDarkMode = isDarkMode,
-                    onDarkModeChange = { isDarkMode = it }
+                    isDarkMode,
+                    { isDarkMode = it },
+                    accentColorHex,
+                    { accentColorHex = it }
                 )
             }
         }

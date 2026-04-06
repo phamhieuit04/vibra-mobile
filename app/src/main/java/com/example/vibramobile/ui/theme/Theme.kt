@@ -5,8 +5,9 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 
-private val DarkColorScheme = darkColorScheme(
+private val BaseDarkColorScheme = darkColorScheme(
     primary = Color(0xFF1DB954),
     secondary = PurpleGrey80,
     tertiary = Pink80,
@@ -19,7 +20,7 @@ private val DarkColorScheme = darkColorScheme(
     onSurfaceVariant = Color(0xFFBDBDBD)
 )
 
-private val LightColorScheme = lightColorScheme(
+private val BaseLightColorScheme = lightColorScheme(
     primary = Color(0xFF1A8F46),
     secondary = PurpleGrey40,
     tertiary = Pink40,
@@ -35,9 +36,26 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun VibraMobileTheme(
     darkTheme: Boolean,
+    accentColorHex: String = DEFAULT_ACCENT_COLOR_HEX,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    val accentColor = accentColorFromHex(accentColorHex)
+    val onAccentColor = if (accentColor.luminance() > 0.55f) Color.Black else Color.White
+    val colorScheme = if (darkTheme) {
+        BaseDarkColorScheme.copy(
+            primary = accentColor,
+            primaryContainer = accentColor.copy(alpha = 0.24f),
+            onPrimary = onAccentColor,
+            onPrimaryContainer = BaseDarkColorScheme.onBackground
+        )
+    } else {
+        BaseLightColorScheme.copy(
+            primary = accentColor,
+            primaryContainer = accentColor.copy(alpha = 0.16f),
+            onPrimary = onAccentColor,
+            onPrimaryContainer = BaseLightColorScheme.onBackground
+        )
+    }
 
     MaterialTheme(
         colorScheme = colorScheme,
@@ -45,3 +63,10 @@ fun VibraMobileTheme(
         content = content
     )
 }
+
+private fun accentColorFromHex(hex: String): Color {
+    val normalized = hex.trim().uppercase()
+    val safeHex = if (normalized in AccentColorHexList) normalized else DEFAULT_ACCENT_COLOR_HEX
+    return Color(android.graphics.Color.parseColor(safeHex))
+}
+

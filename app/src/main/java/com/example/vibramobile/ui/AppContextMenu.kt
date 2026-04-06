@@ -102,8 +102,8 @@ fun AppContextMenu(
 
     ModalBottomSheet(state = sheetState) {
         Scrim(
-            scrimColor = MaterialTheme.colorScheme.onBackground.copy(alpha = scrimAlpha),
-            modifier = Modifier.noRippleClickable(onClick = { viewModel.hide() })
+            modifier = Modifier.noRippleClickable(
+                onClick = { viewModel.hide() })
         )
 
         Sheet(

@@ -254,7 +254,7 @@ fun HomeScreen(
             }
         }
 
-        val selectedCategoryColor: Color = Color(0xffbc4d15)
+        val selectedCategoryColor: Color = MaterialTheme.colorScheme.primary
         val defaultCategoryColor: Color = MaterialTheme.colorScheme.surfaceVariant
         var selectedCategoryId by remember { mutableStateOf<Int?>(null) }
         LazyRow(
@@ -294,9 +294,9 @@ fun HomeScreen(
                     )
                 ) {
                     val allTextColor = if (selectedCategoryId == null) {
-                        Color.White
+                        MaterialTheme.colorScheme.onPrimary
                     } else {
-                        MaterialTheme.colorScheme.onSurface
+                        MaterialTheme.colorScheme.onSurfaceVariant
                     }
 
                     Text(
@@ -321,9 +321,9 @@ fun HomeScreen(
                     )
                 ) {
                     val categoryTextColor = if (selectedCategoryId == category.id) {
-                        Color.White
+                        MaterialTheme.colorScheme.onPrimary
                     } else {
-                        MaterialTheme.colorScheme.onSurface
+                        MaterialTheme.colorScheme.onSurfaceVariant
                     }
 
                     Text(

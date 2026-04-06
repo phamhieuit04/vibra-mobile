@@ -94,7 +94,7 @@ fun AuthGraph(
             Icon(
                 imageVector = Icons.Filled.Brightness6,
                 contentDescription = if (isDarkMode) "Switch to light mode" else "Switch to dark mode",
-                tint = MaterialTheme.colorScheme.onBackground
+                tint = MaterialTheme.colorScheme.primary
             )
         }
     }
