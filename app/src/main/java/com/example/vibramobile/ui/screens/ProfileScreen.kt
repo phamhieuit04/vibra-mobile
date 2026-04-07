@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.vibramobile.states.UserState
@@ -46,6 +47,7 @@ import com.example.vibramobile.ui.theme.AccentColorHexList
 import com.example.vibramobile.viewmodels.ProfileViewModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.core.graphics.toColorInt
+import coil3.compose.AsyncImage
 
 @Composable
 fun ProfileScreen(
@@ -76,7 +78,10 @@ fun ProfileScreen(
                 .padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(24.dp))
-            ProfileHeader(currentUser?.name.orEmpty())
+            ProfileHeader(
+                currentUser?.name.orEmpty(),
+                currentUser?.avatar_path.orEmpty()
+            )
             Spacer(modifier = Modifier.height(28.dp))
             StatsRow(
                 playlistCount = myPlaylists.size,
@@ -94,7 +99,7 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun ProfileHeader(userName: String) {
+private fun ProfileHeader(userName: String, avatar: String) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -106,11 +111,11 @@ private fun ProfileHeader(userName: String) {
                 .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = Icons.Filled.AccountCircle,
-                contentDescription = null,
+            AsyncImage(
+                model = avatar,
+                contentDescription = "",
                 modifier = Modifier.size(100.dp),
-                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.24f)
+                contentScale = ContentScale.FillBounds
             )
         }
 
