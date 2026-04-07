@@ -1,5 +1,6 @@
 package com.example.vibramobile
 
+import android.app.Application
 import android.os.Bundle
 import android.content.Context
 import androidx.activity.ComponentActivity
@@ -17,6 +18,20 @@ import androidx.compose.ui.graphics.toArgb
 import com.example.vibramobile.ui.navigations.graphs.RootGraph
 import com.example.vibramobile.ui.theme.DEFAULT_ACCENT_COLOR_HEX
 import com.example.vibramobile.ui.theme.VibraMobileTheme
+import androidx.core.content.edit
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
+
+class App : Application() {
+    override fun onCreate() {
+        super.onCreate()
+
+        startKoin {
+            androidContext(this@App)
+            modules(appModules)
+        }
+    }
+}
 
 class MainActivity : ComponentActivity() {
     companion object {
@@ -42,10 +57,10 @@ class MainActivity : ComponentActivity() {
 
             LaunchedEffect(isDarkMode, accentColorHex) {
                 sharedPreferences
-                    .edit()
-                    .putBoolean(KEY_DARK_MODE, isDarkMode)
-                    .putString(KEY_ACCENT_HEX, accentColorHex)
-                    .apply()
+                    .edit {
+                        putBoolean(KEY_DARK_MODE, isDarkMode)
+                            .putString(KEY_ACCENT_HEX, accentColorHex)
+                    }
             }
 
             VibraMobileTheme(
