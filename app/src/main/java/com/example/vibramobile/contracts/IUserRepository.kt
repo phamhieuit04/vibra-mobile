@@ -9,5 +9,7 @@ interface IUserRepository {
     suspend fun getFollowedArtists(accessToken: String): List<User>
 
     suspend fun getMyPlaylists(accessToken: String): List<Library>
+
+    suspend fun getProfile(accessToken: String): User
 }
 

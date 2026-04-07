@@ -1,5 +1,6 @@
 package com.example.vibramobile.repositories
 
+import android.util.Log
 import com.example.vibramobile.contracts.IUserRepository
 import com.example.vibramobile.models.Library
 import com.example.vibramobile.models.Response
@@ -38,6 +39,14 @@ class UserRepository(
         }.bodyAsText()
 
         return json.decodeFromString<Response<List<Library>>>(response).data
+    }
+
+    override suspend fun getProfile(accessToken: String): User {
+        val response = client.get("profile/show") {
+            bearerAuth(accessToken)
+        }.bodyAsText()
+
+        return json.decodeFromString<Response<User>>(response).data
     }
 }
 

@@ -19,7 +19,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.DividerDefaults
@@ -63,8 +62,7 @@ fun ProfileScreen(
     val myPlaylists by UserState.myPlaylists.collectAsState()
 
     LaunchedEffect(Unit) {
-        profileViewModel.fetchFollowedArtists()
-        profileViewModel.fetchMyPlaylists()
+        profileViewModel.refresh()
     }
 
     Scaffold(
