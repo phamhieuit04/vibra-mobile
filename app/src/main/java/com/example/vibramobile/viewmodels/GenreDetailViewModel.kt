@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 class GenreDetailViewModel(
     private val songRepository: ISongRepository
 ) : ViewModel() {
-    private val accessToken: String = UserState.getCurrentUser()?.token.toString()
+    private fun accessToken(): String = UserState.currentUser.value?.token.orEmpty()
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
@@ -28,7 +28,7 @@ class GenreDetailViewModel(
                 SongState.setSongsByCategory(
                     songRepository.getSongsByCategory(
                         categoryId = categoryId,
-                        accessToken = accessToken
+                        accessToken = accessToken()
                     )
                 )
             }.onFailure { exception ->

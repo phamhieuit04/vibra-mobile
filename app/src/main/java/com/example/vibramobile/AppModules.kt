@@ -18,6 +18,7 @@ import com.example.vibramobile.viewmodels.ContextMenuViewModel
 import com.example.vibramobile.viewmodels.GenreDetailViewModel
 import com.example.vibramobile.viewmodels.HomeViewModel
 import com.example.vibramobile.viewmodels.MediaPlayerViewModel
+import com.example.vibramobile.viewmodels.ProfileViewModel
 import com.example.vibramobile.viewmodels.SearchViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -44,7 +45,7 @@ val appModules = module {
     }
 
     single<HttpClient> {
-        val url = "http://100.113.48.99:8000/api/"
+        val url = "http://10.0.2.2:8000/api/"
 
         HttpClient() {
             install(ContentNegotiation) {
@@ -66,6 +67,7 @@ val appModules = module {
     viewModelOf(::MediaPlayerViewModel)
     viewModelOf(::ContextMenuViewModel)
     viewModelOf(::GenreDetailViewModel)
+    viewModelOf(::ProfileViewModel)
     viewModelOf(::SearchViewModel)
 
     singleOf(::AuthRepository) bind IAuthRepository::class

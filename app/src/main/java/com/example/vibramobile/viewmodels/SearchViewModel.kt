@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 class SearchViewModel(
     private val searchResultRepository: ISearchResultRepository
 ) : ViewModel() {
-    private val accessToken: String = UserState.getCurrentUser()?.token.toString()
+    private fun accessToken(): String = UserState.currentUser.value?.token.orEmpty()
 
     private val _searchResult = MutableStateFlow<SearchResult?>(null)
     val searchResult = _searchResult.asStateFlow()
@@ -29,7 +29,7 @@ class SearchViewModel(
             runCatching {
                 _searchResult.value = searchResultRepository.search(
                     keyword = keyword,
-                    accessToken = accessToken
+                    accessToken = accessToken()
                 )
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())

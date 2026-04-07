@@ -1,11 +1,13 @@
 package com.example.vibramobile.repositories
 
 import com.example.vibramobile.contracts.IUserRepository
+import com.example.vibramobile.models.Library
 import com.example.vibramobile.models.Response
 import com.example.vibramobile.models.User
 import io.ktor.client.HttpClient
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.json.Json
 
@@ -19,6 +21,23 @@ class UserRepository(
         }.bodyAsText()
 
         return json.decodeFromString<Response<List<User>>>(response).data
+    }
+
+    override suspend fun getFollowedArtists(accessToken: String): List<User> {
+        val response = client.get("library/list-artist") {
+            bearerAuth(accessToken)
+        }.bodyAsText()
+
+        return json.decodeFromString<Response<List<User>>>(response).data
+    }
+
+    override suspend fun getMyPlaylists(accessToken: String): List<Library> {
+        val response = client.get("library/list-playlist") {
+            bearerAuth(accessToken)
+            parameter("type", 2)
+        }.bodyAsText()
+
+        return json.decodeFromString<Response<List<Library>>>(response).data
     }
 }
 

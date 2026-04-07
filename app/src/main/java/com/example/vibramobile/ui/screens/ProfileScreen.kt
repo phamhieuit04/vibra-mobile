@@ -31,6 +31,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,7 +41,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.vibramobile.states.UserState
 import com.example.vibramobile.ui.theme.AccentColorHexList
+import com.example.vibramobile.viewmodels.ProfileViewModel
+import org.koin.androidx.compose.koinViewModel
+import androidx.core.graphics.toColorInt
 
 @Composable
 fun ProfileScreen(
@@ -46,8 +53,18 @@ fun ProfileScreen(
     onDarkModeChange: (Boolean) -> Unit,
     selectedAccentColorHex: String,
     onAccentColorChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    profileViewModel: ProfileViewModel = koinViewModel()
 ) {
+    val currentUser by UserState.currentUser.collectAsState()
+    val followedArtists by UserState.followedArtists.collectAsState()
+    val myPlaylists by UserState.myPlaylists.collectAsState()
+
+    LaunchedEffect(Unit) {
+        profileViewModel.fetchFollowedArtists()
+        profileViewModel.fetchMyPlaylists()
+    }
+
     Scaffold(
         modifier = modifier,
         containerColor = MaterialTheme.colorScheme.background
@@ -59,9 +76,12 @@ fun ProfileScreen(
                 .padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(24.dp))
-            ProfileHeader()
+            ProfileHeader(currentUser?.name.orEmpty())
             Spacer(modifier = Modifier.height(28.dp))
-            StatsRow()
+            StatsRow(
+                playlistCount = myPlaylists.size,
+                followedArtistsCount = followedArtists.size
+            )
             Spacer(modifier = Modifier.height(32.dp))
             SettingsSection(
                 isDarkMode = isDarkMode,
@@ -74,7 +94,7 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun ProfileHeader() {
+private fun ProfileHeader(userName: String) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -105,7 +125,7 @@ private fun ProfileHeader() {
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = "tomnguyenhieu2004",
+            text = userName,
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.ExtraBold,
             color = MaterialTheme.colorScheme.onSurface
@@ -114,14 +134,14 @@ private fun ProfileHeader() {
 }
 
 @Composable
-private fun StatsRow() {
+private fun StatsRow(playlistCount: Int, followedArtistsCount: Int) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
-        StatItem(value = "2", label = "Playlist")
+        StatItem(value = playlistCount.toString(), label = "Playlist")
         Spacer(modifier = Modifier.width(48.dp))
-        StatItem(value = "0", label = "Đang theo dõi")
+        StatItem(value = followedArtistsCount.toString(), label = "Đang theo dõi")
     }
 }
 
@@ -244,7 +264,7 @@ private fun AccentColorOption(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val optionColor = Color(android.graphics.Color.parseColor(colorHex))
+    val optionColor = Color(colorHex.toColorInt())
 
     Box(
         modifier = Modifier

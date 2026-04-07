@@ -23,10 +23,10 @@ class HomeViewModel(
     private val playlistRepository: IPlaylistRepository,
     private val userRepository: IUserRepository
 ) : ViewModel() {
-    private val accessToken: String = UserState.getCurrentUser()?.token.toString()
-
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
+
+    private fun accessToken(): String = UserState.currentUser.value?.token.orEmpty()
 
     init {
         viewModelScope.launch { fetchAll() }
@@ -51,7 +51,7 @@ class HomeViewModel(
     suspend fun getRecommendedSongs() {
         withContext(Dispatchers.IO) {
             runCatching {
-                SongState.setRecommendedSongs(songRepository.getRecommendedSongs(accessToken))
+                SongState.setRecommendedSongs(songRepository.getRecommendedSongs(accessToken()))
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
@@ -62,7 +62,7 @@ class HomeViewModel(
         withContext(Dispatchers.IO) {
             runCatching {
                 SongState.setRecentRotationSongs(
-                    songRepository.getRecentRotationSongs(accessToken = accessToken)
+                    songRepository.getRecentRotationSongs(accessToken = accessToken())
                 )
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
@@ -73,7 +73,7 @@ class HomeViewModel(
     suspend fun getCategories() {
         withContext(Dispatchers.IO) {
             runCatching {
-                CategoryState.setCategories(categoryRepository.getCategories(accessToken))
+                CategoryState.setCategories(categoryRepository.getCategories(accessToken()))
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
@@ -83,7 +83,7 @@ class HomeViewModel(
     suspend fun getPopularAlbums() {
         withContext(Dispatchers.IO) {
             runCatching {
-                SongState.setPopularAlbums(playlistRepository.getPopularAlbums(accessToken))
+                SongState.setPopularAlbums(playlistRepository.getPopularAlbums(accessToken()))
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
@@ -93,7 +93,7 @@ class HomeViewModel(
     suspend fun getPopularSongs() {
         withContext(Dispatchers.IO) {
             runCatching {
-                SongState.setPopularSongs(songRepository.getPopularSongs(accessToken))
+                SongState.setPopularSongs(songRepository.getPopularSongs(accessToken()))
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
@@ -103,7 +103,7 @@ class HomeViewModel(
     suspend fun getPopularArtists() {
         withContext(Dispatchers.IO) {
             runCatching {
-                ArtistState.setPopularArtists(userRepository.getPopularArtists(accessToken))
+                ArtistState.setPopularArtists(userRepository.getPopularArtists(accessToken()))
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
