@@ -1,6 +1,7 @@
 package com.example.vibramobile.states
 
 import com.example.vibramobile.models.Library
+import com.example.vibramobile.models.Playlist
 import com.example.vibramobile.models.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,8 +14,11 @@ object UserState {
     private val _followedArtists = MutableStateFlow<List<User>>(emptyList())
     val followedArtists: StateFlow<List<User>> = _followedArtists.asStateFlow()
 
-    private val _myPlaylists = MutableStateFlow<List<Library>>(emptyList())
-    val myPlaylists: StateFlow<List<Library>> = _myPlaylists.asStateFlow()
+    private val _myPlaylists = MutableStateFlow<List<Playlist>>(emptyList())
+    val myPlaylists: StateFlow<List<Playlist>> = _myPlaylists.asStateFlow()
+
+    private val _myAlbums = MutableStateFlow<List<Playlist>>(emptyList())
+    val myAlbums: StateFlow<List<Playlist>> = _myAlbums.asStateFlow()
 
     fun setCurrentUser(user: User?) {
         val previousUserId = _currentUser.value?.id
@@ -30,7 +34,11 @@ object UserState {
         _followedArtists.value = artists
     }
 
-    fun setMyPlaylists(playlists: List<Library>) {
+    fun setMyPlaylists(playlists: List<Playlist>) {
         _myPlaylists.value = playlists
+    }
+
+    fun setMyAlbums(albums: List<Playlist>) {
+        _myAlbums.value = albums
     }
 }

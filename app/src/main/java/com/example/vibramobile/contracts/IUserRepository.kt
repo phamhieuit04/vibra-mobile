@@ -1,6 +1,7 @@
 package com.example.vibramobile.contracts
 
 import com.example.vibramobile.models.Library
+import com.example.vibramobile.models.Playlist
 import com.example.vibramobile.models.User
 
 interface IUserRepository {
@@ -8,7 +9,9 @@ interface IUserRepository {
 
     suspend fun getFollowedArtists(accessToken: String): List<User>
 
-    suspend fun getMyPlaylists(accessToken: String): List<Library>
+    suspend fun getMyPlaylists(accessToken: String): List<Playlist>
+
+    suspend fun getMyAlbums(accessToken: String): List<Playlist>
 
     suspend fun getProfile(accessToken: String): User
 }

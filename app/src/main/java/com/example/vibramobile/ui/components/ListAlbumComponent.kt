@@ -17,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -33,7 +32,11 @@ import com.example.vibramobile.ui.extends.skeletonEffect
 import io.ktor.http.encodeURLPath
 
 @Composable
-fun ListAlbumComponent(modifier: Modifier = Modifier, albums: List<Playlist>) {
+fun ListAlbumComponent(
+    onClick: (Playlist) -> Unit,
+    modifier: Modifier = Modifier,
+    albums: List<Playlist>
+) {
     LazyRow() {
         itemsIndexed(albums) { index, album ->
             Column(modifier = Modifier.width(140.dp)) {
@@ -61,14 +64,17 @@ fun ListAlbumComponent(modifier: Modifier = Modifier, albums: List<Playlist>) {
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = album.author.name.toString(),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 12.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                val authorName = album.author?.name
+                if (!authorName.isNullOrBlank()) {
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        text = authorName,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 12.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
             Spacer(Modifier.width(16.dp))
         }

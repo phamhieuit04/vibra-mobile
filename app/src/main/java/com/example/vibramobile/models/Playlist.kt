@@ -12,5 +12,5 @@ data class Playlist(
     var total_song: Int,
     var price: Int,
 
-    var author: User,
+    var author: User? = null,
 )

@@ -248,7 +248,10 @@ fun SearchResultScreen(
                                     Column(modifier = Modifier.fillMaxWidth()) {
                                         SectionTitle(text = "Albums")
                                         Spacer(Modifier.height(16.dp))
-                                        ListAlbumComponent(albums = searchResult!!.albums)
+                                        ListAlbumComponent(
+                                            albums = searchResult!!.albums,
+                                            onClick = { }
+                                        )
                                     }
                                 }
                             }

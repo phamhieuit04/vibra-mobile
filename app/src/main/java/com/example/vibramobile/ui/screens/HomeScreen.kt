@@ -233,7 +233,7 @@ fun HomeScreen(
                                 Column(modifier = Modifier.fillMaxWidth()) {
                                     SectionTitle(text = "Album phổ biến")
                                     Spacer(Modifier.height(16.dp))
-                                    ListAlbumComponent(albums = popularAlbums)
+                                    ListAlbumComponent(albums = popularAlbums, onClick = { })
                                 }
                             }
                         }

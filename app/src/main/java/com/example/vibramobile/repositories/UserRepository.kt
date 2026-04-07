@@ -3,6 +3,7 @@ package com.example.vibramobile.repositories
 import android.util.Log
 import com.example.vibramobile.contracts.IUserRepository
 import com.example.vibramobile.models.Library
+import com.example.vibramobile.models.Playlist
 import com.example.vibramobile.models.Response
 import com.example.vibramobile.models.User
 import io.ktor.client.HttpClient
@@ -32,13 +33,21 @@ class UserRepository(
         return json.decodeFromString<Response<List<User>>>(response).data
     }
 
-    override suspend fun getMyPlaylists(accessToken: String): List<Library> {
+    override suspend fun getMyPlaylists(accessToken: String): List<Playlist> {
         val response = client.get("library/list-playlist") {
             bearerAuth(accessToken)
             parameter("type", 2)
         }.bodyAsText()
 
-        return json.decodeFromString<Response<List<Library>>>(response).data
+        return json.decodeFromString<Response<List<Playlist>>>(response).data
+    }
+
+    override suspend fun getMyAlbums(accessToken: String): List<Playlist> {
+        val response = client.get("profile/list-album") {
+            bearerAuth(accessToken)
+        }.bodyAsText()
+
+        return json.decodeFromString<Response<List<Playlist>>>(response).data
     }
 
     override suspend fun getProfile(accessToken: String): User {

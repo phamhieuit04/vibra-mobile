@@ -16,6 +16,7 @@ class ProfileViewModel(
         fetchProfile()
         fetchFollowedArtists()
         fetchMyPlaylists()
+        fetchMyAlbums()
     }
 
     fun fetchProfile() {
@@ -45,6 +46,17 @@ class ProfileViewModel(
             try {
                 val playlists = userRepository.getMyPlaylists(accessToken())
                 UserState.setMyPlaylists(playlists)
+            } catch (exception: Exception) {
+                Log.e("MyApp", exception.toString())
+            }
+        }
+    }
+
+    fun fetchMyAlbums() {
+        viewModelScope.launch {
+            try {
+                val albums = userRepository.getMyAlbums(accessToken())
+                UserState.setMyAlbums(albums)
             } catch (exception: Exception) {
                 Log.e("MyApp", exception.toString())
             }

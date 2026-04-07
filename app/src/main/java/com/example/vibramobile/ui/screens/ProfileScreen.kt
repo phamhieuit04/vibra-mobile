@@ -7,6 +7,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,6 +49,9 @@ import com.example.vibramobile.viewmodels.ProfileViewModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.core.graphics.toColorInt
 import coil3.compose.AsyncImage
+import com.example.vibramobile.states.UiState
+import com.example.vibramobile.ui.components.ListAlbumComponent
+import com.example.vibramobile.ui.components.ListAlbumRowComponent
 
 @Composable
 fun ProfileScreen(
@@ -60,6 +65,7 @@ fun ProfileScreen(
     val currentUser by UserState.currentUser.collectAsState()
     val followedArtists by UserState.followedArtists.collectAsState()
     val myPlaylists by UserState.myPlaylists.collectAsState()
+    val myAlbums by UserState.myAlbums.collectAsState()
 
     LaunchedEffect(Unit) {
         profileViewModel.refresh()
@@ -69,29 +75,57 @@ fun ProfileScreen(
         modifier = modifier,
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(horizontal = 16.dp)
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
-            ProfileHeader(
-                currentUser?.name.orEmpty(),
-                currentUser?.avatar_path.orEmpty()
-            )
-            Spacer(modifier = Modifier.height(28.dp))
-            StatsRow(
-                playlistCount = myPlaylists.size,
-                followedArtistsCount = followedArtists.size
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-            SettingsSection(
-                isDarkMode = isDarkMode,
-                onDarkModeChange = onDarkModeChange,
-                selectedAccentColorHex = selectedAccentColorHex,
-                onAccentColorChange = onAccentColorChange
-            )
+            item(key = "header") {
+                Spacer(modifier = Modifier.height(24.dp))
+                ProfileHeader(
+                    currentUser?.name.orEmpty(),
+                    currentUser?.avatar_path.orEmpty()
+                )
+            }
+
+            item(key = "stats") {
+                Spacer(modifier = Modifier.height(24.dp))
+                StatsRow(
+                    playlistCount = myPlaylists.size,
+                    followedArtistsCount = followedArtists.size
+                )
+            }
+
+            item(key = "settings") {
+                Spacer(modifier = Modifier.height(24.dp))
+                SettingsSection(
+                    isDarkMode = isDarkMode,
+                    onDarkModeChange = onDarkModeChange,
+                    selectedAccentColorHex = selectedAccentColorHex,
+                    onAccentColorChange = onAccentColorChange
+                )
+            }
+
+            item(key = "albums") {
+                Spacer(modifier = Modifier.height(24.dp))
+                ListAlbumComponent(albums = myAlbums, onClick = { })
+            }
+
+            item(key = "playlists") {
+                Spacer(modifier = Modifier.height(24.dp))
+                ListAlbumRowComponent(albums = myPlaylists, onClick = { })
+            }
+
+            item(key = "bottom_spacer") {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(
+                            if (UiState.getDisplayMediaPlayer()) 192.dp else 96.dp
+                        )
+                )
+            }
         }
     }
 }
