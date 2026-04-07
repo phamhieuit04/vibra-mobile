@@ -1,0 +1,8 @@
+package com.example.vibramobile.contracts
+
+import com.example.vibramobile.models.User
+
+interface IUserRepository {
+    suspend fun getPopularArtists(accessToken: String): List<User>
+}
+
