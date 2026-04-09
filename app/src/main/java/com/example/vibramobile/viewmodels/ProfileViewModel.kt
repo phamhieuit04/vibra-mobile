@@ -3,12 +3,14 @@ package com.example.vibramobile.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.vibramobile.contracts.IPlaylistRepository
 import com.example.vibramobile.contracts.IUserRepository
 import com.example.vibramobile.states.UserState
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(
-    private val userRepository: IUserRepository
+    private val userRepository: IUserRepository,
+    private val playlistRepository: IPlaylistRepository
 ) : ViewModel() {
     private fun accessToken() = UserState.currentUser.value?.token.orEmpty()
 
@@ -44,7 +46,7 @@ class ProfileViewModel(
     fun fetchMyPlaylists() {
         viewModelScope.launch {
             try {
-                val playlists = userRepository.getMyPlaylists(accessToken())
+                val playlists = playlistRepository.getMyPlaylists(accessToken())
                 UserState.setMyPlaylists(playlists)
             } catch (exception: Exception) {
                 Log.e("MyApp", exception.toString())
@@ -55,7 +57,7 @@ class ProfileViewModel(
     fun fetchMyAlbums() {
         viewModelScope.launch {
             try {
-                val albums = userRepository.getMyAlbums(accessToken())
+                val albums = playlistRepository.getMyAlbums(accessToken())
                 UserState.setMyAlbums(albums)
             } catch (exception: Exception) {
                 Log.e("MyApp", exception.toString())
