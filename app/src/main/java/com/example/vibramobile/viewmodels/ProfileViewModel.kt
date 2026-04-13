@@ -3,6 +3,7 @@ package com.example.vibramobile.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.vibramobile.contracts.IBillRepository
 import com.example.vibramobile.contracts.IPlaylistRepository
 import com.example.vibramobile.contracts.IUserRepository
 import com.example.vibramobile.states.UserState
@@ -10,7 +11,8 @@ import kotlinx.coroutines.launch
 
 class ProfileViewModel(
     private val userRepository: IUserRepository,
-    private val playlistRepository: IPlaylistRepository
+    private val playlistRepository: IPlaylistRepository,
+    private val billRepository: IBillRepository
 ) : ViewModel() {
     private fun accessToken() = UserState.currentUser.value?.token.orEmpty()
 
@@ -19,6 +21,7 @@ class ProfileViewModel(
         fetchFollowedArtists()
         fetchMyPlaylists()
         fetchMyAlbums()
+        fetchPaymentHistory()
     }
 
     fun fetchProfile() {
@@ -59,6 +62,17 @@ class ProfileViewModel(
             try {
                 val albums = playlistRepository.getMyAlbums(accessToken())
                 UserState.setMyAlbums(albums)
+            } catch (exception: Exception) {
+                Log.e("MyApp", exception.toString())
+            }
+        }
+    }
+
+    fun fetchPaymentHistory() {
+        viewModelScope.launch {
+            try {
+                val bills = billRepository.getPaymentHistory(accessToken())
+                UserState.setPaymentHistory(bills)
             } catch (exception: Exception) {
                 Log.e("MyApp", exception.toString())
             }

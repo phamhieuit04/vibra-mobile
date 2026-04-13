@@ -50,6 +50,7 @@ import com.example.vibramobile.ui.components.ListAlbumComponent
 import com.example.vibramobile.ui.components.ListArtistComponent
 import com.example.vibramobile.ui.components.ListSongComponent
 import com.example.vibramobile.ui.components.ListSongRowComponent
+import com.example.vibramobile.ui.components.SectionTitle
 import com.example.vibramobile.ui.components.TopArtistsComponent
 import com.example.vibramobile.viewmodels.ContextMenuViewModel
 import com.example.vibramobile.viewmodels.HomeViewModel
@@ -132,7 +133,6 @@ fun HomeScreen(
                             ) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
                                     SectionTitle(text = "Lắng nghe gần đây")
-                                    Spacer(Modifier.height(16.dp))
                                     ListSongRowComponent(
                                         onClick = {
                                             contextMenuViewModel.show(
@@ -156,7 +156,6 @@ fun HomeScreen(
                             ) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
                                     SectionTitle(text = "Phù hợp với bạn")
-                                    Spacer(Modifier.height(16.dp))
                                     ListSongComponent(
                                         onClick = {
                                             contextMenuViewModel.show(
@@ -178,7 +177,6 @@ fun HomeScreen(
                             ) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
                                     SectionTitle(text = "Nghệ sĩ nổi bật")
-                                    Spacer(Modifier.height(16.dp))
                                     TopArtistsComponent(
                                         artists = popularArtists.take(5),
                                         onClick = { }
@@ -198,7 +196,6 @@ fun HomeScreen(
                             ) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
                                     SectionTitle(text = "Bài hát có nhiều lượt nghe")
-                                    Spacer(Modifier.height(16.dp))
                                     ListSongComponent(
                                         onClick = {
                                             contextMenuViewModel.show(
@@ -232,7 +229,6 @@ fun HomeScreen(
                             ) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
                                     SectionTitle(text = "Album phổ biến")
-                                    Spacer(Modifier.height(16.dp))
                                     ListAlbumComponent(albums = popularAlbums, onClick = { })
                                 }
                             }
@@ -347,15 +343,4 @@ fun HomeScreen(
             }
         }
     }
-}
-
-@Composable
-fun SectionTitle(modifier: Modifier = Modifier, text: String) {
-    Text(
-        modifier = modifier,
-        text = text,
-        color = MaterialTheme.colorScheme.onBackground,
-        fontWeight = FontWeight.Bold,
-        fontSize = 26.sp
-    )
 }

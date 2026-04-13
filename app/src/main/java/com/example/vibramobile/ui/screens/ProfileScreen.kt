@@ -1,5 +1,6 @@
 package com.example.vibramobile.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,6 +24,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.PlaylistPlay
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -35,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +47,8 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.vibramobile.models.Bill
 import com.example.vibramobile.states.UserState
 import com.example.vibramobile.ui.theme.AccentColorHexList
 import com.example.vibramobile.viewmodels.ProfileViewModel
@@ -52,6 +58,10 @@ import coil3.compose.AsyncImage
 import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.components.ListAlbumComponent
 import com.example.vibramobile.ui.components.ListAlbumRowComponent
+import com.example.vibramobile.ui.components.SectionTitle
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun ProfileScreen(
@@ -66,6 +76,7 @@ fun ProfileScreen(
     val followedArtists by UserState.followedArtists.collectAsState()
     val myPlaylists by UserState.myPlaylists.collectAsState()
     val myAlbums by UserState.myAlbums.collectAsState()
+    val paymentHistory by UserState.paymentHistory.collectAsState()
 
     LaunchedEffect(Unit) {
         profileViewModel.refresh()
@@ -79,7 +90,8 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item(key = "header") {
                 Spacer(modifier = Modifier.height(24.dp))
@@ -105,16 +117,25 @@ fun ProfileScreen(
                     selectedAccentColorHex = selectedAccentColorHex,
                     onAccentColorChange = onAccentColorChange
                 )
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             item(key = "albums") {
-                Spacer(modifier = Modifier.height(24.dp))
-                ListAlbumComponent(albums = myAlbums, onClick = { })
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    SectionTitle(text = "Album của tôi")
+                    ListAlbumComponent(albums = myAlbums, onClick = { })
+                }
             }
 
             item(key = "playlists") {
-                Spacer(modifier = Modifier.height(24.dp))
-                ListAlbumRowComponent(albums = myPlaylists, onClick = { })
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    SectionTitle(text = "Playlist của tôi")
+                    ListAlbumRowComponent(albums = myPlaylists, onClick = { })
+                }
+            }
+
+            item(key = "payment_history") {
+                PaymentHistorySection(bills = paymentHistory)
             }
 
             item(key = "bottom_spacer") {
@@ -126,6 +147,168 @@ fun ProfileScreen(
                         )
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun PaymentHistorySection(bills: List<Bill>) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        SectionTitle(text = "Lịch sử thanh toán")
+
+        if (bills.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Chưa có giao dịch nào",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = MaterialTheme.colorScheme.surface,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+            ) {
+                bills.forEachIndexed { index, bill ->
+                    BillItem(bill = bill)
+                    if (index < bills.lastIndex) {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            thickness = DividerDefaults.Thickness,
+                            color = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BillItem(bill: Bill) {
+    val itemName = bill.song?.name ?: bill.playlist?.name ?: "Không rõ"
+    val itemPrice = bill.song?.price ?: bill.playlist?.price ?: 0
+    val thumbnailPath = bill.song?.thumbnail_path ?: bill.playlist?.thumbnail_path
+    val isPlaylist = bill.playlist != null
+
+    val formattedDate = remember(bill.created_at) {
+        runCatching {
+            val inputFormat =
+                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+            val date = inputFormat.parse(bill.created_at ?: "")
+            outputFormat.format(date!!)
+        }.getOrElse { bill.created_at.orEmpty() }
+    }
+
+    val formattedPrice = remember(itemPrice) {
+        NumberFormat.getNumberInstance(Locale("vi", "VN")).format(itemPrice) + "đ"
+    }
+
+    val statusText = when (bill.status) {
+        "1" -> "Thất bại"
+        "2" -> "Thành công"
+        else -> "Không rõ"
+    }
+
+    val statusColor = when (bill.status) {
+        "1" -> Color(0xFFE53935)
+        "2" -> Color(0xFF1DB954)
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.weight(1f)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                if (!thumbnailPath.isNullOrBlank()) {
+                    AsyncImage(
+                        model = thumbnailPath,
+                        contentDescription = itemName,
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(10.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = if (isPlaylist) Icons.Default.PlaylistPlay else Icons.Default.MusicNote,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = itemName,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    fontSize = 15.sp
+                )
+                Spacer(modifier = Modifier.height(3.dp))
+                Text(
+                    text = if (isPlaylist) "Playlist" else "Bài hát",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 13.sp
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = formattedDate,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(horizontalAlignment = Alignment.End) {
+            Text(
+                text = formattedPrice,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 15.sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = statusText,
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Medium,
+                color = statusColor,
+                fontSize = 13.sp
+            )
         }
     }
 }
@@ -213,7 +396,8 @@ private fun SettingsSection(
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(bottom = 12.dp)
+            modifier = Modifier.padding(bottom = 12.dp),
+            fontSize = 20.sp
         )
 
         Column(

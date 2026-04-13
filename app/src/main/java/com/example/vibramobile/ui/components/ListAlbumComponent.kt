@@ -47,7 +47,7 @@ fun ListAlbumComponent(
                             shape = RoundedCornerShape(6.dp)
                         ),
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(album.thumbnail_path.encodeURLPath())
+                        .data(album.thumbnail_path?.encodeURLPath())
                         .size(400)
                         .crossfade(true)
                         .build(),
@@ -58,7 +58,7 @@ fun ListAlbumComponent(
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text = album.name,
+                    text = album.name ?: "",
                     color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 16.sp,
                     maxLines = 1,

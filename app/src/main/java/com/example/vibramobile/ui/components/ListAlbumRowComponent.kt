@@ -58,7 +58,7 @@ fun ListAlbumRowComponent(
                         contentDescription = "",
                         contentScale = ContentScale.Crop,
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(album.thumbnail_path.encodeURLPath())
+                            .data(album.thumbnail_path?.encodeURLPath())
                             .size(400)
                             .crossfade(true)
                             .build(),
@@ -68,7 +68,7 @@ fun ListAlbumRowComponent(
                     Spacer(Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = album.name,
+                            text = album.name ?: "",
                             color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 18.sp,
                             lineHeight = 18.sp

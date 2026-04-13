@@ -1,6 +1,7 @@
 package com.example.vibramobile
 
 import com.example.vibramobile.contracts.IAuthRepository
+import com.example.vibramobile.contracts.IBillRepository
 import com.example.vibramobile.contracts.ICategoryRepository
 import com.example.vibramobile.contracts.IPlaylistRepository
 import com.example.vibramobile.contracts.ISearchResultRepository
@@ -8,6 +9,7 @@ import com.example.vibramobile.contracts.ISongRepository
 import com.example.vibramobile.contracts.IUserRepository
 import com.example.vibramobile.controllers.MediaPlayerController
 import com.example.vibramobile.repositories.AuthRepository
+import com.example.vibramobile.repositories.BillRepository
 import com.example.vibramobile.repositories.CategoryRepository
 import com.example.vibramobile.repositories.PlaylistRepository
 import com.example.vibramobile.repositories.SearchResultRepository
@@ -76,4 +78,5 @@ val appModules = module {
     singleOf(::SongRepository) bind ISongRepository::class
     singleOf(::UserRepository) bind IUserRepository::class
     singleOf(::SearchResultRepository) bind ISearchResultRepository::class
+    singleOf(::BillRepository) bind IBillRepository::class
 }

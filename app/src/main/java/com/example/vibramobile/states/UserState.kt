@@ -1,5 +1,6 @@
 package com.example.vibramobile.states
 
+import com.example.vibramobile.models.Bill
 import com.example.vibramobile.models.Library
 import com.example.vibramobile.models.Playlist
 import com.example.vibramobile.models.User
@@ -19,6 +20,9 @@ object UserState {
 
     private val _myAlbums = MutableStateFlow<List<Playlist>>(emptyList())
     val myAlbums: StateFlow<List<Playlist>> = _myAlbums.asStateFlow()
+
+    private val _paymentHistory = MutableStateFlow<List<Bill>>(emptyList())
+    val paymentHistory: StateFlow<List<Bill>> = _paymentHistory.asStateFlow()
 
     fun setCurrentUser(user: User?) {
         val previousUserId = _currentUser.value?.id
@@ -40,5 +44,9 @@ object UserState {
 
     fun setMyAlbums(albums: List<Playlist>) {
         _myAlbums.value = albums
+    }
+
+    fun setPaymentHistory(bills: List<Bill>) {
+        _paymentHistory.value = bills
     }
 }

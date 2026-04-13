@@ -59,6 +59,7 @@ import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.components.GenreDetailShimmer
 import com.example.vibramobile.ui.components.ListSongComponent
 import com.example.vibramobile.ui.components.ListSongRowComponent
+import com.example.vibramobile.ui.components.SectionTitle
 import com.example.vibramobile.viewmodels.ContextMenuViewModel
 import com.example.vibramobile.viewmodels.GenreDetailViewModel
 import com.example.vibramobile.viewmodels.MediaPlayerViewModel
@@ -133,7 +134,6 @@ fun GenreDetailScreen(
                                         .padding(start = 16.dp, end = 16.dp, top = 24.dp)
                                 ) {
                                     SectionTitle(text = "Danh sách nhạc nổi bật")
-                                    Spacer(Modifier.height(16.dp))
                                     ListSongComponent(
                                         onPlay = { mediaPlayerViewModel.playSong(it) },
                                         onClick = {
@@ -156,7 +156,6 @@ fun GenreDetailScreen(
                                         .padding(start = 16.dp, end = 16.dp, top = 24.dp)
                                 ) {
                                     SectionTitle(text = "Bài hát")
-                                    Spacer(Modifier.height(16.dp))
                                     ListSongRowComponent(
                                         onPlay = { mediaPlayerViewModel.playSong(it) },
                                         onClick = {

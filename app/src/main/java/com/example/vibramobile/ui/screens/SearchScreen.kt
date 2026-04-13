@@ -47,6 +47,7 @@ import com.example.vibramobile.R
 import com.example.vibramobile.models.Category
 import com.example.vibramobile.states.CategoryState
 import com.example.vibramobile.states.UiState
+import com.example.vibramobile.ui.components.SectionTitle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,7 +104,6 @@ fun SearchScreen(
                 GridItemSpan(maxLineSpan)
             }) {
                 SectionTitle(text = "Thể loại nổi bật")
-                Spacer(Modifier.height(16.dp))
             }
 
             items(items = categories, key = { it.id!! }) { category ->
