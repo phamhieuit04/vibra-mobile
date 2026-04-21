@@ -94,4 +94,5 @@ dependencies {
     implementation(libs.composeunstyled.theming)
     implementation(libs.composeunstyled.primitives)
     implementation(libs.composeunstyled.platformtheme)
+    implementation(libs.androidx.datastore.preferences)
 }

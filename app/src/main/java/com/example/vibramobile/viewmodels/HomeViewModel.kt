@@ -9,8 +9,8 @@ import com.example.vibramobile.contracts.ISongRepository
 import com.example.vibramobile.contracts.IUserRepository
 import com.example.vibramobile.states.ArtistState
 import com.example.vibramobile.states.CategoryState
+import com.example.vibramobile.states.SessionStore
 import com.example.vibramobile.states.SongState
-import com.example.vibramobile.states.UserState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,12 +21,13 @@ class HomeViewModel(
     private val songRepository: ISongRepository,
     private val categoryRepository: ICategoryRepository,
     private val playlistRepository: IPlaylistRepository,
-    private val userRepository: IUserRepository
+    private val userRepository: IUserRepository,
+    private val sessionStore: SessionStore
 ) : ViewModel() {
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
-    private fun accessToken(): String = UserState.currentUser.value?.token.orEmpty()
+    private fun accessToken(): String = sessionStore.currentAccessToken()
 
     init {
         viewModelScope.launch { fetchAll() }

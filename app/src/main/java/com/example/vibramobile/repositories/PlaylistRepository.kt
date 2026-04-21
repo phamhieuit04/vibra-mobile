@@ -36,7 +36,12 @@ class PlaylistRepository(
             bearerAuth(accessToken)
         }.bodyAsText()
 
-        return json.decodeFromString<Response<List<Playlist>>>(response).data
+        val result = json.decodeFromString<Response<List<Playlist>>>(response).data
+        result.forEach { playlist ->
+            playlist.author?.name = null
+        }
+
+        return result
     }
 }
 

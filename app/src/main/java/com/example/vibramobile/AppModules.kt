@@ -15,6 +15,7 @@ import com.example.vibramobile.repositories.PlaylistRepository
 import com.example.vibramobile.repositories.SearchResultRepository
 import com.example.vibramobile.repositories.SongRepository
 import com.example.vibramobile.repositories.UserRepository
+import com.example.vibramobile.states.SessionStore
 import com.example.vibramobile.viewmodels.AuthViewModel
 import com.example.vibramobile.viewmodels.ContextMenuViewModel
 import com.example.vibramobile.viewmodels.GenreDetailViewModel
@@ -46,8 +47,12 @@ val appModules = module {
         MediaPlayerController(androidContext().applicationContext)
     }
 
+    single {
+        SessionStore(androidContext().applicationContext)
+    }
+
     single<HttpClient> {
-        val url = "http://10.0.2.2:8000/api/"
+        val url = "http://100.113.48.99:8000/api/"
 
         HttpClient() {
             install(ContentNegotiation) {

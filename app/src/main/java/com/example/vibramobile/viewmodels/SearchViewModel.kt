@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.vibramobile.contracts.ISearchResultRepository
 import com.example.vibramobile.models.SearchResult
-import com.example.vibramobile.states.UserState
+import com.example.vibramobile.states.SessionStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,9 +12,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 
 class SearchViewModel(
-    private val searchResultRepository: ISearchResultRepository
+    private val searchResultRepository: ISearchResultRepository,
+    private val sessionStore: SessionStore
 ) : ViewModel() {
-    private fun accessToken(): String = UserState.currentUser.value?.token.orEmpty()
+    private fun accessToken(): String = sessionStore.currentAccessToken()
 
     private val _searchResult = MutableStateFlow<SearchResult?>(null)
     val searchResult = _searchResult.asStateFlow()

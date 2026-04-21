@@ -6,74 +6,95 @@ import androidx.lifecycle.viewModelScope
 import com.example.vibramobile.contracts.IBillRepository
 import com.example.vibramobile.contracts.IPlaylistRepository
 import com.example.vibramobile.contracts.IUserRepository
+import com.example.vibramobile.states.SessionStore
 import com.example.vibramobile.states.UserState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ProfileViewModel(
     private val userRepository: IUserRepository,
     private val playlistRepository: IPlaylistRepository,
-    private val billRepository: IBillRepository
+    private val billRepository: IBillRepository,
+    private val sessionStore: SessionStore
 ) : ViewModel() {
-    private fun accessToken() = UserState.currentUser.value?.token.orEmpty()
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+
+    private fun accessToken() = sessionStore.currentAccessToken()
+
+    init {
+        refresh()
+    }
 
     fun refresh() {
-        fetchProfile()
-        fetchFollowedArtists()
-        fetchMyPlaylists()
-        fetchMyAlbums()
-        fetchPaymentHistory()
+        viewModelScope.launch {
+            val tokenSnapshot = accessToken()
+            if (tokenSnapshot.isBlank()) {
+                Log.w("myapp", "Profile refresh skipped: empty access token")
+                return@launch
+            }
+
+            _isRefreshing.value = true
+            try {
+                fetchProfile(tokenSnapshot)
+                fetchFollowedArtists(tokenSnapshot)
+                fetchMyPlaylists(tokenSnapshot)
+                fetchMyAlbums(tokenSnapshot)
+                fetchPaymentHistory(tokenSnapshot)
+            } finally {
+                _isRefreshing.value = false
+            }
+        }
     }
 
-    fun fetchProfile() {
-        viewModelScope.launch {
-            try {
-                val profile = userRepository.getProfile(accessToken())
-                UserState.setCurrentUser(profile)
-            } catch (exception: Exception) {
+    suspend fun fetchProfile(token: String = accessToken()) {
+        withContext(Dispatchers.IO) {
+            runCatching {
+                UserState.setCurrentUser(userRepository.getProfile(token).copy(token = null))
+            }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
         }
     }
 
-    fun fetchFollowedArtists() {
-        viewModelScope.launch {
-            try {
-                val artists = userRepository.getFollowedArtists(accessToken())
-                UserState.setFollowedArtists(artists)
-            } catch (exception: Exception) {
+    suspend fun fetchFollowedArtists(token: String = accessToken()) {
+        withContext(Dispatchers.IO) {
+            runCatching {
+                UserState.setFollowedArtists(userRepository.getFollowedArtists(token))
+            }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
         }
     }
 
-    fun fetchMyPlaylists() {
-        viewModelScope.launch {
-            try {
-                val playlists = playlistRepository.getMyPlaylists(accessToken())
-                UserState.setMyPlaylists(playlists)
-            } catch (exception: Exception) {
+    suspend fun fetchMyPlaylists(token: String = accessToken()) {
+        withContext(Dispatchers.IO) {
+            runCatching {
+                UserState.setMyPlaylists(playlistRepository.getMyPlaylists(token))
+            }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
         }
     }
 
-    fun fetchMyAlbums() {
-        viewModelScope.launch {
-            try {
-                val albums = playlistRepository.getMyAlbums(accessToken())
-                UserState.setMyAlbums(albums)
-            } catch (exception: Exception) {
+    suspend fun fetchMyAlbums(token: String = accessToken()) {
+        withContext(Dispatchers.IO) {
+            runCatching {
+                UserState.setMyAlbums(playlistRepository.getMyAlbums(token))
+            }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
         }
     }
 
-    fun fetchPaymentHistory() {
-        viewModelScope.launch {
-            try {
-                val bills = billRepository.getPaymentHistory(accessToken())
-                UserState.setPaymentHistory(bills)
-            } catch (exception: Exception) {
+    suspend fun fetchPaymentHistory(token: String = accessToken()) {
+        withContext(Dispatchers.IO) {
+            runCatching {
+                UserState.setPaymentHistory(billRepository.getPaymentHistory(token))
+            }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
         }
