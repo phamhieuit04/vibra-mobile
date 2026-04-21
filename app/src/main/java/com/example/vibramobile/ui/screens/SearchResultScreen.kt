@@ -69,6 +69,7 @@ import com.example.vibramobile.ui.components.ListAlbumComponent
 import com.example.vibramobile.ui.components.ListArtistComponent
 import com.example.vibramobile.ui.components.ListSongRowComponent
 import com.example.vibramobile.ui.components.SearchResultShimmer
+import com.example.vibramobile.ui.components.SectionTitle
 import com.example.vibramobile.ui.components.TopArtistsComponent
 import com.example.vibramobile.viewmodels.ContextMenuViewModel
 import com.example.vibramobile.viewmodels.MediaPlayerViewModel
@@ -205,7 +206,6 @@ fun SearchResultScreen(
                                 ) {
                                     Column(modifier = Modifier.fillMaxWidth()) {
                                         SectionTitle(text = "Bài hát")
-                                        Spacer(Modifier.height(16.dp))
                                         ListSongRowComponent(
                                             onClick = {
                                                 contextMenuViewModel.show(
@@ -227,7 +227,6 @@ fun SearchResultScreen(
                                 ) {
                                     Column(modifier = Modifier.fillMaxWidth()) {
                                         SectionTitle(text = "Nghệ sĩ")
-                                        Spacer(Modifier.height(16.dp))
                                         TopArtistsComponent(
                                             artists = searchResult!!.artists.take(5),
                                             onClick = { }
@@ -247,8 +246,10 @@ fun SearchResultScreen(
                                 ) {
                                     Column(modifier = Modifier.fillMaxWidth()) {
                                         SectionTitle(text = "Albums")
-                                        Spacer(Modifier.height(16.dp))
-                                        ListAlbumComponent(albums = searchResult!!.albums)
+                                        ListAlbumComponent(
+                                            albums = searchResult!!.albums,
+                                            onClick = { }
+                                        )
                                     }
                                 }
                             }

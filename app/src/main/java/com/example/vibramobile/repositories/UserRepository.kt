@@ -20,5 +20,22 @@ class UserRepository(
 
         return json.decodeFromString<Response<List<User>>>(response).data
     }
+
+    override suspend fun getFollowedArtists(accessToken: String): List<User> {
+        val response = client.get("library/list-artist") {
+            bearerAuth(accessToken)
+        }.bodyAsText()
+
+        return json.decodeFromString<Response<List<User>>>(response).data
+    }
+
+
+    override suspend fun getProfile(accessToken: String): User {
+        val response = client.get("profile/show") {
+            bearerAuth(accessToken)
+        }.bodyAsText()
+
+        return json.decodeFromString<Response<User>>(response).data
+    }
 }
 

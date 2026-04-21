@@ -4,5 +4,10 @@ import com.example.vibramobile.models.User
 
 interface IUserRepository {
     suspend fun getPopularArtists(accessToken: String): List<User>
+
+    suspend fun getFollowedArtists(accessToken: String): List<User>
+
+
+    suspend fun getProfile(accessToken: String): User
 }
 

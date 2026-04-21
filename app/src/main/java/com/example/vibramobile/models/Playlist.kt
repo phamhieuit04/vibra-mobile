@@ -4,13 +4,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Playlist(
-    var id: Int,
-    var name: String,
-    var description: String?,
-    var thumbnail_path: String,
-    var type: Int,
-    var total_song: Int,
-    var price: Int,
+    var id: Int? = null,
+    var name: String? = null,
+    var description: String? = null,
+    var thumbnail_path: String? = null,
+    var type: Int? = null,
+    var total_song: Int? = null,
+    var price: Int? = null,
+    var quantity: Int? = null,
 
-    var author: User,
+    var author: User? = null,
 )
