@@ -37,7 +37,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -81,9 +84,14 @@ fun GenreDetailScreen(
     val pullToRefreshState = rememberPullToRefreshState()
     val scrollState = rememberLazyListState()
     val songsByCategory by SongState.songsByCategory.collectAsState()
+    var isInitialLoading by remember(category.id) { mutableStateOf(true) }
+    val showLoading = isInitialLoading || isRefreshing
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(category.id) {
+        isInitialLoading = true
+        SongState.setSongsByCategory(emptyList())
         genreDetailViewModel.getSongsByCategory(category.id!!)
+        isInitialLoading = false
     }
 
     PullToRefreshBox(
@@ -102,7 +110,7 @@ fun GenreDetailScreen(
         }
     ) {
         Crossfade(
-            targetState = isRefreshing,
+            targetState = showLoading,
             label = "GenreDetailContent"
         ) { loading ->
             LazyColumn(
