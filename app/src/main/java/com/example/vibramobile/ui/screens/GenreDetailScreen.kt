@@ -134,7 +134,7 @@ fun GenreDetailScreen(
                                         .padding(start = 16.dp, end = 16.dp, top = 24.dp)
                                 ) {
                                     SectionTitle(text = "Danh sách nhạc nổi bật")
-                                    ListSongComponent(
+                                    ListSongRowComponent(
                                         onPlay = { mediaPlayerViewModel.playSong(it) },
                                         onClick = {
                                             contextMenuViewModel.show(
@@ -218,10 +218,10 @@ private fun GenreHeader(
                 )
         )
 
+
         IconButton(
             onClick = onBackClick,
             modifier = Modifier
-                .statusBarsPadding()
                 .padding(8.dp)
                 .align(Alignment.TopStart),
             colors = IconButtonDefaults.iconButtonColors(
