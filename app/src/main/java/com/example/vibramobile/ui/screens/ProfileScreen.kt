@@ -58,6 +58,7 @@ import com.example.vibramobile.states.UiState
 import com.example.vibramobile.ui.components.ListAlbumComponent
 import com.example.vibramobile.ui.components.ListAlbumRowComponent
 import com.example.vibramobile.ui.components.SectionTitle
+import com.example.vibramobile.viewmodels.ContextMenuViewModel
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -69,7 +70,8 @@ fun ProfileScreen(
     selectedAccentColorHex: String,
     onAccentColorChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    profileViewModel: ProfileViewModel = koinViewModel()
+    profileViewModel: ProfileViewModel = koinViewModel(),
+    contextMenuViewModel: ContextMenuViewModel = koinViewModel()
 ) {
     val currentUser by UserState.currentUser.collectAsState()
     val followedArtists by UserState.followedArtists.collectAsState()
@@ -129,7 +131,16 @@ fun ProfileScreen(
                 item(key = "albums") {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         SectionTitle(text = "Album của tôi")
-                        ListAlbumRowComponent(albums = myAlbums, onClick = { })
+                        ListAlbumRowComponent(
+                            albums = myAlbums,
+                            onClick = {
+                                contextMenuViewModel.show(
+                                    it.thumbnail_path,
+                                    it.name,
+                                    it.author?.name
+                                )
+                            }
+                        )
                     }
                 }
             }
@@ -138,7 +149,13 @@ fun ProfileScreen(
                 item(key = "playlists") {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         SectionTitle(text = "Playlist của tôi")
-                        ListAlbumRowComponent(albums = myPlaylists, onClick = { })
+                        ListAlbumRowComponent(albums = myPlaylists, onClick = {
+                            contextMenuViewModel.show(
+                                it.thumbnail_path,
+                                it.name,
+                                it.author?.name
+                            )
+                        })
                     }
                 }
             }
