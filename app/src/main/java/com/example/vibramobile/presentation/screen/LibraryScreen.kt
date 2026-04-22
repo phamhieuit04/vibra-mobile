@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.presentation.component.ListAlbumRowComponent
+import com.example.vibramobile.presentation.component.ListArtistComponent
 import com.example.vibramobile.presentation.component.ListSongRowComponent
 import com.example.vibramobile.presentation.component.SectionTitle
 import com.example.vibramobile.presentation.state.UiState
@@ -39,6 +40,7 @@ fun LibraryScreen(
 ) {
     val likedSongs by UserState.likedSongs.collectAsState()
     val myPlaylists by UserState.myPlaylists.collectAsState()
+    val followedArtists by UserState.followedArtists.collectAsState()
 
     val isRefreshing by libraryViewModel.isRefreshing.collectAsState()
     val pullToRefreshState = rememberPullToRefreshState()
@@ -95,6 +97,15 @@ fun LibraryScreen(
                                 it.author?.name
                             )
                         })
+                    }
+                }
+            }
+
+            if (followedArtists.isNotEmpty()) {
+                item(key = "followed_artists") {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        SectionTitle(text = "Nghệ sĩ theo dõi")
+                        ListArtistComponent(artists = followedArtists, onClick = { })
                     }
                 }
             }

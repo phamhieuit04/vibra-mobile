@@ -1,9 +1,11 @@
 package com.example.vibramobile.data.repository
 
+import android.util.Log
 import com.example.vibramobile.domain.contract.IUserRepository
 import com.example.vibramobile.data.source.remote.dto.Response
 import com.example.vibramobile.data.source.remote.dto.UserResponseDto
 import com.example.vibramobile.data.mapper.toDomain
+import com.example.vibramobile.data.source.remote.dto.LibraryResponseDto
 import com.example.vibramobile.domain.model.User
 import io.ktor.client.HttpClient
 import io.ktor.client.request.bearerAuth
@@ -28,7 +30,14 @@ class UserRepository(
             bearerAuth(accessToken)
         }.bodyAsText()
 
-        return json.decodeFromString<Response<List<UserResponseDto>>>(response).data.map { it.toDomain() }
+        val followedArtistsResponse =
+            json.decodeFromString<Response<List<LibraryResponseDto>>>(response)
+        val followedArtists = mutableListOf<User>()
+        followedArtistsResponse.data.forEach { item ->
+            item.artist?.toDomain()?.let { followedArtists.add(it) }
+        }
+
+        return followedArtists
     }
 
 

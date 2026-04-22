@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vibramobile.domain.contract.IPlaylistRepository
 import com.example.vibramobile.domain.contract.ISongRepository
+import com.example.vibramobile.domain.contract.IUserRepository
 import com.example.vibramobile.presentation.state.SessionStore
 import com.example.vibramobile.presentation.state.UserState
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,7 @@ import kotlinx.coroutines.withContext
 class LibraryViewModel(
     private val playlistRepository: IPlaylistRepository,
     private val songRepository: ISongRepository,
+    private val userRepository: IUserRepository,
     private val sessionStore: SessionStore
 ) : ViewModel() {
     private val _isRefreshing = MutableStateFlow(false)
@@ -38,6 +40,7 @@ class LibraryViewModel(
             try {
                 fetchLikedSongs(tokenSnapshot)
                 fetchMyPlaylists(tokenSnapshot)
+                fetchFollowedArtists(tokenSnapshot)
             } finally {
                 _isRefreshing.value = false
             }
@@ -58,6 +61,16 @@ class LibraryViewModel(
         withContext(Dispatchers.IO) {
             runCatching {
                 UserState.setLikedSongs(songRepository.getLikedSongs(token))
+            }.onFailure { exception ->
+                Log.e("MyApp", exception.toString())
+            }
+        }
+    }
+
+    suspend fun fetchFollowedArtists(token: String = accessToken()) {
+        withContext(Dispatchers.IO) {
+            runCatching {
+                UserState.setFollowedArtists(userRepository.getFollowedArtists(token))
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
