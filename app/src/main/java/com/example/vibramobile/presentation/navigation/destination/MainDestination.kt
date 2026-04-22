@@ -1,0 +1,26 @@
+package com.example.vibramobile.presentation.navigation.destination
+
+import androidx.navigation3.runtime.NavKey
+import com.example.vibramobile.domain.model.Category
+import kotlinx.serialization.Serializable
+
+@Serializable
+sealed class MainDestination : NavKey {
+    @Serializable
+    object Home : MainDestination()
+
+    @Serializable
+    object Search : MainDestination()
+
+    @Serializable
+    object SearchResult : MainDestination()
+
+    @Serializable
+    object Library : MainDestination()
+
+    @Serializable
+    object Profile : MainDestination()
+
+    @Serializable
+    data class GenreDetail(val category: Category) : MainDestination()
+}

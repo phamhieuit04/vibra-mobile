@@ -15,10 +15,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.toArgb
-import com.example.vibramobile.ui.navigations.graphs.RootGraph
-import com.example.vibramobile.ui.theme.DEFAULT_ACCENT_COLOR_HEX
-import com.example.vibramobile.ui.theme.VibraMobileTheme
+import com.example.vibramobile.presentation.navigation.graph.RootGraph
+import com.example.vibramobile.presentation.theme.DEFAULT_ACCENT_COLOR_HEX
+import com.example.vibramobile.presentation.theme.VibraMobileTheme
 import androidx.core.content.edit
+import com.example.vibramobile.core.di.controllerModule
+import com.example.vibramobile.core.di.jsonModule
+import com.example.vibramobile.core.di.networkModule
+import com.example.vibramobile.core.di.repositoryModule
+import com.example.vibramobile.core.di.storeModule
+import com.example.vibramobile.core.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -28,7 +34,14 @@ class App : Application() {
 
         startKoin {
             androidContext(this@App)
-            modules(appModules)
+            modules(
+                controllerModule,
+                jsonModule,
+                networkModule,
+                repositoryModule,
+                storeModule,
+                viewModelModule
+            )
         }
     }
 }
