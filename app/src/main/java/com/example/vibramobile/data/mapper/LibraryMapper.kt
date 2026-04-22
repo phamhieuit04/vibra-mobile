@@ -9,6 +9,9 @@ fun LibraryResponseDto.toDomain(): Library {
         userId = user_id,
         playlistId = playlist_id,
         artistId = artist_id,
-        songId = song_id
+        songId = song_id,
+        song = song?.toDomain(),
+        playlist = playlist?.toDomain(),
+        artist = artist?.toDomain()
     )
 }

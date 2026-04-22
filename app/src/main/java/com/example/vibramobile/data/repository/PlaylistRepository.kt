@@ -5,6 +5,8 @@ import com.example.vibramobile.domain.model.Playlist
 import com.example.vibramobile.data.source.remote.dto.PlaylistResponseDto
 import com.example.vibramobile.data.source.remote.dto.Response
 import com.example.vibramobile.data.mapper.toDomain
+import com.example.vibramobile.data.source.remote.dto.LibraryResponseDto
+import com.example.vibramobile.domain.model.Library
 import io.ktor.client.HttpClient
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get

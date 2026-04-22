@@ -1,5 +1,6 @@
 package com.example.vibramobile.domain.contract
 
+import com.example.vibramobile.domain.model.Library
 import com.example.vibramobile.domain.model.Playlist
 
 interface IPlaylistRepository {

@@ -21,21 +21,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.presentation.component.ListAlbumRowComponent
+import com.example.vibramobile.presentation.component.ListSongRowComponent
 import com.example.vibramobile.presentation.component.SectionTitle
 import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.state.UserState
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.LibraryViewModel
+import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LibraryScreen(
     modifier: Modifier = Modifier,
     libraryViewModel: LibraryViewModel = koinViewModel(),
-    contextMenuViewModel: ContextMenuViewModel = koinViewModel()
+    contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
+    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel()
 ) {
+    val likedSongs by UserState.likedSongs.collectAsState()
     val myPlaylists by UserState.myPlaylists.collectAsState()
-    
+
     val isRefreshing by libraryViewModel.isRefreshing.collectAsState()
     val pullToRefreshState = rememberPullToRefreshState()
 
@@ -58,6 +62,27 @@ fun LibraryScreen(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+
+            if (likedSongs.isNotEmpty()) {
+                item(key = "liked_songs") {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        SectionTitle(text = "Bài hát yêu thích")
+                        ListSongRowComponent(
+                            songs = likedSongs,
+                            onClick = {
+                                contextMenuViewModel.show(
+                                    it.thumbnailPath,
+                                    it.name,
+                                    it.author?.name
+                                )
+                            },
+                            onPlay = {
+                                mediaPlayerViewModel.playSong(it)
+                            }
+                        )
+                    }
+                }
+            }
 
             if (myPlaylists.isNotEmpty()) {
                 item(key = "playlists") {
