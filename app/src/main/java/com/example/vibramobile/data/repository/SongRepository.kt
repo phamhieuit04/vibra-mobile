@@ -3,7 +3,7 @@ package com.example.vibramobile.data.repository
 import com.example.vibramobile.domain.contract.ISongRepository
 import com.example.vibramobile.data.source.remote.dto.Response
 import com.example.vibramobile.data.source.remote.dto.SongResponseDto
-import com.example.vibramobile.data.source.remote.mapper.toDomain
+import com.example.vibramobile.data.mapper.toDomain
 import com.example.vibramobile.domain.model.Song
 import io.ktor.client.HttpClient
 import io.ktor.client.request.bearerAuth

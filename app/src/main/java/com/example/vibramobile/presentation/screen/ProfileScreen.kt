@@ -103,7 +103,7 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(24.dp))
                 ProfileHeader(
                     currentUser?.name.orEmpty(),
-                    currentUser?.avatar_path.orEmpty()
+                    currentUser?.avatarPath.orEmpty()
                 )
             }
 
@@ -134,7 +134,7 @@ fun ProfileScreen(
                             albums = myAlbums,
                             onClick = {
                                 contextMenuViewModel.show(
-                                    it.thumbnail_path,
+                                    it.thumbnailPath,
                                     it.name,
                                     it.author?.name
                                 )
@@ -150,7 +150,7 @@ fun ProfileScreen(
                         SectionTitle(text = "Playlist của tôi")
                         ListAlbumRowComponent(albums = myPlaylists, onClick = {
                             contextMenuViewModel.show(
-                                it.thumbnail_path,
+                                it.thumbnailPath,
                                 it.name,
                                 it.author?.name
                             )
@@ -223,17 +223,17 @@ private fun PaymentHistorySection(bills: List<Bill>) {
 private fun BillItem(bill: Bill) {
     val itemName = bill.song?.name ?: bill.playlist?.name ?: "Không rõ"
     val itemPrice = bill.song?.price ?: bill.playlist?.price ?: 0
-    val thumbnailPath = bill.song?.thumbnail_path ?: bill.playlist?.thumbnail_path
+    val thumbnailPath = bill.song?.thumbnailPath ?: bill.playlist?.thumbnailPath
     val isPlaylist = bill.playlist != null
 
-    val formattedDate = remember(bill.created_at) {
+    val formattedDate = remember(bill.createdAt) {
         runCatching {
             val inputFormat =
                 SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault())
             val outputFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-            val date = inputFormat.parse(bill.created_at ?: "")
+            val date = inputFormat.parse(bill.createdAt ?: "")
             outputFormat.format(date!!)
-        }.getOrElse { bill.created_at.orEmpty() }
+        }.getOrElse { bill.createdAt.orEmpty() }
     }
 
     val formattedPrice = remember(itemPrice) {
