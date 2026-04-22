@@ -33,7 +33,6 @@ class ProfileViewModel(
         viewModelScope.launch {
             val tokenSnapshot = accessToken()
             if (tokenSnapshot.isBlank()) {
-                Log.w("myapp", "Profile refresh skipped: empty access token")
                 return@launch
             }
 
@@ -41,7 +40,6 @@ class ProfileViewModel(
             try {
                 fetchProfile(tokenSnapshot)
                 fetchFollowedArtists(tokenSnapshot)
-                fetchMyPlaylists(tokenSnapshot)
                 fetchMyAlbums(tokenSnapshot)
                 fetchPaymentHistory(tokenSnapshot)
             } finally {
@@ -64,16 +62,6 @@ class ProfileViewModel(
         withContext(Dispatchers.IO) {
             runCatching {
                 UserState.setFollowedArtists(userRepository.getFollowedArtists(token))
-            }.onFailure { exception ->
-                Log.e("MyApp", exception.toString())
-            }
-        }
-    }
-
-    suspend fun fetchMyPlaylists(token: String = accessToken()) {
-        withContext(Dispatchers.IO) {
-            runCatching {
-                UserState.setMyPlaylists(playlistRepository.getMyPlaylists(token))
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }

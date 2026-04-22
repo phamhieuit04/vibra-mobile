@@ -144,21 +144,6 @@ fun ProfileScreen(
                 }
             }
 
-            if (myPlaylists.isNotEmpty()) {
-                item(key = "playlists") {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        SectionTitle(text = "Playlist của tôi")
-                        ListAlbumRowComponent(albums = myPlaylists, onClick = {
-                            contextMenuViewModel.show(
-                                it.thumbnailPath,
-                                it.name,
-                                it.author?.name
-                            )
-                        })
-                    }
-                }
-            }
-
             item(key = "payment_history") {
                 PaymentHistorySection(bills = paymentHistory)
             }
