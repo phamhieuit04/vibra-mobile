@@ -7,6 +7,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +26,7 @@ class MediaPlayerController(
     val progress = _progress.asStateFlow()
 
     private var progressJob: Job? = null
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     init {
         player.addListener(object : Player.Listener {
@@ -58,7 +60,7 @@ class MediaPlayerController(
     private fun startProgressUpdater() {
         if (progressJob != null) return
 
-        progressJob = CoroutineScope(Dispatchers.Main).launch {
+        progressJob = scope.launch {
             while (isActive) {
                 val duration = player.duration
                 if (duration > 0) {

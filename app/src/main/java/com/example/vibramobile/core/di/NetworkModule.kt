@@ -1,5 +1,6 @@
 package com.example.vibramobile.core.di
 
+import com.example.vibramobile.data.source.remote.config.API_BASE_URL
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
@@ -10,7 +11,7 @@ import org.koin.dsl.module
 
 val networkModule = module {
     single<HttpClient> {
-        val url = "http://100.113.48.99:8000/api/"
+        val url = API_BASE_URL
 
         HttpClient() {
             install(ContentNegotiation) {
