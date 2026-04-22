@@ -3,11 +3,16 @@ package com.example.vibramobile.presentation.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -18,8 +23,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.example.vibramobile.presentation.component.ListAlbumRowComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
 import com.example.vibramobile.presentation.component.ListSongRowComponent
@@ -29,6 +37,7 @@ import com.example.vibramobile.presentation.state.UserState
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.LibraryViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
+import io.ktor.http.headers
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -38,6 +47,7 @@ fun LibraryScreen(
     contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel()
 ) {
+    val currentUser = UserState.currentUser.collectAsState().value
     val likedSongs by UserState.likedSongs.collectAsState()
     val myPlaylists by UserState.myPlaylists.collectAsState()
     val followedArtists by UserState.followedArtists.collectAsState()
@@ -65,10 +75,34 @@ fun LibraryScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
+            headers {
+                item(key = "header") {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AsyncImage(
+                            model = currentUser?.avatarPath,
+                            contentDescription = "",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .clip(shape = CircleShape)
+                                .size(52.dp)
+                        )
+
+                        Spacer(modifier.width(6.dp))
+
+                        Text(
+                            text = "Thư viện của tôi"
+                        )
+                    }
+                }
+            }
+
             if (likedSongs.isNotEmpty()) {
                 item(key = "liked_songs") {
                     Column(modifier = Modifier.fillMaxWidth()) {
-                        SectionTitle(text = "Bài hát yêu thích")
+                        SectionTitle(text = "Bài hát yêu thích", fontSize = 16.sp)
                         ListSongRowComponent(
                             songs = likedSongs,
                             onClick = {
@@ -89,7 +123,7 @@ fun LibraryScreen(
             if (myPlaylists.isNotEmpty()) {
                 item(key = "playlists") {
                     Column(modifier = Modifier.fillMaxWidth()) {
-                        SectionTitle(text = "Playlist của tôi")
+                        SectionTitle(text = "Playlist của tôi", fontSize = 16.sp)
                         ListAlbumRowComponent(albums = myPlaylists, onClick = {
                             contextMenuViewModel.show(
                                 it.thumbnailPath,
@@ -104,7 +138,7 @@ fun LibraryScreen(
             if (followedArtists.isNotEmpty()) {
                 item(key = "followed_artists") {
                     Column(modifier = Modifier.fillMaxWidth()) {
-                        SectionTitle(text = "Nghệ sĩ theo dõi")
+                        SectionTitle(text = "Nghệ sĩ theo dõi", fontSize = 16.sp)
                         ListArtistComponent(artists = followedArtists, onClick = { })
                     }
                 }
