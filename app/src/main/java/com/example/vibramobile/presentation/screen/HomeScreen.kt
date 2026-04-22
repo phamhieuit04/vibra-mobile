@@ -135,7 +135,7 @@ fun HomeScreen(
                                     ListSongRowComponent(
                                         onClick = {
                                             contextMenuViewModel.show(
-                                                thumbnailPath = it.thumbnail_path,
+                                                thumbnailPath = it.thumbnailPath,
                                                 songTitle = it.name,
                                                 artistName = it.author?.name
                                             )
@@ -158,7 +158,7 @@ fun HomeScreen(
                                     ListSongComponent(
                                         onClick = {
                                             contextMenuViewModel.show(
-                                                thumbnailPath = it.thumbnail_path,
+                                                thumbnailPath = it.thumbnailPath,
                                                 songTitle = it.name,
                                                 artistName = it.author?.name
                                             )
@@ -198,7 +198,7 @@ fun HomeScreen(
                                     ListSongComponent(
                                         onClick = {
                                             contextMenuViewModel.show(
-                                                thumbnailPath = it.thumbnail_path,
+                                                thumbnailPath = it.thumbnailPath,
                                                 songTitle = it.name,
                                                 artistName = it.author?.name
                                             )
@@ -210,7 +210,7 @@ fun HomeScreen(
                                     ListSongRowComponent(
                                         onClick = {
                                             contextMenuViewModel.show(
-                                                thumbnailPath = it.thumbnail_path,
+                                                thumbnailPath = it.thumbnailPath,
                                                 songTitle = it.name,
                                                 artistName = it.author?.name
                                             )

@@ -26,7 +26,7 @@ class MediaPlayerViewModel(
         if (currentSongValue?.id != song.id) {
             currentSongValue = song
 
-            val url = song.song_path?.encodeURLPath()
+            val url = song.songPath?.encodeURLPath()
             if (url.isNullOrBlank()) return
 
             controller.replaceMediaItem(mediaItem = MediaItem.fromUri(url))

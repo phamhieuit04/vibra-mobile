@@ -11,5 +11,5 @@ data class User(
     var avatar: String? = null,
     var followers: Int? = null,
     var token: String? = null,
-    var avatar_path: String? = null
+    var avatarPath: String? = null
 )

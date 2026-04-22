@@ -123,7 +123,7 @@ fun FullscreenPlayer(
                                 .size(320.dp)
                                 .clip(shape = RoundedCornerShape(12.dp)),
                             contentDescription = "",
-                            model = currentSong?.thumbnail_path?.encodeURLPath(),
+                            model = currentSong?.thumbnailPath?.encodeURLPath(),
                             contentScale = ContentScale.Crop
                         )
                     }

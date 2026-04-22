@@ -144,7 +144,7 @@ fun GenreDetailScreen(
                                         onPlay = { mediaPlayerViewModel.playSong(it) },
                                         onClick = {
                                             contextMenuViewModel.show(
-                                                thumbnailPath = it.thumbnail_path,
+                                                thumbnailPath = it.thumbnailPath,
                                                 songTitle = it.name,
                                                 artistName = it.author?.name
                                             )
@@ -166,7 +166,7 @@ fun GenreDetailScreen(
                                         onPlay = { mediaPlayerViewModel.playSong(it) },
                                         onClick = {
                                             contextMenuViewModel.show(
-                                                thumbnailPath = it.thumbnail_path,
+                                                thumbnailPath = it.thumbnailPath,
                                                 songTitle = it.name,
                                                 artistName = it.author?.name
                                             )
@@ -201,7 +201,7 @@ private fun GenreHeader(
             .height(280.dp)
     ) {
         AsyncImage(
-            model = category.thumbnail_path,
+            model = category.thumbnailPath,
             contentDescription = null,
             modifier = Modifier
                 .fillMaxSize()
@@ -248,7 +248,7 @@ private fun GenreHeader(
             verticalAlignment = Alignment.Bottom
         ) {
             AsyncImage(
-                model = category.thumbnail_path,
+                model = category.thumbnailPath,
                 contentDescription = category.name,
                 modifier = Modifier
                     .size(140.dp)

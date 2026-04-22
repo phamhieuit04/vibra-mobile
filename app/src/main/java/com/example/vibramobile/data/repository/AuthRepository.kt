@@ -1,7 +1,9 @@
 package com.example.vibramobile.data.repository
 
 import com.example.vibramobile.domain.contract.IAuthRepository
-import com.example.vibramobile.domain.model.Response
+import com.example.vibramobile.data.source.remote.dto.Response
+import com.example.vibramobile.data.source.remote.dto.UserResponseDto
+import com.example.vibramobile.data.source.remote.mapper.toDomain
 import com.example.vibramobile.domain.model.User
 import io.ktor.client.HttpClient
 import io.ktor.client.request.forms.submitForm
@@ -22,6 +24,6 @@ class AuthRepository(
             }
         ).bodyAsText()
 
-        return json.decodeFromString<Response<User>>(response).data
+        return json.decodeFromString<Response<UserResponseDto>>(response).data.toDomain()
     }
 }

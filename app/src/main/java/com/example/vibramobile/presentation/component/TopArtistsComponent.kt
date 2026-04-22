@@ -66,7 +66,7 @@ fun TopArtistCard(
         AsyncImage(
             modifier = Modifier.fillMaxSize(),
             model = ImageRequest.Builder(LocalContext.current)
-                .data(artist.avatar_path?.encodeURLPath())
+                .data(artist.avatarPath?.encodeURLPath())
                 .size(400)
                 .crossfade(true)
                 .build(),

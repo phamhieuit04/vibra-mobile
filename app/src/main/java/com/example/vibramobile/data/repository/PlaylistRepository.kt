@@ -2,7 +2,9 @@ package com.example.vibramobile.data.repository
 
 import com.example.vibramobile.domain.contract.IPlaylistRepository
 import com.example.vibramobile.domain.model.Playlist
-import com.example.vibramobile.domain.model.Response
+import com.example.vibramobile.data.source.remote.dto.PlaylistResponseDto
+import com.example.vibramobile.data.source.remote.dto.Response
+import com.example.vibramobile.data.source.remote.mapper.toDomain
 import io.ktor.client.HttpClient
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
@@ -19,7 +21,7 @@ class PlaylistRepository(
             bearerAuth(accessToken)
         }.bodyAsText()
 
-        return json.decodeFromString<Response<List<Playlist>>>(response).data
+        return json.decodeFromString<Response<List<PlaylistResponseDto>>>(response).data.map { it.toDomain() }
     }
 
     override suspend fun getMyPlaylists(accessToken: String): List<Playlist> {
@@ -28,7 +30,7 @@ class PlaylistRepository(
             parameter("type", 2)
         }.bodyAsText()
 
-        return json.decodeFromString<Response<List<Playlist>>>(response).data
+        return json.decodeFromString<Response<List<PlaylistResponseDto>>>(response).data.map { it.toDomain() }
     }
 
     override suspend fun getMyAlbums(accessToken: String): List<Playlist> {
@@ -36,7 +38,9 @@ class PlaylistRepository(
             bearerAuth(accessToken)
         }.bodyAsText()
 
-        val result = json.decodeFromString<Response<List<Playlist>>>(response).data
+        val result = json.decodeFromString<Response<List<PlaylistResponseDto>>>(response)
+            .data
+            .map { it.toDomain() }
         result.forEach { playlist ->
             playlist.author?.name = null
         }

@@ -143,7 +143,7 @@ private fun CategoryCard(
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(category.thumbnail_path)
+                .data(category.thumbnailPath)
                 .size(400)
                 .allowHardware(true)
                 .crossfade(false)

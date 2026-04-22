@@ -2,7 +2,9 @@ package com.example.vibramobile.data.repository
 
 import com.example.vibramobile.domain.contract.IBillRepository
 import com.example.vibramobile.domain.model.Bill
-import com.example.vibramobile.domain.model.Response
+import com.example.vibramobile.data.source.remote.dto.BillResponseDto
+import com.example.vibramobile.data.source.remote.dto.Response
+import com.example.vibramobile.data.source.remote.mapper.toDomain
 import io.ktor.client.HttpClient
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
@@ -18,6 +20,6 @@ class BillRepository(
             bearerAuth(accessToken)
         }.bodyAsText()
 
-        return json.decodeFromString<Response<List<Bill>>>(response).data
+        return json.decodeFromString<Response<List<BillResponseDto>>>(response).data.map { it.toDomain() }
     }
 }

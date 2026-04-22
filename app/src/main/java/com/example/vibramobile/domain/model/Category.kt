@@ -7,5 +7,5 @@ data class Category(
     var id: Int? = null,
     var name: String? = null,
     var description: String? = null,
-    var thumbnail_path: String? = null
+    var thumbnailPath: String? = null
 )

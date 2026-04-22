@@ -47,7 +47,7 @@ fun ListAlbumComponent(
                             shape = RoundedCornerShape(6.dp)
                         ),
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(album.thumbnail_path?.encodeURLPath())
+                        .data(album.thumbnailPath?.encodeURLPath())
                         .size(400)
                         .crossfade(true)
                         .build(),

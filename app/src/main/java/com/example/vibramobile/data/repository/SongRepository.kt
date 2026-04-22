@@ -1,8 +1,9 @@
 package com.example.vibramobile.data.repository
 
 import com.example.vibramobile.domain.contract.ISongRepository
-import com.example.vibramobile.domain.model.RecommendedSongs
-import com.example.vibramobile.domain.model.Response
+import com.example.vibramobile.data.source.remote.dto.Response
+import com.example.vibramobile.data.source.remote.dto.SongResponseDto
+import com.example.vibramobile.data.source.remote.mapper.toDomain
 import com.example.vibramobile.domain.model.Song
 import io.ktor.client.HttpClient
 import io.ktor.client.request.bearerAuth
@@ -20,7 +21,11 @@ class SongRepository(
             bearerAuth(accessToken)
         }.bodyAsText()
 
-        return json.decodeFromString<Response<RecommendedSongs>>(response).data.songs
+        return json.decodeFromString<Response<SongResponseDto>>(response)
+            .data
+            .songs
+            .orEmpty()
+            .map { it.toDomain() }
     }
 
     override suspend fun getRecentRotationSongs(accessToken: String, limit: Int): List<Song> {
@@ -29,7 +34,7 @@ class SongRepository(
             parameter(key = "limit", value = limit)
         }.bodyAsText()
 
-        return json.decodeFromString<Response<List<Song>>>(response).data
+        return json.decodeFromString<Response<List<SongResponseDto>>>(response).data.map { it.toDomain() }
     }
 
     override suspend fun getPopularSongs(accessToken: String): List<Song> {
@@ -37,7 +42,7 @@ class SongRepository(
             bearerAuth(accessToken)
         }.bodyAsText()
 
-        return json.decodeFromString<Response<List<Song>>>(response).data
+        return json.decodeFromString<Response<List<SongResponseDto>>>(response).data.map { it.toDomain() }
     }
 
     override suspend fun getSongsByCategory(categoryId: Int, accessToken: String): List<Song> {
@@ -45,7 +50,7 @@ class SongRepository(
             bearerAuth(accessToken)
         }.bodyAsText()
 
-        return json.decodeFromString<Response<List<Song>>>(response).data
+        return json.decodeFromString<Response<List<SongResponseDto>>>(response).data.map { it.toDomain() }
     }
 }
 

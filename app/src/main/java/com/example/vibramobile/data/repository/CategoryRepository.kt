@@ -2,7 +2,9 @@ package com.example.vibramobile.data.repository
 
 import com.example.vibramobile.domain.contract.ICategoryRepository
 import com.example.vibramobile.domain.model.Category
-import com.example.vibramobile.domain.model.Response
+import com.example.vibramobile.data.source.remote.dto.CategoryResponseDto
+import com.example.vibramobile.data.source.remote.dto.Response
+import com.example.vibramobile.data.source.remote.mapper.toDomain
 import io.ktor.client.HttpClient
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
@@ -18,7 +20,7 @@ class CategoryRepository(
             bearerAuth(accessToken)
         }.bodyAsText()
 
-        return json.decodeFromString<Response<List<Category>>>(response).data
+        return json.decodeFromString<Response<List<CategoryResponseDto>>>(response).data.map { it.toDomain() }
     }
 }
 

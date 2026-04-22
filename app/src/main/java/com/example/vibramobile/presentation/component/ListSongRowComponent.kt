@@ -62,7 +62,7 @@ fun ListSongRowComponent(
                         contentDescription = "",
                         contentScale = ContentScale.Crop,
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(song.thumbnail_path?.encodeURLPath())
+                            .data(song.thumbnailPath?.encodeURLPath())
                             .size(400)
                             .crossfade(true)
                             .build(),

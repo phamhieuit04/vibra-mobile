@@ -60,7 +60,7 @@ fun ListSongComponent(
                             shape = CircleShape
                         ),
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(song.thumbnail_path?.encodeURLPath())
+                        .data(song.thumbnailPath?.encodeURLPath())
                         .size(400)
                         .crossfade(true)
                         .build(),

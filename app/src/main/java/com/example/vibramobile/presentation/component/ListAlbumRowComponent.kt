@@ -58,7 +58,7 @@ fun ListAlbumRowComponent(
                         contentDescription = "",
                         contentScale = ContentScale.Crop,
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(album.thumbnail_path?.encodeURLPath())
+                            .data(album.thumbnailPath?.encodeURLPath())
                             .size(400)
                             .crossfade(true)
                             .build(),

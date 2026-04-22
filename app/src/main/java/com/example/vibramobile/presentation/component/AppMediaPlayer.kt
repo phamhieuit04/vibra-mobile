@@ -82,7 +82,7 @@ fun AppMediaPlayer(
                             .clip(shape = RoundedCornerShape(4.dp)),
                         contentDescription = "",
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(currentSong?.thumbnail_path?.encodeURLPath())
+                            .data(currentSong?.thumbnailPath?.encodeURLPath())
                             .size(400)
                             .crossfade(true)
                             .build(),

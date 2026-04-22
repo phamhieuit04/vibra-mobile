@@ -209,7 +209,7 @@ fun SearchResultScreen(
                                         ListSongRowComponent(
                                             onClick = {
                                                 contextMenuViewModel.show(
-                                                    thumbnailPath = it.thumbnail_path,
+                                                    thumbnailPath = it.thumbnailPath,
                                                     songTitle = it.name,
                                                     artistName = it.author?.name
                                                 )
@@ -331,7 +331,7 @@ private fun TopResultCard(
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(song.thumbnail_path)
+                .data(song.thumbnailPath)
                 .crossfade(true)
                 .build(),
             contentDescription = song.name,

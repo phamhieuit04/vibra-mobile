@@ -7,9 +7,9 @@ data class Playlist(
     var id: Int? = null,
     var name: String? = null,
     var description: String? = null,
-    var thumbnail_path: String? = null,
+    var thumbnailPath: String? = null,
     var type: Int? = null,
-    var total_song: Int? = null,
+    var totalSong: Int? = null,
     var price: Int? = null,
     var quantity: Int? = null,
 

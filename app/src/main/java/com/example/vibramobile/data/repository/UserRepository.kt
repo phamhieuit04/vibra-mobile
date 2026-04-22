@@ -1,7 +1,9 @@
 package com.example.vibramobile.data.repository
 
 import com.example.vibramobile.domain.contract.IUserRepository
-import com.example.vibramobile.domain.model.Response
+import com.example.vibramobile.data.source.remote.dto.Response
+import com.example.vibramobile.data.source.remote.dto.UserResponseDto
+import com.example.vibramobile.data.source.remote.mapper.toDomain
 import com.example.vibramobile.domain.model.User
 import io.ktor.client.HttpClient
 import io.ktor.client.request.bearerAuth
@@ -18,7 +20,7 @@ class UserRepository(
             bearerAuth(accessToken)
         }.bodyAsText()
 
-        return json.decodeFromString<Response<List<User>>>(response).data
+        return json.decodeFromString<Response<List<UserResponseDto>>>(response).data.map { it.toDomain() }
     }
 
     override suspend fun getFollowedArtists(accessToken: String): List<User> {
@@ -26,7 +28,7 @@ class UserRepository(
             bearerAuth(accessToken)
         }.bodyAsText()
 
-        return json.decodeFromString<Response<List<User>>>(response).data
+        return json.decodeFromString<Response<List<UserResponseDto>>>(response).data.map { it.toDomain() }
     }
 
 
@@ -35,7 +37,7 @@ class UserRepository(
             bearerAuth(accessToken)
         }.bodyAsText()
 
-        return json.decodeFromString<Response<User>>(response).data
+        return json.decodeFromString<Response<UserResponseDto>>(response).data.toDomain()
     }
 }
 
