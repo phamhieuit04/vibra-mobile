@@ -50,6 +50,7 @@ import com.example.vibramobile.presentation.component.ListArtistComponent
 import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.ListSongRowComponent
 import com.example.vibramobile.presentation.component.SectionTitle
+import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.component.TopArtistsComponent
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.HomeViewModel
@@ -124,14 +125,15 @@ fun HomeScreen(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         contentPadding = PaddingValues(top = topBarHeight),
                         state = scrollState,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(24.dp)
                     ) {
                         item(key = "recent_rotation") {
                             AnimatedVisibility(
                                 visible = recentRotationSongs.isNotEmpty()
                             ) {
-                                Column(modifier = Modifier.fillMaxWidth()) {
-                                    SectionTitle(text = "Lắng nghe gần đây")
+                                SpotifySection(
+                                    title = "Lắng nghe gần đây"
+                                ) {
                                     ListSongRowComponent(
                                         onClick = {
                                             contextMenuViewModel.show(
@@ -153,8 +155,9 @@ fun HomeScreen(
                             AnimatedVisibility(
                                 visible = recommendedSongs.isNotEmpty()
                             ) {
-                                Column(modifier = Modifier.fillMaxWidth()) {
-                                    SectionTitle(text = "Phù hợp với bạn")
+                                SpotifySection(
+                                    title = "Dành cho bạn"
+                                ) {
                                     ListSongComponent(
                                         onClick = {
                                             contextMenuViewModel.show(
@@ -174,8 +177,9 @@ fun HomeScreen(
                             AnimatedVisibility(
                                 visible = popularArtists.isNotEmpty()
                             ) {
-                                Column(modifier = Modifier.fillMaxWidth()) {
-                                    SectionTitle(text = "Nghệ sĩ nổi bật")
+                                SpotifySection(
+                                    title = "Nghệ sĩ nổi bật"
+                                ) {
                                     TopArtistsComponent(
                                         artists = popularArtists.take(5),
                                         onClick = { }
@@ -193,8 +197,9 @@ fun HomeScreen(
                             AnimatedVisibility(
                                 visible = popularSongs.isNotEmpty()
                             ) {
-                                Column(modifier = Modifier.fillMaxWidth()) {
-                                    SectionTitle(text = "Bài hát có nhiều lượt nghe")
+                                SpotifySection(
+                                    title = "Bài hát phổ biến"
+                                ) {
                                     ListSongComponent(
                                         onClick = {
                                             contextMenuViewModel.show(
@@ -226,8 +231,9 @@ fun HomeScreen(
                             AnimatedVisibility(
                                 visible = popularAlbums.isNotEmpty()
                             ) {
-                                Column(modifier = Modifier.fillMaxWidth()) {
-                                    SectionTitle(text = "Album phổ biến")
+                                SpotifySection(
+                                    title = "Album phổ biến"
+                                ) {
                                     ListAlbumComponent(albums = popularAlbums, onClick = { })
                                 }
                             }
