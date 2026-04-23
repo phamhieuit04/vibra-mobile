@@ -71,7 +71,7 @@ fun ListAlbumRowComponent(
                         Text(
                             text = album.name ?: "",
                             color = MaterialTheme.colorScheme.onBackground,
-                            fontSize = 18.sp,
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold,
                             lineHeight = 18.sp
                         )
