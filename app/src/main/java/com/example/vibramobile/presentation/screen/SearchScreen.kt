@@ -103,7 +103,7 @@ fun SearchScreen(
             item(span = {
                 GridItemSpan(maxLineSpan)
             }) {
-                SectionTitle(text = "Thể loại nổi bật")
+                SectionTitle(text = "Thể loại nổi bật", modifier = Modifier.padding(top = 16.dp))
             }
 
             items(items = categories, key = { it.id!! }) { category ->
