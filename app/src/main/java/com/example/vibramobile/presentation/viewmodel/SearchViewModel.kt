@@ -28,10 +28,19 @@ class SearchViewModel(
         delay(1000)
         withContext(Dispatchers.IO) {
             runCatching {
-                _searchResult.value = searchResultRepository.search(
+                val result = searchResultRepository.search(
                     keyword = keyword,
                     accessToken = accessToken()
                 )
+
+                if (result.albums.isEmpty() &&
+                    result.artists.isEmpty() &&
+                    result.songs.isEmpty()
+                ) {
+                    _searchResult.value = null
+                } else {
+                    _searchResult.value = result
+                }
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }

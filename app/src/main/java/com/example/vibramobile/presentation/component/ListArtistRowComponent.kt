@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -69,7 +70,8 @@ fun ListArtistRowComponent(
                         Text(
                             text = artist.name.toString(),
                             color = MaterialTheme.colorScheme.onBackground,
-                            fontSize = 18.sp,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold,
                             lineHeight = 18.sp
                         )
                         Spacer(Modifier.height(2.dp))

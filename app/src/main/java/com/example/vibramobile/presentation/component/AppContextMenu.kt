@@ -280,7 +280,7 @@ private fun SongHeader(
     ) {
         AsyncImage(
             modifier = Modifier
-                .size(42.dp)
+                .size(64.dp)
                 .clip(shape = RoundedCornerShape(4.dp)),
             contentDescription = "",
             model = ImageRequest.Builder(LocalContext.current)
@@ -300,14 +300,17 @@ private fun SongHeader(
                 text = songTitle,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
+                lineHeight = 1.sp
             )
             Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = artistName,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 14.sp
-            )
+            if (artistName.isNotBlank()) {
+                Text(
+                    text = artistName,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp
+                )
+            }
         }
     }
 }

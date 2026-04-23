@@ -57,6 +57,7 @@ import coil3.compose.AsyncImage
 import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.component.ListAlbumRowComponent
 import com.example.vibramobile.presentation.component.SectionTitle
+import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -97,7 +98,7 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item(key = "header") {
                 Spacer(modifier = Modifier.height(24.dp))
@@ -116,20 +117,23 @@ fun ProfileScreen(
             }
 
             item(key = "settings") {
-                Spacer(modifier = Modifier.height(24.dp))
-                SettingsSection(
-                    isDarkMode = isDarkMode,
-                    onDarkModeChange = onDarkModeChange,
-                    selectedAccentColorHex = selectedAccentColorHex,
-                    onAccentColorChange = onAccentColorChange
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+                SpotifySection(
+                    title = "Cài đặt"
+                ) {
+                    SettingsSection(
+                        isDarkMode = isDarkMode,
+                        onDarkModeChange = onDarkModeChange,
+                        selectedAccentColorHex = selectedAccentColorHex,
+                        onAccentColorChange = onAccentColorChange
+                    )
+                }
             }
 
             if (myAlbums.isNotEmpty()) {
                 item(key = "albums") {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        SectionTitle(text = "Album của tôi")
+                    SpotifySection(
+                        title = "Album của tôi"
+                    ) {
                         ListAlbumRowComponent(
                             albums = myAlbums,
                             onClick = {
@@ -145,7 +149,11 @@ fun ProfileScreen(
             }
 
             item(key = "payment_history") {
-                PaymentHistorySection(bills = paymentHistory)
+                SpotifySection(
+                    title = "Lịch sử giao dịch"
+                ) {
+                    PaymentHistorySection(bills = paymentHistory)
+                }
             }
 
             item(key = "bottom_spacer") {
@@ -163,41 +171,37 @@ fun ProfileScreen(
 
 @Composable
 private fun PaymentHistorySection(bills: List<Bill>) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        SectionTitle(text = "Lịch sử thanh toán")
-
-        if (bills.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 24.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Chưa có giao dịch nào",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 14.sp
+    if (bills.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Chưa có giao dịch nào",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 14.sp
+            )
+        }
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(16.dp)
                 )
-            }
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.surface,
-                        shape = RoundedCornerShape(16.dp)
+        ) {
+            bills.forEachIndexed { index, bill ->
+                BillItem(bill = bill)
+                if (index < bills.lastIndex) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        thickness = DividerDefaults.Thickness,
+                        color = MaterialTheme.colorScheme.surfaceVariant
                     )
-            ) {
-                bills.forEachIndexed { index, bill ->
-                    BillItem(bill = bill)
-                    if (index < bills.lastIndex) {
-                        HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            thickness = DividerDefaults.Thickness,
-                            color = MaterialTheme.colorScheme.surfaceVariant
-                        )
-                    }
                 }
             }
         }
@@ -401,89 +405,78 @@ private fun SettingsSection(
     selectedAccentColorHex: String,
     onAccentColorChange: (String) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = "Cài đặt",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(bottom = 12.dp),
-            fontSize = 20.sp
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(16.dp)
+            )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Brightness6,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(22.dp)
+                )
+
+                Spacer(modifier = Modifier.width(14.dp))
+
+                Text(
+                    text = "Giao diện tối",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            Switch(
+                checked = isDarkMode,
+                onCheckedChange = onDarkModeChange,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                    checkedTrackColor = MaterialTheme.colorScheme.primary,
+                    checkedBorderColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            thickness = DividerDefaults.Thickness,
+            color = MaterialTheme.colorScheme.surfaceVariant
         )
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    color = MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(16.dp)
-                )
+                .padding(horizontal = 16.dp, vertical = 14.dp)
         ) {
+            Text(
+                text = "Màu chủ đạo",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(12.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 14.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Brightness6,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(22.dp)
+                AccentColorHexList.forEach { colorHex ->
+                    AccentColorOption(
+                        colorHex = colorHex,
+                        isSelected = colorHex.equals(selectedAccentColorHex, ignoreCase = true),
+                        onClick = { onAccentColorChange(colorHex.uppercase()) }
                     )
-
-                    Spacer(modifier = Modifier.width(14.dp))
-
-                    Text(
-                        text = "Giao diện tối",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-
-                Switch(
-                    checked = isDarkMode,
-                    onCheckedChange = onDarkModeChange,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                        checkedTrackColor = MaterialTheme.colorScheme.primary,
-                        checkedBorderColor = MaterialTheme.colorScheme.primary
-                    )
-                )
-            }
-
-            HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                thickness = DividerDefaults.Thickness,
-                color = MaterialTheme.colorScheme.surfaceVariant
-            )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 14.dp)
-            ) {
-                Text(
-                    text = "Màu chủ đạo",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    AccentColorHexList.forEach { colorHex ->
-                        AccentColorOption(
-                            colorHex = colorHex,
-                            isSelected = colorHex.equals(selectedAccentColorHex, ignoreCase = true),
-                            onClick = { onAccentColorChange(colorHex.uppercase()) }
-                        )
-                    }
                 }
             }
         }

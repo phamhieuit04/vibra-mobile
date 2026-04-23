@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -79,8 +80,9 @@ fun ListSongComponent(
                         Text(
                             text = song.name.toString(),
                             color = MaterialTheme.colorScheme.onBackground,
-                            fontSize = 16.sp,
-                            lineHeight = 16.sp
+                            fontSize = 15.sp,
+                            lineHeight = 16.sp,
+                            fontWeight = FontWeight.SemiBold
                         )
                         Spacer(Modifier.height(2.dp))
                         Text(

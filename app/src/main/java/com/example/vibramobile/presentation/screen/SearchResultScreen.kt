@@ -70,6 +70,7 @@ import com.example.vibramobile.presentation.component.ListArtistComponent
 import com.example.vibramobile.presentation.component.ListSongRowComponent
 import com.example.vibramobile.presentation.component.SearchResultShimmer
 import com.example.vibramobile.presentation.component.SectionTitle
+import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.component.TopArtistsComponent
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
@@ -190,8 +191,8 @@ fun SearchResultScreen(
                             contentPadding = PaddingValues(16.dp),
                             verticalArrangement = Arrangement.spacedBy(24.dp)
                         ) {
-                            item(key = "top") {
-                                AnimatedVisibility(visible = searchResult!!.songs.isNotEmpty()) {
+                            if (searchResult!!.songs.isNotEmpty()) {
+                                item(key = "top") {
                                     TopResultCard(
                                         isPlaying = isPlaying,
                                         song = searchResult!!.songs.first(),
@@ -200,12 +201,11 @@ fun SearchResultScreen(
                                 }
                             }
 
-                            item(key = "songs") {
-                                AnimatedVisibility(
-                                    visible = searchResult!!.songs.drop(1).isNotEmpty()
-                                ) {
-                                    Column(modifier = Modifier.fillMaxWidth()) {
-                                        SectionTitle(text = "Bài hát")
+                            if (searchResult!!.songs.drop(1).isNotEmpty()) {
+                                item(key = "songs") {
+                                    SpotifySection(
+                                        title = "Bài hát"
+                                    ) {
                                         ListSongRowComponent(
                                             onClick = {
                                                 contextMenuViewModel.show(
@@ -221,12 +221,11 @@ fun SearchResultScreen(
                                 }
                             }
 
-                            item(key = "artists") {
-                                AnimatedVisibility(
-                                    visible = searchResult!!.artists.isNotEmpty()
-                                ) {
-                                    Column(modifier = Modifier.fillMaxWidth()) {
-                                        SectionTitle(text = "Nghệ sĩ")
+                            if (searchResult!!.artists.isNotEmpty()) {
+                                item(key = "artists") {
+                                    SpotifySection(
+                                        title = "Nghệ sĩ"
+                                    ) {
                                         TopArtistsComponent(
                                             artists = searchResult!!.artists.take(5),
                                             onClick = { }
@@ -240,12 +239,11 @@ fun SearchResultScreen(
                                 }
                             }
 
-                            item(key = "albums") {
-                                AnimatedVisibility(
-                                    visible = searchResult!!.albums.isNotEmpty()
-                                ) {
-                                    Column(modifier = Modifier.fillMaxWidth()) {
-                                        SectionTitle(text = "Albums")
+                            if (searchResult!!.albums.isNotEmpty()) {
+                                item(key = "albums") {
+                                    SpotifySection(
+                                        title = "Album"
+                                    ) {
                                         ListAlbumComponent(
                                             albums = searchResult!!.albums,
                                             onClick = { }
