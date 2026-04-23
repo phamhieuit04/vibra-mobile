@@ -1,43 +1,32 @@
 package com.example.vibramobile.presentation.screen
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.example.vibramobile.presentation.component.ListAlbumRowComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
 import com.example.vibramobile.presentation.component.ListSongRowComponent
-import com.example.vibramobile.presentation.component.SectionTitle
 import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.state.UserState
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.LibraryViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
-import io.ktor.http.headers
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -52,107 +41,141 @@ fun LibraryScreen(
     val myPlaylists by UserState.myPlaylists.collectAsState()
     val followedArtists by UserState.followedArtists.collectAsState()
 
-    val isRefreshing by libraryViewModel.isRefreshing.collectAsState()
-    val pullToRefreshState = rememberPullToRefreshState()
+    val colorScheme = MaterialTheme.colorScheme
 
-    PullToRefreshBox(
-        modifier = modifier.fillMaxSize(),
-        state = pullToRefreshState,
-        isRefreshing = isRefreshing,
-        onRefresh = { libraryViewModel.refresh() },
-        indicator = {
-            PullToRefreshDefaults.Indicator(
-                state = pullToRefreshState,
-                isRefreshing = isRefreshing,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
-        }
+    val headerGradient = Brush.verticalGradient(
+        colors = listOf(
+            colorScheme.primary,
+            colorScheme.background
+        )
+    )
+
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .background(colorScheme.background),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
 
-            headers {
-                item(key = "header") {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        AsyncImage(
-                            model = currentUser?.avatarPath,
-                            contentDescription = "",
-                            contentScale = ContentScale.FillBounds,
-                            modifier = Modifier
-                                .clip(shape = CircleShape)
-                                .size(52.dp)
-                        )
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(headerGradient)
+                    .padding(top = 28.dp, bottom = 32.dp)
+                    .padding(horizontal = 16.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    AsyncImage(
+                        model = currentUser?.avatarPath,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(64.dp)
+                            .clip(CircleShape)
+                    )
 
-                        Spacer(modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
 
+                    Column {
                         Text(
-                            text = "Thư viện của tôi"
+                            text = "Thư viện của bạn",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colorScheme.onBackground
+                        )
+                        Text(
+                            text = currentUser?.name ?: "",
+                            fontSize = 14.sp,
+                            color = colorScheme.onBackground.copy(alpha = 0.7f)
                         )
                     }
                 }
             }
+        }
 
-            if (likedSongs.isNotEmpty()) {
-                item(key = "liked_songs") {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        SectionTitle(text = "Bài hát yêu thích", fontSize = 16.sp)
-                        ListSongRowComponent(
-                            songs = likedSongs,
-                            onClick = {
-                                contextMenuViewModel.show(
-                                    it.thumbnailPath,
-                                    it.name,
-                                    it.author?.name
-                                )
-                            },
-                            onPlay = {
-                                mediaPlayerViewModel.playSong(it)
-                            }
-                        )
-                    }
-                }
-            }
-
-            if (myPlaylists.isNotEmpty()) {
-                item(key = "playlists") {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        SectionTitle(text = "Playlist của tôi", fontSize = 16.sp)
-                        ListAlbumRowComponent(albums = myPlaylists, onClick = {
+        if (likedSongs.isNotEmpty()) {
+            item {
+                SpotifySection(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    title = "Bài hát yêu thích",
+                ) {
+                    ListSongRowComponent(
+                        songs = likedSongs,
+                        onClick = {
                             contextMenuViewModel.show(
                                 it.thumbnailPath,
                                 it.name,
                                 it.author?.name
                             )
-                        })
-                    }
+                        },
+                        onPlay = {
+                            mediaPlayerViewModel.playSong(it)
+                        }
+                    )
                 }
-            }
-
-            if (followedArtists.isNotEmpty()) {
-                item(key = "followed_artists") {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        SectionTitle(text = "Nghệ sĩ theo dõi", fontSize = 16.sp)
-                        ListArtistComponent(artists = followedArtists, onClick = { })
-                    }
-                }
-            }
-
-            item(key = "bottom_spacer") {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(
-                            if (UiState.getDisplayMediaPlayer()) 192.dp else 96.dp
-                        )
-                )
             }
         }
+
+        if (myPlaylists.isNotEmpty()) {
+            item {
+                SpotifySection(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    title = "Playlist của bạn"
+                ) {
+                    ListAlbumRowComponent(
+                        albums = myPlaylists,
+                        onClick = {
+                            contextMenuViewModel.show(
+                                it.thumbnailPath,
+                                it.name,
+                                it.author?.name
+                            )
+                        }
+                    )
+                }
+            }
+        }
+
+        if (followedArtists.isNotEmpty()) {
+            item {
+                SpotifySection(modifier = Modifier.padding(horizontal = 16.dp), title = "Nghệ sĩ") {
+                    ListArtistComponent(
+                        artists = followedArtists,
+                        onClick = {}
+                    )
+                }
+            }
+        }
+
+        item {
+            Spacer(
+                modifier = Modifier.height(
+                    if (UiState.getDisplayMediaPlayer()) 180.dp else 100.dp
+                )
+            )
+        }
+    }
+}
+
+@Composable
+private fun SpotifySection(
+    modifier: Modifier = Modifier,
+    title: String,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    val colorScheme = MaterialTheme.colorScheme
+
+    Column(modifier = modifier) {
+        Text(
+            text = title,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = colorScheme.onBackground
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        content()
     }
 }
