@@ -1,9 +1,11 @@
 package com.example.vibramobile.data.repository
 
+import android.util.Log
 import com.example.vibramobile.domain.contract.ISongRepository
 import com.example.vibramobile.data.source.remote.dto.Response
 import com.example.vibramobile.data.source.remote.dto.SongResponseDto
 import com.example.vibramobile.data.mapper.toDomain
+import com.example.vibramobile.data.source.remote.dto.LibraryResponseDto
 import com.example.vibramobile.domain.model.Song
 import io.ktor.client.HttpClient
 import io.ktor.client.request.bearerAuth
@@ -51,6 +53,21 @@ class SongRepository(
         }.bodyAsText()
 
         return json.decodeFromString<Response<List<SongResponseDto>>>(response).data.map { it.toDomain() }
+    }
+
+    override suspend fun getLikedSongs(accessToken: String): List<Song> {
+        val response = client.get("library/list-song") {
+            bearerAuth(accessToken)
+        }.bodyAsText()
+
+        val result = json.decodeFromString<Response<List<LibraryResponseDto>>>(response)
+
+        val songs = mutableListOf<Song>()
+        result.data.forEach { item ->
+            item.song?.toDomain()?.let { songs.add(it) }
+        }
+
+        return songs
     }
 }
 

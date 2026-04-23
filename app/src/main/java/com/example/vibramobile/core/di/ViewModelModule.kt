@@ -4,6 +4,7 @@ import com.example.vibramobile.presentation.viewmodel.AuthViewModel
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.GenreDetailViewModel
 import com.example.vibramobile.presentation.viewmodel.HomeViewModel
+import com.example.vibramobile.presentation.viewmodel.LibraryViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import com.example.vibramobile.presentation.viewmodel.ProfileViewModel
 import com.example.vibramobile.presentation.viewmodel.SearchViewModel
@@ -18,4 +19,5 @@ val viewModelModule = module {
     viewModelOf(::GenreDetailViewModel)
     viewModelOf(::ProfileViewModel)
     viewModelOf(::SearchViewModel)
+    viewModelOf(::LibraryViewModel)
 }

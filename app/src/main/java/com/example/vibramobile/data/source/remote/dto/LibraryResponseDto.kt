@@ -8,6 +8,10 @@ data class LibraryResponseDto(
     val user_id: Int? = null,
     val playlist_id: Int? = null,
     val artist_id: Int? = null,
-    val song_id: Int? = null
+    val song_id: Int? = null,
+
+    val song: SongResponseDto? = null,
+    val playlist: PlaylistResponseDto? = null,
+    val artist: UserResponseDto? = null
 )
 

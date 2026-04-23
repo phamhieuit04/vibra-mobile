@@ -1,7 +1,9 @@
 package com.example.vibramobile.presentation.state
 
 import com.example.vibramobile.domain.model.Bill
+import com.example.vibramobile.domain.model.Library
 import com.example.vibramobile.domain.model.Playlist
+import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.domain.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +24,9 @@ object UserState {
 
     private val _paymentHistory = MutableStateFlow<List<Bill>>(emptyList())
     val paymentHistory: StateFlow<List<Bill>> = _paymentHistory.asStateFlow()
+
+    private val _likedSongs = MutableStateFlow<List<Song>>(emptyList())
+    val likedSongs: StateFlow<List<Song>> = _likedSongs.asStateFlow()
 
     fun setCurrentUser(user: User?) {
         val previousUserId = _currentUser.value?.id
@@ -47,5 +52,9 @@ object UserState {
 
     fun setPaymentHistory(bills: List<Bill>) {
         _paymentHistory.value = bills
+    }
+
+    fun setLikedSongs(songs: List<Song>) {
+        _likedSongs.value = songs
     }
 }

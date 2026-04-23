@@ -3,8 +3,8 @@ package com.example.vibramobile.presentation.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.vibramobile.domain.contract.IBillRepository
 import com.example.vibramobile.domain.contract.IPlaylistRepository
+import com.example.vibramobile.domain.contract.ISongRepository
 import com.example.vibramobile.domain.contract.IUserRepository
 import com.example.vibramobile.presentation.state.SessionStore
 import com.example.vibramobile.presentation.state.UserState
@@ -14,10 +14,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ProfileViewModel(
-    private val userRepository: IUserRepository,
+class LibraryViewModel(
     private val playlistRepository: IPlaylistRepository,
-    private val billRepository: IBillRepository,
+    private val songRepository: ISongRepository,
+    private val userRepository: IUserRepository,
     private val sessionStore: SessionStore
 ) : ViewModel() {
     private val _isRefreshing = MutableStateFlow(false)
@@ -38,20 +38,29 @@ class ProfileViewModel(
 
             _isRefreshing.value = true
             try {
-                fetchProfile(tokenSnapshot)
+                fetchLikedSongs(tokenSnapshot)
+                fetchMyPlaylists(tokenSnapshot)
                 fetchFollowedArtists(tokenSnapshot)
-                fetchMyAlbums(tokenSnapshot)
-                fetchPaymentHistory(tokenSnapshot)
             } finally {
                 _isRefreshing.value = false
             }
         }
     }
 
-    suspend fun fetchProfile(token: String = accessToken()) {
+    suspend fun fetchMyPlaylists(token: String = accessToken()) {
         withContext(Dispatchers.IO) {
             runCatching {
-                UserState.setCurrentUser(userRepository.getProfile(token).copy(token = null))
+                UserState.setMyPlaylists(playlistRepository.getMyPlaylists(token))
+            }.onFailure { exception ->
+                Log.e("MyApp", exception.toString())
+            }
+        }
+    }
+
+    suspend fun fetchLikedSongs(token: String = accessToken()) {
+        withContext(Dispatchers.IO) {
+            runCatching {
+                UserState.setLikedSongs(songRepository.getLikedSongs(token))
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
@@ -62,26 +71,6 @@ class ProfileViewModel(
         withContext(Dispatchers.IO) {
             runCatching {
                 UserState.setFollowedArtists(userRepository.getFollowedArtists(token))
-            }.onFailure { exception ->
-                Log.e("MyApp", exception.toString())
-            }
-        }
-    }
-
-    suspend fun fetchMyAlbums(token: String = accessToken()) {
-        withContext(Dispatchers.IO) {
-            runCatching {
-                UserState.setMyAlbums(playlistRepository.getMyAlbums(token))
-            }.onFailure { exception ->
-                Log.e("MyApp", exception.toString())
-            }
-        }
-    }
-
-    suspend fun fetchPaymentHistory(token: String = accessToken()) {
-        withContext(Dispatchers.IO) {
-            runCatching {
-                UserState.setPaymentHistory(billRepository.getPaymentHistory(token))
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
