@@ -1,5 +1,6 @@
 package com.example.vibramobile.presentation.state
 
+import com.example.vibramobile.domain.model.Playlist
 import com.example.vibramobile.domain.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,5 +12,12 @@ object ArtistState {
 
     fun setPopularArtists(artists: List<User>) {
         _popularArtists.value = artists
+    }
+
+    private val _albumsByArtist = MutableStateFlow<List<Playlist>>(emptyList())
+    val albumsByArtist: StateFlow<List<Playlist>> = _albumsByArtist.asStateFlow()
+
+    fun setAlbumsByArtist(albums: List<Playlist>) {
+        _albumsByArtist.value = albums
     }
 }

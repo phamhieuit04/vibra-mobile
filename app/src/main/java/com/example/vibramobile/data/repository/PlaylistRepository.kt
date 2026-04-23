@@ -49,5 +49,14 @@ class PlaylistRepository(
 
         return result
     }
+
+    override suspend fun getAlbumsByArtist(artistId: Int, accessToken: String): List<Playlist> {
+        val response = client.get("artist/get-artist-albums/$artistId") {
+            bearerAuth(accessToken)
+            parameter("artist_id", artistId)
+        }.bodyAsText()
+
+        return json.decodeFromString<Response<List<PlaylistResponseDto>>>(response).data.map { it.toDomain() }
+    }
 }
 

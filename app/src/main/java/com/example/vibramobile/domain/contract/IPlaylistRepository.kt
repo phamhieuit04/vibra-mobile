@@ -9,5 +9,7 @@ interface IPlaylistRepository {
     suspend fun getMyPlaylists(accessToken: String): List<Playlist>
 
     suspend fun getMyAlbums(accessToken: String): List<Playlist>
+
+    suspend fun getAlbumsByArtist(artistId: Int, accessToken: String): List<Playlist>
 }
 

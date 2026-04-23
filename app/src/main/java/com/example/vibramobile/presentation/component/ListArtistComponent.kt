@@ -67,7 +67,7 @@ fun ListArtistComponent(
                     fontSize = 15.sp,
                     maxLines = 1,
                     fontWeight = FontWeight.SemiBold,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
@@ -75,7 +75,8 @@ fun ListArtistComponent(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 12.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 1.sp
                 )
             }
             if (index < artists.lastIndex) {
