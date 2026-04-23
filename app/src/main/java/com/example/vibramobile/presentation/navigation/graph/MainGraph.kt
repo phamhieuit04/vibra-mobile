@@ -23,6 +23,7 @@ import com.example.vibramobile.presentation.component.AppNavigationBar
 import com.example.vibramobile.presentation.component.TOP_LEVEL_DESTINATIONS
 import com.example.vibramobile.presentation.navigation.destination.MainDestination
 import com.example.vibramobile.presentation.component.FullscreenPlayer
+import com.example.vibramobile.presentation.screen.ArtistDetailScreen
 import com.example.vibramobile.presentation.screen.GenreDetailScreen
 import com.example.vibramobile.presentation.screen.HomeScreen
 import com.example.vibramobile.presentation.screen.LibraryScreen
@@ -78,6 +79,9 @@ fun MainGraph(
                                     },
                                     navigateToSearch = {
                                         navigator.navigate(MainDestination.Search)
+                                    },
+                                    navigateToArtistDetail = { artist ->
+                                        navigator.navigate(MainDestination.ArtistDetail(artist))
                                     }
                                 )
                             }
@@ -93,11 +97,18 @@ fun MainGraph(
                             }
                             entry<MainDestination.SearchResult> {
                                 SearchResultScreen(
-                                    navigateBack = navigator::goBack
+                                    navigateBack = navigator::goBack,
+                                    navigateToArtistDetail = { artist ->
+                                        navigator.navigate(MainDestination.ArtistDetail(artist))
+                                    }
                                 )
                             }
                             entry<MainDestination.Library> {
-                                LibraryScreen()
+                                LibraryScreen(
+                                    navigateToArtistDetail = { artist ->
+                                        navigator.navigate(MainDestination.ArtistDetail(artist))
+                                    }
+                                )
                             }
                             entry<MainDestination.Profile> {
                                 ProfileScreen(
@@ -114,6 +125,11 @@ fun MainGraph(
                                     navigateToSearch = {
                                         navigator.navigate(MainDestination.Search)
                                     }
+                                )
+                            }
+                            entry<MainDestination.ArtistDetail> { route ->
+                                ArtistDetailScreen(
+                                    artist = route.artist
                                 )
                             }
                         }

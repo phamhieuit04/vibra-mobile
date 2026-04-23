@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.domain.model.Category
+import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.state.ArtistState
 import com.example.vibramobile.presentation.state.CategoryState
 import com.example.vibramobile.presentation.state.SongState
@@ -71,7 +72,8 @@ fun HomeScreen(
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
     contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
     navigateToGenreDetail: (Category) -> Unit,
-    navigateToSearch: () -> Unit
+    navigateToSearch: () -> Unit,
+    navigateToArtistDetail: (User) -> Unit
 ) {
     LaunchedEffect(Unit) {
         UiState.setDisplayNavigationBar(true)
@@ -182,12 +184,12 @@ fun HomeScreen(
                                 ) {
                                     TopArtistsComponent(
                                         artists = popularArtists.take(5),
-                                        onClick = { }
+                                        onClick = { navigateToArtistDetail(it) }
                                     )
                                     Spacer(Modifier.height(16.dp))
                                     ListArtistComponent(
                                         artists = popularArtists.drop(5),
-                                        onClick = { }
+                                        onClick = { navigateToArtistDetail(it) }
                                     )
                                 }
                             }

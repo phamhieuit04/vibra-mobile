@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.component.ListAlbumRowComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
 import com.example.vibramobile.presentation.component.ListSongRowComponent
@@ -35,7 +36,8 @@ fun LibraryScreen(
     modifier: Modifier = Modifier,
     libraryViewModel: LibraryViewModel = koinViewModel(),
     contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
-    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel()
+    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
+    navigateToArtistDetail: (User) -> Unit
 ) {
     val currentUser = UserState.currentUser.collectAsState().value
     val likedSongs by UserState.likedSongs.collectAsState()
@@ -143,7 +145,7 @@ fun LibraryScreen(
                 SpotifySection(modifier = Modifier.padding(horizontal = 16.dp), title = "Nghệ sĩ") {
                     ListArtistComponent(
                         artists = followedArtists,
-                        onClick = {}
+                        onClick = { navigateToArtistDetail(it) }
                     )
                 }
             }
