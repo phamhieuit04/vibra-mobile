@@ -22,6 +22,7 @@ import coil3.compose.AsyncImage
 import com.example.vibramobile.presentation.component.ListAlbumRowComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
 import com.example.vibramobile.presentation.component.ListSongRowComponent
+import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.state.UserState
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
@@ -155,27 +156,5 @@ fun LibraryScreen(
                 )
             )
         }
-    }
-}
-
-@Composable
-private fun SpotifySection(
-    modifier: Modifier = Modifier,
-    title: String,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    val colorScheme = MaterialTheme.colorScheme
-
-    Column(modifier = modifier) {
-        Text(
-            text = title,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorScheme.onBackground
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        content()
     }
 }
