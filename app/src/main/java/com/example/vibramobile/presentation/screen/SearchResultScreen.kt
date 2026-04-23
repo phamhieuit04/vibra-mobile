@@ -70,6 +70,7 @@ import com.example.vibramobile.presentation.component.ListArtistComponent
 import com.example.vibramobile.presentation.component.ListSongRowComponent
 import com.example.vibramobile.presentation.component.SearchResultShimmer
 import com.example.vibramobile.presentation.component.SectionTitle
+import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.component.TopArtistsComponent
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
@@ -202,8 +203,9 @@ fun SearchResultScreen(
 
                             if (searchResult!!.songs.drop(1).isNotEmpty()) {
                                 item(key = "songs") {
-                                    Column(modifier = Modifier.fillMaxWidth()) {
-                                        SectionTitle(text = "Bài hát")
+                                    SpotifySection(
+                                        title = "Bài hát"
+                                    ) {
                                         ListSongRowComponent(
                                             onClick = {
                                                 contextMenuViewModel.show(
@@ -221,8 +223,9 @@ fun SearchResultScreen(
 
                             if (searchResult!!.artists.isNotEmpty()) {
                                 item(key = "artists") {
-                                    Column(modifier = Modifier.fillMaxWidth()) {
-                                        SectionTitle(text = "Nghệ sĩ")
+                                    SpotifySection(
+                                        title = "Nghệ sĩ"
+                                    ) {
                                         TopArtistsComponent(
                                             artists = searchResult!!.artists.take(5),
                                             onClick = { }
@@ -238,8 +241,9 @@ fun SearchResultScreen(
 
                             if (searchResult!!.albums.isNotEmpty()) {
                                 item(key = "albums") {
-                                    Column(modifier = Modifier.fillMaxWidth()) {
-                                        SectionTitle(text = "Albums")
+                                    SpotifySection(
+                                        title = "Album"
+                                    ) {
                                         ListAlbumComponent(
                                             albums = searchResult!!.albums,
                                             onClick = { }
