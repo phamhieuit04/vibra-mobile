@@ -190,8 +190,8 @@ fun SearchResultScreen(
                             contentPadding = PaddingValues(16.dp),
                             verticalArrangement = Arrangement.spacedBy(24.dp)
                         ) {
-                            item(key = "top") {
-                                AnimatedVisibility(visible = searchResult!!.songs.isNotEmpty()) {
+                            if (searchResult!!.songs.isNotEmpty()) {
+                                item(key = "top") {
                                     TopResultCard(
                                         isPlaying = isPlaying,
                                         song = searchResult!!.songs.first(),
@@ -200,10 +200,8 @@ fun SearchResultScreen(
                                 }
                             }
 
-                            item(key = "songs") {
-                                AnimatedVisibility(
-                                    visible = searchResult!!.songs.drop(1).isNotEmpty()
-                                ) {
+                            if (searchResult!!.songs.drop(1).isNotEmpty()) {
+                                item(key = "songs") {
                                     Column(modifier = Modifier.fillMaxWidth()) {
                                         SectionTitle(text = "Bài hát")
                                         ListSongRowComponent(
@@ -221,10 +219,8 @@ fun SearchResultScreen(
                                 }
                             }
 
-                            item(key = "artists") {
-                                AnimatedVisibility(
-                                    visible = searchResult!!.artists.isNotEmpty()
-                                ) {
+                            if (searchResult!!.artists.isNotEmpty()) {
+                                item(key = "artists") {
                                     Column(modifier = Modifier.fillMaxWidth()) {
                                         SectionTitle(text = "Nghệ sĩ")
                                         TopArtistsComponent(
@@ -240,10 +236,8 @@ fun SearchResultScreen(
                                 }
                             }
 
-                            item(key = "albums") {
-                                AnimatedVisibility(
-                                    visible = searchResult!!.albums.isNotEmpty()
-                                ) {
+                            if (searchResult!!.albums.isNotEmpty()) {
+                                item(key = "albums") {
                                     Column(modifier = Modifier.fillMaxWidth()) {
                                         SectionTitle(text = "Albums")
                                         ListAlbumComponent(
