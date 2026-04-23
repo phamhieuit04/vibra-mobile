@@ -47,8 +47,6 @@ class ArtistDetailViewModel(
             runCatching {
                 val result = songRepository.getSongsByArtist(artistId, accessToken)
                 SongState.setSongsByArtist(result)
-
-                Log.i("myapp", result.toString())
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
@@ -60,8 +58,6 @@ class ArtistDetailViewModel(
             runCatching {
                 val result = playlistRepository.getAlbumsByArtist(artistId, accessToken)
                 ArtistState.setAlbumsByArtist(result)
-
-                Log.i("myapp", result.toString())
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
