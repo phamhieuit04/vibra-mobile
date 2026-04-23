@@ -61,6 +61,8 @@ import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.component.GenreDetailShimmer
 import com.example.vibramobile.presentation.component.ListSongRowComponent
 import com.example.vibramobile.presentation.component.SectionTitle
+import com.example.vibramobile.presentation.component.SpotifySection
+import com.example.vibramobile.presentation.component.TopTrendingSongComponent
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.GenreDetailViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
@@ -114,7 +116,7 @@ fun GenreDetailScreen(
             LazyColumn(
                 state = scrollState,
                 contentPadding = PaddingValues(bottom = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(0.dp)
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 item(key = "header") {
                     GenreHeader(category = category, onBackClick = navigateBack)
@@ -122,8 +124,6 @@ fun GenreDetailScreen(
 
                 if (loading) {
                     item(key = "loading") {
-                        Spacer(modifier.height(24.dp))
-
                         GenreDetailShimmer()
                     }
                 } else {
@@ -132,36 +132,39 @@ fun GenreDetailScreen(
                             EmptyStateView(onExploreClick = navigateToSearch)
                         }
                     } else {
+
                         item(key = "featured_songs") {
-                            AnimatedVisibility(visible = songsByCategory.isNotEmpty()) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 16.dp, end = 16.dp, top = 24.dp)
-                                ) {
-                                    SectionTitle(text = "Danh sách nhạc nổi bật")
-                                    ListSongRowComponent(
-                                        onPlay = { mediaPlayerViewModel.playSong(it) },
-                                        onClick = {
-                                            contextMenuViewModel.show(
-                                                thumbnailPath = it.thumbnailPath,
-                                                songTitle = it.name,
-                                                artistName = it.author?.name
-                                            )
-                                        },
-                                        songs = songsByCategory.take(5)
-                                    )
-                                }
+                            SpotifySection(
+                                title = "Danh sách nhạc nổi bật",
+                                modifier = Modifier.padding(
+                                    start = 16.dp,
+                                    end = 16.dp
+                                )
+                            ) {
+                                TopTrendingSongComponent(
+                                    onPlay = { mediaPlayerViewModel.playSong(it) },
+                                    onClick = {
+                                        contextMenuViewModel.show(
+                                            thumbnailPath = it.thumbnailPath,
+                                            songTitle = it.name,
+                                            artistName = it.author?.name
+                                        )
+                                    },
+                                    songs = songsByCategory.take(5)
+                                )
                             }
                         }
-                        item(key = "list_song") {
-                            AnimatedVisibility(visible = songsByCategory.size > 5) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 16.dp, end = 16.dp, top = 24.dp)
+
+                        if (songsByCategory.size > 5) {
+                            item(key = "list_song") {
+                                SpotifySection(
+                                    title = "Bài hát",
+                                    modifier = Modifier.padding(
+                                        start = 16.dp,
+                                        end = 16.dp,
+                                        top = 24.dp
+                                    )
                                 ) {
-                                    SectionTitle(text = "Bài hát")
                                     ListSongRowComponent(
                                         onPlay = { mediaPlayerViewModel.playSong(it) },
                                         onClick = {
@@ -176,6 +179,7 @@ fun GenreDetailScreen(
                                 }
                             }
                         }
+
                         item(key = "bottom_spacer") {
                             Spacer(Modifier.height(96.dp))
                             if (UiState.getDisplayMediaPlayer()) {

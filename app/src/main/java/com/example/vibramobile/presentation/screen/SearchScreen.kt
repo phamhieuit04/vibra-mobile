@@ -48,6 +48,7 @@ import com.example.vibramobile.domain.model.Category
 import com.example.vibramobile.presentation.state.CategoryState
 import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.component.SectionTitle
+import com.example.vibramobile.presentation.component.SpotifySection
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,7 +104,9 @@ fun SearchScreen(
             item(span = {
                 GridItemSpan(maxLineSpan)
             }) {
-                SectionTitle(text = "Thể loại nổi bật", modifier = Modifier.padding(top = 16.dp))
+                SpotifySection(
+                    title = "Thể loại nổi bật", modifier = Modifier.padding(top = 16.dp)
+                ) { }
             }
 
             items(items = categories, key = { it.id!! }) { category ->
