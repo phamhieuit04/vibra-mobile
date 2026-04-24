@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.domain.model.Category
+import com.example.vibramobile.domain.model.Playlist
 import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.state.ArtistState
 import com.example.vibramobile.presentation.state.CategoryState
@@ -73,7 +74,8 @@ fun HomeScreen(
     contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
     navigateToGenreDetail: (Category) -> Unit,
     navigateToSearch: () -> Unit,
-    navigateToArtistDetail: (User) -> Unit
+    navigateToArtistDetail: (User) -> Unit,
+    navigateToAlbumDetail: (Playlist) -> Unit
 ) {
     LaunchedEffect(Unit) {
         UiState.setDisplayNavigationBar(true)
@@ -236,7 +238,9 @@ fun HomeScreen(
                                 SpotifySection(
                                     title = "Album phổ biến"
                                 ) {
-                                    ListAlbumComponent(albums = popularAlbums, onClick = { })
+                                    ListAlbumComponent(
+                                        albums = popularAlbums,
+                                        onClick = { navigateToAlbumDetail(it) })
                                 }
                             }
                         }

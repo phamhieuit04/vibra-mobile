@@ -28,6 +28,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.vibramobile.R
+import com.example.vibramobile.core.extension.noRippleClickable
 import com.example.vibramobile.domain.model.Playlist
 import com.example.vibramobile.core.extension.skeletonEffect
 import io.ktor.http.encodeURLPath
@@ -40,7 +41,11 @@ fun ListAlbumComponent(
 ) {
     LazyRow() {
         itemsIndexed(albums) { index, album ->
-            Column(modifier = Modifier.width(140.dp)) {
+            Column(
+                modifier = Modifier
+                    .width(140.dp)
+                    .noRippleClickable() { onClick(album) }
+            ) {
                 AsyncImage(
                     modifier = Modifier
                         .size(140.dp)
