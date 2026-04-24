@@ -1,6 +1,5 @@
 package com.example.vibramobile.presentation.screen
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -61,7 +60,7 @@ import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.component.GenreDetailShimmer
 import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
-import com.example.vibramobile.presentation.component.TopTrendingSongComponent
+import com.example.vibramobile.presentation.component.TopSongsComponent
 import com.example.vibramobile.presentation.config.LayoutStyle
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.GenreDetailViewModel
@@ -141,7 +140,7 @@ fun GenreDetailScreen(
                                     end = 16.dp
                                 )
                             ) {
-                                TopTrendingSongComponent(
+                                TopSongsComponent(
                                     onPlay = { mediaPlayerViewModel.playSong(it) },
                                     onClick = {
                                         contextMenuViewModel.show(

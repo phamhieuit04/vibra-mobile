@@ -5,7 +5,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,9 +49,9 @@ import com.example.vibramobile.presentation.component.HomeShimmer
 import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
 import com.example.vibramobile.presentation.component.ListSongComponent
-import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.component.TopArtistsComponent
+import com.example.vibramobile.presentation.component.TopSongsComponent
 import com.example.vibramobile.presentation.config.LayoutStyle
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.HomeViewModel
@@ -163,7 +162,8 @@ fun HomeScreen(
                                 SpotifySection(
                                     title = "Dành cho bạn"
                                 ) {
-                                    ListSongComponent(
+                                    TopSongsComponent(
+                                        songs = recommendedSongs.take(10),
                                         onClick = {
                                             contextMenuViewModel.show(
                                                 thumbnailPath = it.thumbnailPath,
@@ -172,7 +172,6 @@ fun HomeScreen(
                                             )
                                         },
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
-                                        songs = recommendedSongs
                                     )
                                 }
                             }

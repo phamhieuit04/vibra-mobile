@@ -67,7 +67,7 @@ import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
-import com.example.vibramobile.presentation.component.TopTrendingSongComponent
+import com.example.vibramobile.presentation.component.TopSongsComponent
 import com.example.vibramobile.presentation.config.LayoutStyle
 import com.example.vibramobile.presentation.state.ArtistState
 import com.example.vibramobile.presentation.state.SongState
@@ -158,7 +158,7 @@ fun ArtistDetailScreen(
                             title = "Bài hát phổ biến",
                             modifier = Modifier.padding(horizontal = 16.dp)
                         ) {
-                            TopTrendingSongComponent(
+                            TopSongsComponent(
                                 songs = songs.take(5),
                                 onClick = {
                                     contextMenuViewModel.show(
