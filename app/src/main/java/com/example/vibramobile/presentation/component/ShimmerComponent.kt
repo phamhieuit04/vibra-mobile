@@ -49,3 +49,14 @@ fun SearchResultShimmer(modifier: Modifier = Modifier) {
         ListSongRowSkeleton()
     }
 }
+
+@Composable
+fun LibraryShimmer(modifier: Modifier = Modifier) {
+    Column(modifier = modifier.padding(horizontal = 16.dp)) {
+        ListSongRowSkeleton()
+        Spacer(Modifier.height(16.dp))
+        ListSongRowSkeleton()
+        Spacer(Modifier.height(16.dp))
+        ListSongRowSkeleton()
+    }
+}

@@ -9,6 +9,7 @@ import com.example.vibramobile.domain.contract.IUserRepository
 import com.example.vibramobile.presentation.state.SessionStore
 import com.example.vibramobile.presentation.state.UserState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -25,10 +26,6 @@ class LibraryViewModel(
 
     private fun accessToken() = sessionStore.currentAccessToken()
 
-    init {
-        refresh()
-    }
-
     fun refresh() {
         viewModelScope.launch {
             val tokenSnapshot = accessToken()
@@ -38,6 +35,7 @@ class LibraryViewModel(
 
             _isRefreshing.value = true
             try {
+                delay(500)
                 fetchLikedSongs(tokenSnapshot)
                 fetchMyPlaylists(tokenSnapshot)
                 fetchFollowedArtists(tokenSnapshot)
