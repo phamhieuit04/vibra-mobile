@@ -68,11 +68,11 @@ import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
-import com.example.vibramobile.presentation.component.ListSongRowComponent
+import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SearchResultShimmer
-import com.example.vibramobile.presentation.component.SectionTitle
 import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.component.TopArtistsComponent
+import com.example.vibramobile.presentation.config.LayoutStyle
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import com.example.vibramobile.presentation.viewmodel.SearchViewModel
@@ -208,7 +208,7 @@ fun SearchResultScreen(
                                     SpotifySection(
                                         title = "Bài hát"
                                     ) {
-                                        ListSongRowComponent(
+                                        ListSongComponent(
                                             onClick = {
                                                 contextMenuViewModel.show(
                                                     thumbnailPath = it.thumbnailPath,
@@ -217,6 +217,7 @@ fun SearchResultScreen(
                                                 )
                                             },
                                             onPlay = { mediaPlayerViewModel.playSong(it) },
+                                            layoutStyle = LayoutStyle.Vertical,
                                             songs = searchResult!!.songs.drop(1).take(20)
                                         )
                                     }

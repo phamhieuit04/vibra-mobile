@@ -59,10 +59,10 @@ import com.example.vibramobile.domain.model.Category
 import com.example.vibramobile.presentation.state.SongState
 import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.component.GenreDetailShimmer
-import com.example.vibramobile.presentation.component.ListSongRowComponent
-import com.example.vibramobile.presentation.component.SectionTitle
+import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.component.TopTrendingSongComponent
+import com.example.vibramobile.presentation.config.LayoutStyle
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.GenreDetailViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
@@ -165,8 +165,9 @@ fun GenreDetailScreen(
                                         top = 24.dp
                                     )
                                 ) {
-                                    ListSongRowComponent(
+                                    ListSongComponent(
                                         onPlay = { mediaPlayerViewModel.playSong(it) },
+                                        layoutStyle = LayoutStyle.Vertical,
                                         onClick = {
                                             contextMenuViewModel.show(
                                                 thumbnailPath = it.thumbnailPath,

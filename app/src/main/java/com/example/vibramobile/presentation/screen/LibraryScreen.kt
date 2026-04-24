@@ -28,7 +28,7 @@ import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.component.LibraryShimmer
 import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
-import com.example.vibramobile.presentation.component.ListSongRowComponent
+import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.config.LayoutStyle
 import com.example.vibramobile.presentation.state.UiState
@@ -134,8 +134,9 @@ fun LibraryScreen(
                                 modifier = Modifier.padding(horizontal = 16.dp),
                                 title = "Bài hát yêu thích",
                             ) {
-                                ListSongRowComponent(
+                                ListSongComponent(
                                     songs = likedSongs,
+                                    layoutStyle = LayoutStyle.Vertical,
                                     onClick = {
                                         contextMenuViewModel.show(
                                             it.thumbnailPath,

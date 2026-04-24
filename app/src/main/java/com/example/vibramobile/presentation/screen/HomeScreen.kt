@@ -50,10 +50,10 @@ import com.example.vibramobile.presentation.component.HomeShimmer
 import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
 import com.example.vibramobile.presentation.component.ListSongComponent
-import com.example.vibramobile.presentation.component.ListSongRowComponent
-import com.example.vibramobile.presentation.component.SectionTitle
+import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.component.TopArtistsComponent
+import com.example.vibramobile.presentation.config.LayoutStyle
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.HomeViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
@@ -138,7 +138,8 @@ fun HomeScreen(
                                 SpotifySection(
                                     title = "Lắng nghe gần đây"
                                 ) {
-                                    ListSongRowComponent(
+                                    ListSongComponent(
+                                        layoutStyle = LayoutStyle.Vertical,
                                         onClick = {
                                             contextMenuViewModel.show(
                                                 thumbnailPath = it.thumbnailPath,
@@ -216,7 +217,8 @@ fun HomeScreen(
                                         songs = popularSongs.take(5)
                                     )
                                     Spacer(Modifier.height(16.dp))
-                                    ListSongRowComponent(
+                                    ListSongComponent(
+                                        layoutStyle = LayoutStyle.Vertical,
                                         onClick = {
                                             contextMenuViewModel.show(
                                                 thumbnailPath = it.thumbnailPath,

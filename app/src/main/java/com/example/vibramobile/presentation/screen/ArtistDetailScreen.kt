@@ -65,9 +65,10 @@ import com.example.vibramobile.domain.model.Playlist
 import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.component.ListAlbumComponent
-import com.example.vibramobile.presentation.component.ListSongRowComponent
+import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.component.TopTrendingSongComponent
+import com.example.vibramobile.presentation.config.LayoutStyle
 import com.example.vibramobile.presentation.state.ArtistState
 import com.example.vibramobile.presentation.state.SongState
 import com.example.vibramobile.presentation.state.UiState
@@ -181,8 +182,9 @@ fun ArtistDetailScreen(
                                     .padding(horizontal = 16.dp)
                                     .padding(top = 12.dp)
                             ) {
-                                ListSongRowComponent(
+                                ListSongComponent(
                                     songs = songs.drop(5),
+                                    layoutStyle = LayoutStyle.Vertical,
                                     onClick = {
                                         contextMenuViewModel.show(
                                             thumbnailPath = it.thumbnailPath,
