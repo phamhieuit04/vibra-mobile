@@ -71,7 +71,10 @@ fun VerticalListAlbum(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
                     AsyncImage(
                         modifier = Modifier
                             .size(42.dp)
@@ -87,13 +90,17 @@ fun VerticalListAlbum(
                         error = painterResource(R.drawable.default_image)
                     )
                     Spacer(Modifier.width(12.dp))
-                    Column {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.Start
+                    ) {
                         Text(
                             text = album.name ?: "",
                             color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold,
-                            lineHeight = 18.sp
+                            lineHeight = 1.sp,
                         )
                         val authorName = album.author?.name
                         if (!authorName.isNullOrBlank()) {
@@ -103,8 +110,7 @@ fun VerticalListAlbum(
                                 modifier = Modifier.fillMaxWidth(),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 12.sp,
-                                lineHeight = 12.sp,
-                                textAlign = TextAlign.Center
+                                lineHeight = 1.sp
                             )
                         }
                     }
@@ -159,7 +165,8 @@ fun HorizontalListAlbum(
                     fontSize = 15.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    lineHeight = 1.sp
                 )
                 val authorName = album.author?.name
                 if (!authorName.isNullOrBlank()) {
@@ -169,7 +176,8 @@ fun HorizontalListAlbum(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 12.sp,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        lineHeight = 1.sp
                     )
                 }
             }
