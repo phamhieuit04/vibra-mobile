@@ -25,12 +25,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.example.vibramobile.domain.model.User
-import com.example.vibramobile.presentation.component.HomeShimmer
 import com.example.vibramobile.presentation.component.LibraryShimmer
-import com.example.vibramobile.presentation.component.ListAlbumRowComponent
+import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
 import com.example.vibramobile.presentation.component.ListSongRowComponent
 import com.example.vibramobile.presentation.component.SpotifySection
+import com.example.vibramobile.presentation.config.LayoutStyle
 import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.state.UserState
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
@@ -157,8 +157,9 @@ fun LibraryScreen(
                                 modifier = Modifier.padding(horizontal = 16.dp),
                                 title = "Playlist của bạn"
                             ) {
-                                ListAlbumRowComponent(
+                                ListAlbumComponent(
                                     albums = myPlaylists,
+                                    layoutStyle = LayoutStyle.Vertical,
                                     onClick = {
                                         contextMenuViewModel.show(
                                             it.thumbnailPath,
