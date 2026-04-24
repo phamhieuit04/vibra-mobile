@@ -64,6 +64,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.vibramobile.R
 import com.example.vibramobile.domain.model.Song
+import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
@@ -85,7 +86,8 @@ fun SearchResultScreen(
     searchViewModel: SearchViewModel = koinViewModel(),
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
     contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    navigateToArtistDetail: (User) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var query by remember { mutableStateOf("") }
@@ -228,12 +230,12 @@ fun SearchResultScreen(
                                     ) {
                                         TopArtistsComponent(
                                             artists = searchResult!!.artists.take(5),
-                                            onClick = { }
+                                            onClick = { navigateToArtistDetail(it) }
                                         )
                                         Spacer(Modifier.height(16.dp))
                                         ListArtistComponent(
                                             artists = searchResult!!.artists.drop(5),
-                                            onClick = { }
+                                            onClick = { navigateToArtistDetail(it) }
                                         )
                                     }
                                 }

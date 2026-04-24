@@ -64,9 +64,9 @@ private fun TrendingRow(
 
         Text(
             text = index.toString(),
-            fontSize = 28.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = colorScheme.onBackground.copy(alpha = 0.6f),
+            color = colorScheme.onBackground,
             modifier = Modifier.width(36.dp)
         )
 

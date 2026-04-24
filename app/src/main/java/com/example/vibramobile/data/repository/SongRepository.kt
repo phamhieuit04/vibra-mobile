@@ -69,5 +69,13 @@ class SongRepository(
 
         return songs
     }
+
+    override suspend fun getSongsByArtist(artistId: Int, accessToken: String): List<Song> {
+        val response = client.get("artist/get-artist-songs/$artistId") {
+            bearerAuth(accessToken)
+        }.bodyAsText()
+
+        return json.decodeFromString<Response<List<SongResponseDto>>>(response).data.map { it.toDomain() }
+    }
 }
 

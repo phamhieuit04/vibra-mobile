@@ -2,6 +2,7 @@ package com.example.vibramobile.presentation.navigation.destination
 
 import androidx.navigation3.runtime.NavKey
 import com.example.vibramobile.domain.model.Category
+import com.example.vibramobile.domain.model.User
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -23,4 +24,7 @@ sealed class MainDestination : NavKey {
 
     @Serializable
     data class GenreDetail(val category: Category) : MainDestination()
+
+    @Serializable
+    data class ArtistDetail(val artist: User) : MainDestination()
 }

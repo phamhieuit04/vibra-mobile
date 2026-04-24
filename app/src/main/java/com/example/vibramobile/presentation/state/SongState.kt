@@ -48,4 +48,11 @@ object SongState {
     fun setSongsByCategory(songs: List<Song>) {
         _songsByCategory.value = songs
     }
+
+    private val _songsByArtist = MutableStateFlow<List<Song>>(emptyList())
+    val songsByArtist: StateFlow<List<Song>> = _songsByArtist.asStateFlow()
+
+    fun setSongsByArtist(songs: List<Song>) {
+        _songsByArtist.value = songs
+    }
 }
