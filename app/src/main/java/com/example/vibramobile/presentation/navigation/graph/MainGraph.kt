@@ -129,7 +129,8 @@ fun MainGraph(
                             }
                             entry<MainDestination.ArtistDetail> { route ->
                                 ArtistDetailScreen(
-                                    artist = route.artist
+                                    artist = route.artist,
+                                    navigateBack = navigator::goBack,
                                 )
                             }
                         }
