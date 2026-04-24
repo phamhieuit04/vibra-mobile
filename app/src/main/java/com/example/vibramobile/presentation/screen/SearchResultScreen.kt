@@ -238,6 +238,12 @@ fun SearchResultScreen(
                                             artists = searchResult!!.artists.drop(5),
                                             onClick = { navigateToArtistDetail(it) }
                                         )
+                                        Spacer(Modifier.height(16.dp))
+                                        ListArtistComponent(
+                                            layoutStyle = LayoutStyle.Vertical,
+                                            artists = searchResult!!.artists.drop(10).take(20),
+                                            onClick = { navigateToArtistDetail(it) }
+                                        )
                                     }
                                 }
                             }
@@ -248,7 +254,13 @@ fun SearchResultScreen(
                                         title = "Album"
                                     ) {
                                         ListAlbumComponent(
-                                            albums = searchResult!!.albums,
+                                            albums = searchResult!!.albums.take(5),
+                                            onClick = { }
+                                        )
+                                        Spacer(Modifier.height(16.dp))
+                                        ListAlbumComponent(
+                                            layoutStyle = LayoutStyle.Vertical,
+                                            albums = searchResult!!.albums.drop(5).take(20),
                                             onClick = { }
                                         )
                                     }

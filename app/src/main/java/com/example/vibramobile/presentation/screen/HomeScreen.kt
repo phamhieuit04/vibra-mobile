@@ -191,7 +191,13 @@ fun HomeScreen(
                                     )
                                     Spacer(Modifier.height(16.dp))
                                     ListArtistComponent(
-                                        artists = popularArtists.drop(5),
+                                        artists = popularArtists.drop(5).take(5),
+                                        onClick = { navigateToArtistDetail(it) }
+                                    )
+                                    Spacer(Modifier.height(16.dp))
+                                    ListArtistComponent(
+                                        layoutStyle = LayoutStyle.Vertical,
+                                        artists = popularArtists.drop(10).take(10),
                                         onClick = { navigateToArtistDetail(it) }
                                     )
                                 }
@@ -241,8 +247,15 @@ fun HomeScreen(
                                     title = "Album phổ biến"
                                 ) {
                                     ListAlbumComponent(
-                                        albums = popularAlbums,
-                                        onClick = { navigateToAlbumDetail(it) })
+                                        albums = popularAlbums.take(5),
+                                        onClick = { navigateToAlbumDetail(it) }
+                                    )
+                                    Spacer(Modifier.height(16.dp))
+                                    ListAlbumComponent(
+                                        layoutStyle = LayoutStyle.Vertical,
+                                        albums = popularAlbums.drop(5).take(20),
+                                        onClick = { navigateToAlbumDetail(it) }
+                                    )
                                 }
                             }
                         }
