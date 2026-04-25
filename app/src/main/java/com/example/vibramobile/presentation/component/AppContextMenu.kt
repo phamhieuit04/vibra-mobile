@@ -370,10 +370,3 @@ sealed class MenuAction {
     object GoToConcerts : MenuAction()
     object ViewCredits : MenuAction()
 }
-
-data class ContextMenuState(
-    val visible: Boolean = false,
-    val thumbnailPath: String = "",
-    val songTitle: String = "Six Feet Under",
-    val artistName: String = "Billie Eilish"
-)

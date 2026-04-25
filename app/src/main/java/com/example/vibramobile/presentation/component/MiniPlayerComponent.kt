@@ -44,7 +44,7 @@ import io.ktor.http.encodeURLPath
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun AppMediaPlayer(
+fun MiniPlayerComponent(
     modifier: Modifier = Modifier,
     isVisible: Boolean,
     viewModel: MediaPlayerViewModel = koinViewModel()

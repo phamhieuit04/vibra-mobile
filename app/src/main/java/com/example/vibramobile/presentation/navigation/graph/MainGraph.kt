@@ -18,7 +18,7 @@ import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.state.rememberNavigationState
 import com.example.vibramobile.presentation.state.toEntries
 import com.example.vibramobile.presentation.component.AppContextMenu
-import com.example.vibramobile.presentation.component.AppMediaPlayer
+import com.example.vibramobile.presentation.component.MiniPlayerComponent
 import com.example.vibramobile.presentation.component.AppNavigationBar
 import com.example.vibramobile.presentation.component.TOP_LEVEL_DESTINATIONS
 import com.example.vibramobile.presentation.navigation.destination.MainDestination
@@ -50,7 +50,7 @@ fun MainGraph(
             containerColor = MaterialTheme.colorScheme.background,
             bottomBar = {
                 Column() {
-                    AppMediaPlayer(
+                    MiniPlayerComponent(
                         isVisible = UiState.getDisplayMediaPlayer()
                     )
 

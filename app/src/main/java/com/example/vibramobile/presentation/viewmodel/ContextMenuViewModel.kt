@@ -1,7 +1,7 @@
 package com.example.vibramobile.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.vibramobile.presentation.component.ContextMenuState
+import com.example.vibramobile.presentation.state.ContextMenuState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

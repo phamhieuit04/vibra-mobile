@@ -12,15 +12,6 @@ object UiState {
         displayNavigationBar.value = value
     }
 
-    private var displayMediaPlayer = mutableStateOf(false)
-    fun getDisplayMediaPlayer(): Boolean {
-        return displayMediaPlayer.value
-    }
-
-    fun setDisplayMediaPlayer(value: Boolean) {
-        displayMediaPlayer.value = value
-    }
-
     private var displaySongDetail = mutableStateOf(false)
     fun getDisplaySongDetail(): Boolean {
         return displaySongDetail.value
