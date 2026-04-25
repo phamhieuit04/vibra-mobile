@@ -64,7 +64,9 @@ fun LibraryScreen(
     val pullToRefreshState = rememberPullToRefreshState()
 
     LaunchedEffect(Unit) {
-        libraryViewModel.refresh()
+        if (likedSongs.isEmpty() && myPlaylists.isEmpty() && followedArtists.isEmpty()) {
+            libraryViewModel.refresh()
+        }
     }
 
     PullToRefreshBox(

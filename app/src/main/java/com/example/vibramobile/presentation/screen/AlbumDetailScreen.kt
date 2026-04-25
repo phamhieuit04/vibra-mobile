@@ -10,8 +10,5 @@ fun AlbumDetailScreen(
     playlist: Playlist,
     navigateBack: () -> Unit
 ) {
-    Text(
-        text = playlist.name ?: "Unknown Album",
-        color = MaterialTheme.colorScheme.onBackground
-    )
+    
 }
