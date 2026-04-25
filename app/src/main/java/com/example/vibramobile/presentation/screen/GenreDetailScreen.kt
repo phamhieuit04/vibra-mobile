@@ -1,6 +1,5 @@
 package com.example.vibramobile.presentation.screen
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -59,10 +58,10 @@ import com.example.vibramobile.domain.model.Category
 import com.example.vibramobile.presentation.state.SongState
 import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.component.GenreDetailShimmer
-import com.example.vibramobile.presentation.component.ListSongRowComponent
-import com.example.vibramobile.presentation.component.SectionTitle
+import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
-import com.example.vibramobile.presentation.component.TopTrendingSongComponent
+import com.example.vibramobile.presentation.component.TopSongsComponent
+import com.example.vibramobile.presentation.config.LayoutStyleConfig
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.GenreDetailViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
@@ -141,7 +140,7 @@ fun GenreDetailScreen(
                                     end = 16.dp
                                 )
                             ) {
-                                TopTrendingSongComponent(
+                                TopSongsComponent(
                                     onPlay = { mediaPlayerViewModel.playSong(it) },
                                     onClick = {
                                         contextMenuViewModel.show(
@@ -165,8 +164,9 @@ fun GenreDetailScreen(
                                         top = 24.dp
                                     )
                                 ) {
-                                    ListSongRowComponent(
+                                    ListSongComponent(
                                         onPlay = { mediaPlayerViewModel.playSong(it) },
+                                        layoutStyle = LayoutStyleConfig.Vertical,
                                         onClick = {
                                             contextMenuViewModel.show(
                                                 thumbnailPath = it.thumbnailPath,

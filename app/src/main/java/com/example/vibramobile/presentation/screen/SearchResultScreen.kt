@@ -1,6 +1,5 @@
 package com.example.vibramobile.presentation.screen
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -68,11 +67,11 @@ import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
-import com.example.vibramobile.presentation.component.ListSongRowComponent
+import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SearchResultShimmer
-import com.example.vibramobile.presentation.component.SectionTitle
 import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.component.TopArtistsComponent
+import com.example.vibramobile.presentation.config.LayoutStyleConfig
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import com.example.vibramobile.presentation.viewmodel.SearchViewModel
@@ -208,7 +207,7 @@ fun SearchResultScreen(
                                     SpotifySection(
                                         title = "Bài hát"
                                     ) {
-                                        ListSongRowComponent(
+                                        ListSongComponent(
                                             onClick = {
                                                 contextMenuViewModel.show(
                                                     thumbnailPath = it.thumbnailPath,
@@ -217,6 +216,7 @@ fun SearchResultScreen(
                                                 )
                                             },
                                             onPlay = { mediaPlayerViewModel.playSong(it) },
+                                            layoutStyle = LayoutStyleConfig.Vertical,
                                             songs = searchResult!!.songs.drop(1).take(20)
                                         )
                                     }
@@ -237,6 +237,12 @@ fun SearchResultScreen(
                                             artists = searchResult!!.artists.drop(5),
                                             onClick = { navigateToArtistDetail(it) }
                                         )
+                                        Spacer(Modifier.height(16.dp))
+                                        ListArtistComponent(
+                                            layoutStyle = LayoutStyleConfig.Vertical,
+                                            artists = searchResult!!.artists.drop(10).take(20),
+                                            onClick = { navigateToArtistDetail(it) }
+                                        )
                                     }
                                 }
                             }
@@ -247,7 +253,13 @@ fun SearchResultScreen(
                                         title = "Album"
                                     ) {
                                         ListAlbumComponent(
-                                            albums = searchResult!!.albums,
+                                            albums = searchResult!!.albums.take(5),
+                                            onClick = { }
+                                        )
+                                        Spacer(Modifier.height(16.dp))
+                                        ListAlbumComponent(
+                                            layoutStyle = LayoutStyleConfig.Vertical,
+                                            albums = searchResult!!.albums.drop(5).take(20),
                                             onClick = { }
                                         )
                                     }

@@ -6,7 +6,9 @@ import com.example.vibramobile.data.source.remote.dto.PlaylistResponseDto
 import com.example.vibramobile.data.source.remote.dto.Response
 import com.example.vibramobile.data.mapper.toDomain
 import com.example.vibramobile.data.source.remote.dto.LibraryResponseDto
+import com.example.vibramobile.data.source.remote.dto.SongResponseDto
 import com.example.vibramobile.domain.model.Library
+import com.example.vibramobile.domain.model.Song
 import io.ktor.client.HttpClient
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
@@ -53,10 +55,20 @@ class PlaylistRepository(
     override suspend fun getAlbumsByArtist(artistId: Int, accessToken: String): List<Playlist> {
         val response = client.get("artist/get-artist-albums/$artistId") {
             bearerAuth(accessToken)
-            parameter("artist_id", artistId)
         }.bodyAsText()
 
         return json.decodeFromString<Response<List<PlaylistResponseDto>>>(response).data.map { it.toDomain() }
+    }
+
+    override suspend fun getSongsByAlbum(
+        albumId: Int,
+        accessToken: String
+    ): List<Song> {
+        val response = client.get("playlist/show/$albumId") {
+            bearerAuth(accessToken)
+        }.bodyAsText()
+
+        return json.decodeFromString<Response<List<SongResponseDto>>>(response).data.map { it.toDomain() }
     }
 }
 

@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.Icon
@@ -37,14 +38,38 @@ import com.example.vibramobile.R
 import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.core.extension.noRippleClickable
 import com.example.vibramobile.core.extension.skeletonEffect
+import com.example.vibramobile.presentation.config.LayoutStyleConfig
 import io.ktor.http.encodeURLPath
 
 @Composable
 fun ListSongComponent(
-    onClick: (Song) -> Unit,
-    onPlay: (Song) -> Unit,
     modifier: Modifier = Modifier,
-    songs: List<Song>
+    songs: List<Song>,
+    layoutStyle: LayoutStyleConfig = LayoutStyleConfig.Horizontal,
+    onClick: (Song) -> Unit,
+    onPlay: (Song) -> Unit
+) {
+    when (layoutStyle) {
+        LayoutStyleConfig.Horizontal -> HorizontalListSong(
+            songs = songs,
+            onClick = onClick,
+            onPlay = onPlay
+        )
+
+        LayoutStyleConfig.Vertical -> VerticalListSong(
+            songs = songs,
+            onClick = onClick,
+            onPlay = onPlay
+        )
+    }
+}
+
+@Composable
+fun HorizontalListSong(
+    modifier: Modifier = Modifier,
+    songs: List<Song>,
+    onClick: (Song) -> Unit,
+    onPlay: (Song) -> Unit
 ) {
     LazyRow() {
         itemsIndexed(songs, key = { index, song -> song.id!! }) { index, song ->
@@ -108,6 +133,73 @@ fun ListSongComponent(
 }
 
 @Composable
+fun VerticalListSong(
+    modifier: Modifier = Modifier,
+    songs: List<Song>,
+    onClick: (Song) -> Unit,
+    onPlay: (Song) -> Unit
+) {
+    Column() {
+        for (song in songs) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .noRippleClickable(onClick = { onPlay(song) }),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row() {
+                    AsyncImage(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(
+                                shape = RoundedCornerShape(
+                                    4.dp
+                                )
+                            ),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(song.thumbnailPath?.encodeURLPath())
+                            .size(400)
+                            .crossfade(true)
+                            .build(),
+                        placeholder = painterResource(R.drawable.default_image),
+                        error = painterResource(R.drawable.default_image)
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Column() {
+                        Text(
+                            text = song.name.toString(),
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 15.sp,
+                            lineHeight = 18.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(Modifier.height(2.dp))
+                        Text(
+                            text = song.author?.name.toString(),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 12.sp,
+                            lineHeight = 12.sp
+                        )
+                    }
+                }
+                IconButton(onClick = { onClick(song) }) {
+                    Icon(
+                        modifier = Modifier.size(20.dp),
+                        imageVector = Icons.Default.MoreHoriz,
+                        contentDescription = "",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+        }
+    }
+}
+
+@Composable
 fun ListSongSkeleton(modifier: Modifier = Modifier) {
     Row(modifier = modifier.horizontalScroll(state = rememberScrollState())) {
         for (i in 0..4) {
@@ -154,6 +246,55 @@ fun ListSongSkeleton(modifier: Modifier = Modifier) {
                 }
             }
             Spacer(Modifier.width(16.dp))
+        }
+    }
+}
+
+@Composable
+fun ListSongRowSkeleton(modifier: Modifier = Modifier) {
+    Column() {
+        for (i in 0..3) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(
+                                shape = RoundedCornerShape(
+                                    4.dp
+                                )
+                            )
+                            .skeletonEffect()
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Column() {
+                        Box(
+                            modifier = Modifier
+                                .size(width = 160.dp, height = 15.dp)
+                                .skeletonEffect()
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(width = 96.dp, height = 15.dp)
+                                .skeletonEffect()
+                        )
+                    }
+                }
+                IconButton(onClick = {}) {
+                    Icon(
+                        modifier = Modifier.size(20.dp),
+                        imageVector = Icons.Default.MoreHoriz,
+                        contentDescription = "",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
+                    )
+                }
+            }
+            Spacer(Modifier.height(12.dp))
         }
     }
 }

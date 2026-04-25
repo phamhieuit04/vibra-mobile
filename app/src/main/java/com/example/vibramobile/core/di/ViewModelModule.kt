@@ -1,5 +1,6 @@
 package com.example.vibramobile.core.di
 
+import com.example.vibramobile.presentation.viewmodel.AlbumDetailViewModel
 import com.example.vibramobile.presentation.viewmodel.ArtistDetailViewModel
 import com.example.vibramobile.presentation.viewmodel.AuthViewModel
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
@@ -22,4 +23,5 @@ val viewModelModule = module {
     viewModelOf(::SearchViewModel)
     viewModelOf(::LibraryViewModel)
     viewModelOf(::ArtistDetailViewModel)
+    viewModelOf(::AlbumDetailViewModel)
 }

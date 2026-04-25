@@ -17,20 +17,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.example.vibramobile.domain.model.User
-import com.example.vibramobile.presentation.component.HomeShimmer
 import com.example.vibramobile.presentation.component.LibraryShimmer
-import com.example.vibramobile.presentation.component.ListAlbumRowComponent
+import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
-import com.example.vibramobile.presentation.component.ListSongRowComponent
+import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
+import com.example.vibramobile.presentation.config.LayoutStyleConfig
 import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.state.UserState
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
@@ -64,7 +62,9 @@ fun LibraryScreen(
     val pullToRefreshState = rememberPullToRefreshState()
 
     LaunchedEffect(Unit) {
-        libraryViewModel.refresh()
+        if (likedSongs.isEmpty() && myPlaylists.isEmpty() && followedArtists.isEmpty()) {
+            libraryViewModel.refresh()
+        }
     }
 
     PullToRefreshBox(
@@ -134,8 +134,9 @@ fun LibraryScreen(
                                 modifier = Modifier.padding(horizontal = 16.dp),
                                 title = "Bài hát yêu thích",
                             ) {
-                                ListSongRowComponent(
+                                ListSongComponent(
                                     songs = likedSongs,
+                                    layoutStyle = LayoutStyleConfig.Vertical,
                                     onClick = {
                                         contextMenuViewModel.show(
                                             it.thumbnailPath,
@@ -157,8 +158,9 @@ fun LibraryScreen(
                                 modifier = Modifier.padding(horizontal = 16.dp),
                                 title = "Playlist của bạn"
                             ) {
-                                ListAlbumRowComponent(
+                                ListAlbumComponent(
                                     albums = myPlaylists,
+                                    layoutStyle = LayoutStyleConfig.Vertical,
                                     onClick = {
                                         contextMenuViewModel.show(
                                             it.thumbnailPath,

@@ -5,7 +5,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,6 +39,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.domain.model.Category
+import com.example.vibramobile.domain.model.Playlist
 import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.state.ArtistState
 import com.example.vibramobile.presentation.state.CategoryState
@@ -49,10 +49,10 @@ import com.example.vibramobile.presentation.component.HomeShimmer
 import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
 import com.example.vibramobile.presentation.component.ListSongComponent
-import com.example.vibramobile.presentation.component.ListSongRowComponent
-import com.example.vibramobile.presentation.component.SectionTitle
 import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.component.TopArtistsComponent
+import com.example.vibramobile.presentation.component.TopSongsComponent
+import com.example.vibramobile.presentation.config.LayoutStyleConfig
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.HomeViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
@@ -73,7 +73,8 @@ fun HomeScreen(
     contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
     navigateToGenreDetail: (Category) -> Unit,
     navigateToSearch: () -> Unit,
-    navigateToArtistDetail: (User) -> Unit
+    navigateToArtistDetail: (User) -> Unit,
+    navigateToAlbumDetail: (Playlist) -> Unit
 ) {
     LaunchedEffect(Unit) {
         UiState.setDisplayNavigationBar(true)
@@ -136,7 +137,8 @@ fun HomeScreen(
                                 SpotifySection(
                                     title = "Lắng nghe gần đây"
                                 ) {
-                                    ListSongRowComponent(
+                                    ListSongComponent(
+                                        layoutStyle = LayoutStyleConfig.Vertical,
                                         onClick = {
                                             contextMenuViewModel.show(
                                                 thumbnailPath = it.thumbnailPath,
@@ -160,7 +162,8 @@ fun HomeScreen(
                                 SpotifySection(
                                     title = "Dành cho bạn"
                                 ) {
-                                    ListSongComponent(
+                                    TopSongsComponent(
+                                        songs = recommendedSongs.take(10),
                                         onClick = {
                                             contextMenuViewModel.show(
                                                 thumbnailPath = it.thumbnailPath,
@@ -169,7 +172,6 @@ fun HomeScreen(
                                             )
                                         },
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
-                                        songs = recommendedSongs
                                     )
                                 }
                             }
@@ -188,7 +190,13 @@ fun HomeScreen(
                                     )
                                     Spacer(Modifier.height(16.dp))
                                     ListArtistComponent(
-                                        artists = popularArtists.drop(5),
+                                        artists = popularArtists.drop(5).take(5),
+                                        onClick = { navigateToArtistDetail(it) }
+                                    )
+                                    Spacer(Modifier.height(16.dp))
+                                    ListArtistComponent(
+                                        layoutStyle = LayoutStyleConfig.Vertical,
+                                        artists = popularArtists.drop(10).take(10),
                                         onClick = { navigateToArtistDetail(it) }
                                     )
                                 }
@@ -214,7 +222,8 @@ fun HomeScreen(
                                         songs = popularSongs.take(5)
                                     )
                                     Spacer(Modifier.height(16.dp))
-                                    ListSongRowComponent(
+                                    ListSongComponent(
+                                        layoutStyle = LayoutStyleConfig.Vertical,
                                         onClick = {
                                             contextMenuViewModel.show(
                                                 thumbnailPath = it.thumbnailPath,
@@ -236,7 +245,16 @@ fun HomeScreen(
                                 SpotifySection(
                                     title = "Album phổ biến"
                                 ) {
-                                    ListAlbumComponent(albums = popularAlbums, onClick = { })
+                                    ListAlbumComponent(
+                                        albums = popularAlbums.take(5),
+                                        onClick = { navigateToAlbumDetail(it) }
+                                    )
+                                    Spacer(Modifier.height(16.dp))
+                                    ListAlbumComponent(
+                                        layoutStyle = LayoutStyleConfig.Vertical,
+                                        albums = popularAlbums.drop(5).take(20),
+                                        onClick = { navigateToAlbumDetail(it) }
+                                    )
                                 }
                             }
                         }
