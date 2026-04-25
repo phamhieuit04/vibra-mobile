@@ -213,14 +213,6 @@ fun ArtistDetailScreen(
                         ArtistDetailIntroduction(artist = artist)
                     }
                 }
-
-                item(key = "bottom_spacer") {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(if (UiState.getDisplayMediaPlayer()) 192.dp else 96.dp)
-                    )
-                }
             }
         }
 

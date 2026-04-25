@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.domain.model.Category
@@ -68,6 +70,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    bottomContentPadding: Dp = 0.dp,
     homeViewModel: HomeViewModel = koinViewModel(),
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
     contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
@@ -126,7 +129,10 @@ fun HomeScreen(
                 if (!loading) {
                     LazyColumn(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        contentPadding = PaddingValues(top = topBarHeight),
+                        contentPadding = PaddingValues(
+                            top = topBarHeight,
+                            bottom = bottomContentPadding
+                        ),
                         state = scrollState,
                         verticalArrangement = Arrangement.spacedBy(24.dp)
                     ) {
@@ -257,16 +263,6 @@ fun HomeScreen(
                                     )
                                 }
                             }
-                        }
-
-                        item(key = "bottom_spacer") {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(
-                                        if (UiState.getDisplayMediaPlayer()) 192.dp else 96.dp
-                                    )
-                            )
                         }
                     }
                 } else {

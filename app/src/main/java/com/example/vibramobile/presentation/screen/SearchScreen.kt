@@ -116,19 +116,6 @@ fun SearchScreen(
                     onClick = { navigateToGenreDetail(category) }
                 )
             }
-
-            item(
-                span = { GridItemSpan(maxLineSpan) }
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(
-                            if (UiState.getDisplayMediaPlayer()) 192.dp else 96.dp
-                        )
-                )
-            }
-
         }
     }
 }

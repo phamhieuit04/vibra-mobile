@@ -4,6 +4,7 @@ import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.vibramobile.core.util.Navigator
@@ -22,7 +24,7 @@ import com.example.vibramobile.presentation.component.MiniPlayerComponent
 import com.example.vibramobile.presentation.component.AppNavigationBar
 import com.example.vibramobile.presentation.component.TOP_LEVEL_DESTINATIONS
 import com.example.vibramobile.presentation.navigation.destination.MainDestination
-import com.example.vibramobile.presentation.component.FullscreenPlayer
+import com.example.vibramobile.presentation.screen.SongDetailScreen
 import com.example.vibramobile.presentation.screen.AlbumDetailScreen
 import com.example.vibramobile.presentation.screen.ArtistDetailScreen
 import com.example.vibramobile.presentation.screen.GenreDetailScreen
@@ -45,14 +47,16 @@ fun MainGraph(
     )
     val navigator = remember { Navigator(navigationState) }
 
+    val bottomContentPadding = 240.dp
+
     CompositionLocalProvider(LocalOverscrollFactory provides null) {
         Scaffold(
             containerColor = MaterialTheme.colorScheme.background,
             bottomBar = {
-                Column() {
-                    MiniPlayerComponent(
-                        isVisible = UiState.getDisplayMediaPlayer()
-                    )
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    MiniPlayerComponent()
 
                     AppNavigationBar(
                         isVisible = UiState.getDisplayNavigationBar(),
@@ -75,6 +79,7 @@ fun MainGraph(
                         entryProvider {
                             entry<MainDestination.Home> {
                                 HomeScreen(
+                                    bottomContentPadding = bottomContentPadding,
                                     navigateToGenreDetail = { category ->
                                         navigator.navigate(MainDestination.GenreDetail(category))
                                     },
@@ -118,7 +123,7 @@ fun MainGraph(
                                 ProfileScreen(
                                     isDarkMode,
                                     onDarkModeChange,
-                                    accentColorHex,
+                                    selectedAccentColorHex = accentColorHex,
                                     onAccentColorChange
                                 )
                             }
@@ -146,16 +151,14 @@ fun MainGraph(
                                     navigateBack = navigator::goBack
                                 )
                             }
+                            entry<MainDestination.SongDetail> { route ->
+                                SongDetailScreen(
+                                    song = route.song,
+                                    navigateBack = navigator::goBack
+                                )
+                            }
                         }
                     )
-                )
-
-                FullscreenPlayer(
-                    isVisible = UiState.getDisplaySongDetail(),
-                    onVisibleChange = { value ->
-                        UiState.setDisplaySongDetail(value)
-                    },
-                    onClickContextMenu = { UiState.setDisplayContextMenu(true) }
                 )
 
                 AppContextMenu()

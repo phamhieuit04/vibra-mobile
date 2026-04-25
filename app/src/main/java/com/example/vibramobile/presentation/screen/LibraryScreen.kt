@@ -191,14 +191,6 @@ fun LibraryScreen(
                         LibraryShimmer()
                     }
                 }
-
-                item {
-                    Spacer(
-                        modifier = Modifier.height(
-                            if (UiState.getDisplayMediaPlayer()) 180.dp else 100.dp
-                        )
-                    )
-                }
             }
         }
     }
