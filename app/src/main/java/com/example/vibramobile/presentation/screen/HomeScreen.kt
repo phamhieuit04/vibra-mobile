@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -88,6 +91,9 @@ fun HomeScreen(
     val scrollState = rememberLazyListState()
     val hazeState = rememberHazeState()
 
+    val statusBarHeight = WindowInsets.statusBars
+        .asPaddingValues()
+        .calculateTopPadding()
     var topBarHeight by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
     val blurProgress by remember {
@@ -130,19 +136,15 @@ fun HomeScreen(
                     LazyColumn(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         contentPadding = PaddingValues(
-                            top = topBarHeight,
+                            top = topBarHeight + 16.dp,
                             bottom = bottomContentPadding
                         ),
                         state = scrollState,
                         verticalArrangement = Arrangement.spacedBy(24.dp)
                     ) {
                         item(key = "recent_rotation") {
-                            AnimatedVisibility(
-                                visible = recentRotationSongs.isNotEmpty()
-                            ) {
-                                SpotifySection(
-                                    title = "Lắng nghe gần đây"
-                                ) {
+                            AnimatedVisibility(visible = recentRotationSongs.isNotEmpty()) {
+                                SpotifySection(title = "Lắng nghe gần đây") {
                                     ListSongComponent(
                                         layoutStyle = LayoutStyleConfig.Vertical,
                                         onClick = {
@@ -152,9 +154,7 @@ fun HomeScreen(
                                                 artistName = it.author?.name
                                             )
                                         },
-                                        onPlay = {
-                                            mediaPlayerViewModel.playSong(song = it)
-                                        },
+                                        onPlay = { mediaPlayerViewModel.playSong(song = it) },
                                         songs = recentRotationSongs
                                     )
                                 }
@@ -162,12 +162,8 @@ fun HomeScreen(
                         }
 
                         item(key = "recommended") {
-                            AnimatedVisibility(
-                                visible = recommendedSongs.isNotEmpty()
-                            ) {
-                                SpotifySection(
-                                    title = "Dành cho bạn"
-                                ) {
+                            AnimatedVisibility(visible = recommendedSongs.isNotEmpty()) {
+                                SpotifySection(title = "Dành cho bạn") {
                                     TopSongsComponent(
                                         songs = recommendedSongs.take(10),
                                         onClick = {
@@ -184,12 +180,8 @@ fun HomeScreen(
                         }
 
                         item(key = "top_artists") {
-                            AnimatedVisibility(
-                                visible = popularArtists.isNotEmpty()
-                            ) {
-                                SpotifySection(
-                                    title = "Nghệ sĩ nổi bật"
-                                ) {
+                            AnimatedVisibility(visible = popularArtists.isNotEmpty()) {
+                                SpotifySection(title = "Nghệ sĩ nổi bật") {
                                     TopArtistsComponent(
                                         artists = popularArtists.take(5),
                                         onClick = { navigateToArtistDetail(it) }
@@ -210,12 +202,8 @@ fun HomeScreen(
                         }
 
                         item(key = "popular_songs") {
-                            AnimatedVisibility(
-                                visible = popularSongs.isNotEmpty()
-                            ) {
-                                SpotifySection(
-                                    title = "Bài hát phổ biến"
-                                ) {
+                            AnimatedVisibility(visible = popularSongs.isNotEmpty()) {
+                                SpotifySection(title = "Bài hát phổ biến") {
                                     ListSongComponent(
                                         onClick = {
                                             contextMenuViewModel.show(
@@ -245,12 +233,8 @@ fun HomeScreen(
                         }
 
                         item(key = "popular_albums") {
-                            AnimatedVisibility(
-                                visible = popularAlbums.isNotEmpty()
-                            ) {
-                                SpotifySection(
-                                    title = "Album phổ biến"
-                                ) {
+                            AnimatedVisibility(visible = popularAlbums.isNotEmpty()) {
+                                SpotifySection(title = "Album phổ biến") {
                                     ListAlbumComponent(
                                         albums = popularAlbums.take(5),
                                         onClick = { navigateToAlbumDetail(it) }
@@ -266,7 +250,7 @@ fun HomeScreen(
                         }
                     }
                 } else {
-                    HomeShimmer(modifier = Modifier.padding(top = topBarHeight))
+                    HomeShimmer(modifier = Modifier.padding(top = topBarHeight + 16.dp))
                 }
             }
         }
@@ -274,92 +258,87 @@ fun HomeScreen(
         val selectedCategoryColor: Color = MaterialTheme.colorScheme.primary
         val defaultCategoryColor: Color = MaterialTheme.colorScheme.surfaceVariant
         var selectedCategoryId by remember { mutableStateOf<Int?>(null) }
-        LazyRow(
+
+        Box(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .background(color = Color.Transparent)
+                .fillMaxWidth()
                 .onGloballyPositioned { coordinates ->
-                    topBarHeight = with(density) {
-                        coordinates.size.height.toDp()
-                    }
+                    topBarHeight = with(density) { coordinates.size.height.toDp() }
                 }
-                .hazeEffect(
-                    state = hazeState,
-                    style = HazeMaterials.thin()
-                ) {
-                    blurEnabled = true
-                    progressive =
-                        HazeProgressive.verticalGradient(
+        ) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .hazeEffect(
+                        state = hazeState,
+                        style = HazeMaterials.ultraThin()
+                    ) {
+                        progressive = HazeProgressive.verticalGradient(
                             startIntensity = 1f,
                             endIntensity = 0f,
                             preferPerformance = true
                         )
-                    alpha = blurProgress
-                },
-            contentPadding = PaddingValues(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            item {
-                FilledTonalButton(
-                    onClick = { selectedCategoryId = null },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedCategoryId == null) {
-                            selectedCategoryColor
-                        } else {
-                            defaultCategoryColor
-                        }
-                    )
-                ) {
-                    val allTextColor = if (selectedCategoryId == null) {
-                        MaterialTheme.colorScheme.onPrimary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
                     }
+            )
 
-                    Text(
-                        text = "All",
-                        color = allTextColor,
-                        fontSize = 14.sp
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(
+                        MaterialTheme.colorScheme.background.copy(alpha = blurProgress * 0.6f)
                     )
-                }
-            }
-            items(items = categories.take(5), key = { it.id!! }) { category ->
-                FilledTonalButton(
-                    onClick = {
-                        selectedCategoryId = category.id
-                        navigateToGenreDetail(category)
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedCategoryId == category.id) {
-                            selectedCategoryColor
-                        } else {
-                            defaultCategoryColor
-                        }
-                    )
-                ) {
-                    val categoryTextColor = if (selectedCategoryId == category.id) {
-                        MaterialTheme.colorScheme.onPrimary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            LazyRow(
+                modifier = Modifier.statusBarsPadding(),
+                contentPadding = PaddingValues(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                item {
+                    FilledTonalButton(
+                        onClick = { selectedCategoryId = null },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (selectedCategoryId == null) selectedCategoryColor
+                            else defaultCategoryColor
+                        )
+                    ) {
+                        Text(
+                            text = "All",
+                            color = if (selectedCategoryId == null) MaterialTheme.colorScheme.onPrimary
+                            else MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 14.sp
+                        )
                     }
-
-                    Text(
-                        text = category.name.toString(),
-                        color = categoryTextColor,
-                        fontSize = 14.sp,
-                        lineHeight = 14.sp
-                    )
                 }
-            }
-            item {
-                OutlinedButton(
-                    onClick = { selectedCategoryId = null; navigateToSearch() }
-                ) {
-                    Text(
-                        text = "See more",
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 14.sp
-                    )
+                items(items = categories.take(5), key = { it.id!! }) { category ->
+                    FilledTonalButton(
+                        onClick = {
+                            selectedCategoryId = category.id
+                            navigateToGenreDetail(category)
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (selectedCategoryId == category.id) selectedCategoryColor
+                            else defaultCategoryColor
+                        )
+                    ) {
+                        Text(
+                            text = category.name.toString(),
+                            color = if (selectedCategoryId == category.id) MaterialTheme.colorScheme.onPrimary
+                            else MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 14.sp,
+                            lineHeight = 14.sp
+                        )
+                    }
+                }
+                item {
+                    OutlinedButton(onClick = { selectedCategoryId = null; navigateToSearch() }) {
+                        Text(
+                            text = "See more",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 14.sp
+                        )
+                    }
                 }
             }
         }

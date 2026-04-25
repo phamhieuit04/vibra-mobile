@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -37,6 +38,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -55,6 +57,7 @@ import com.example.vibramobile.presentation.component.SpotifySection
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
+    bottomContentPadding: Dp = 0.dp,
     navigateToGenreDetail: (Category) -> Unit,
     navigateToSearchResult: () -> Unit
 ) {
@@ -65,6 +68,7 @@ fun SearchScreen(
             Surface(
                 modifier = modifier
                     .padding(16.dp)
+                    .statusBarsPadding()
                     .fillMaxWidth()
                     .height(56.dp)
                     .clickable(onClick = navigateToSearchResult),
@@ -95,7 +99,12 @@ fun SearchScreen(
     ) { padding ->
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(horizontal = 16.dp),
+            contentPadding = PaddingValues(
+                top = 16.dp,
+                start = 16.dp,
+                end = 16.dp,
+                bottom = bottomContentPadding
+            ),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier
@@ -106,7 +115,7 @@ fun SearchScreen(
                 GridItemSpan(maxLineSpan)
             }) {
                 SpotifySection(
-                    title = "Thể loại nổi bật", modifier = Modifier.padding(top = 16.dp)
+                    title = "Thể loại nổi bật", modifier = Modifier.padding(top = 4.dp)
                 ) { }
             }
 
@@ -162,7 +171,7 @@ private fun CategoryCard(
         Text(
             text = category.name ?: "",
             color = Color.White,
-            fontSize = 20.sp,
+            fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .align(Alignment.BottomStart)

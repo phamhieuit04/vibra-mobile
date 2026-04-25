@@ -73,6 +73,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ArtistDetailScreen(
     modifier: Modifier = Modifier,
+    bottomContentPadding: Dp = 0.dp,
     artist: User,
     navigateBack: () -> Unit,
     navigateToAlbumDetail: (Playlist) -> Unit,

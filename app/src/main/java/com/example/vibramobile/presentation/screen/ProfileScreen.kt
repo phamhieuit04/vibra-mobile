@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -45,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.domain.model.Bill
@@ -64,11 +68,12 @@ import java.util.Locale
 
 @Composable
 fun ProfileScreen(
+    modifier: Modifier = Modifier,
+    bottomContentPadding: Dp = 0.dp,
     isDarkMode: Boolean,
     onDarkModeChange: (Boolean) -> Unit,
     selectedAccentColorHex: String,
     onAccentColorChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
     profileViewModel: ProfileViewModel = koinViewModel(),
     contextMenuViewModel: ContextMenuViewModel = koinViewModel()
 ) {
@@ -79,6 +84,10 @@ fun ProfileScreen(
     val paymentHistory by UserState.paymentHistory.collectAsState()
     val isRefreshing by profileViewModel.isRefreshing.collectAsState()
     val pullToRefreshState = rememberPullToRefreshState()
+
+    val statusBarHeight = WindowInsets.statusBars
+        .asPaddingValues()
+        .calculateTopPadding()
 
     PullToRefreshBox(
         modifier = modifier.fillMaxSize(),
@@ -96,7 +105,12 @@ fun ProfileScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = statusBarHeight,
+                    bottom = bottomContentPadding
+                ),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item(key = "header") {

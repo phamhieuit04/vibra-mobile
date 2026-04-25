@@ -1,6 +1,7 @@
 package com.example.vibramobile.presentation.navigation.graph
 
 import androidx.compose.foundation.LocalOverscrollFactory
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entryProvider
@@ -46,32 +48,16 @@ fun MainGraph(
         topLevelRoutes = TOP_LEVEL_DESTINATIONS.keys
     )
     val navigator = remember { Navigator(navigationState) }
-
     val bottomContentPadding = 240.dp
 
     CompositionLocalProvider(LocalOverscrollFactory provides null) {
-        Scaffold(
-            containerColor = MaterialTheme.colorScheme.background,
-            bottomBar = {
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    MiniPlayerComponent()
-
-                    AppNavigationBar(
-                        isVisible = UiState.getDisplayNavigationBar(),
-                        selectedKey = navigationState.topLevelRoute,
-                        onSelectKey = {
-                            navigator.navigate(it)
-                        }
-                    )
-                }
-            }
-        ) { padding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.background)
+        ) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = padding.calculateTopPadding())
+                modifier = Modifier.fillMaxSize()
             ) {
                 NavDisplay(
                     onBack = navigator::goBack,
@@ -96,6 +82,7 @@ fun MainGraph(
                             }
                             entry<MainDestination.Search> {
                                 SearchScreen(
+                                    bottomContentPadding = bottomContentPadding,
                                     navigateToGenreDetail = { category ->
                                         navigator.navigate(MainDestination.GenreDetail(category))
                                     },
@@ -106,6 +93,7 @@ fun MainGraph(
                             }
                             entry<MainDestination.SearchResult> {
                                 SearchResultScreen(
+                                    bottomContentPadding = bottomContentPadding,
                                     navigateBack = navigator::goBack,
                                     navigateToArtistDetail = { artist ->
                                         navigator.navigate(MainDestination.ArtistDetail(artist))
@@ -114,6 +102,7 @@ fun MainGraph(
                             }
                             entry<MainDestination.Library> {
                                 LibraryScreen(
+                                    bottomContentPadding = bottomContentPadding,
                                     navigateToArtistDetail = { artist ->
                                         navigator.navigate(MainDestination.ArtistDetail(artist))
                                     }
@@ -121,14 +110,16 @@ fun MainGraph(
                             }
                             entry<MainDestination.Profile> {
                                 ProfileScreen(
-                                    isDarkMode,
-                                    onDarkModeChange,
+                                    bottomContentPadding = bottomContentPadding,
+                                    isDarkMode = isDarkMode,
+                                    onDarkModeChange = onDarkModeChange,
                                     selectedAccentColorHex = accentColorHex,
-                                    onAccentColorChange
+                                    onAccentColorChange = onAccentColorChange
                                 )
                             }
                             entry<MainDestination.GenreDetail> { route ->
                                 GenreDetailScreen(
+                                    bottomContentPadding = bottomContentPadding,
                                     category = route.category,
                                     navigateBack = navigator::goBack,
                                     navigateToSearch = {
@@ -138,6 +129,7 @@ fun MainGraph(
                             }
                             entry<MainDestination.ArtistDetail> { route ->
                                 ArtistDetailScreen(
+                                    bottomContentPadding = bottomContentPadding,
                                     artist = route.artist,
                                     navigateBack = navigator::goBack,
                                     navigateToAlbumDetail = { album ->
@@ -147,12 +139,14 @@ fun MainGraph(
                             }
                             entry<MainDestination.AlbumDetail> { route ->
                                 AlbumDetailScreen(
+                                    bottomContentPadding = bottomContentPadding,
                                     album = route.album,
                                     navigateBack = navigator::goBack
                                 )
                             }
                             entry<MainDestination.SongDetail> { route ->
                                 SongDetailScreen(
+                                    bottomContentPadding = bottomContentPadding,
                                     song = route.song,
                                     navigateBack = navigator::goBack
                                 )
@@ -162,6 +156,22 @@ fun MainGraph(
                 )
 
                 AppContextMenu()
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(alignment = Alignment.BottomCenter)
+            ) {
+                MiniPlayerComponent()
+
+                AppNavigationBar(
+                    isVisible = UiState.getDisplayNavigationBar(),
+                    selectedKey = navigationState.topLevelRoute,
+                    onSelectKey = {
+                        navigator.navigate(it)
+                    }
+                )
             }
         }
     }
