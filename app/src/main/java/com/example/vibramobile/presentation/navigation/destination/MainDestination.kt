@@ -30,5 +30,5 @@ sealed class MainDestination : NavKey {
     data class ArtistDetail(val artist: User) : MainDestination()
 
     @Serializable
-    data class AlbumDetail(val playlist: Playlist) : MainDestination()
+    data class AlbumDetail(val album: Playlist) : MainDestination()
 }

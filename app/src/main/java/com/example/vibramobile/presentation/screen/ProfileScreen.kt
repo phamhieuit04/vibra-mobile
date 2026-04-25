@@ -57,7 +57,6 @@ import coil3.compose.AsyncImage
 import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.component.SpotifySection
-import com.example.vibramobile.presentation.config.LayoutStyle
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import java.text.NumberFormat
 import java.text.SimpleDateFormat

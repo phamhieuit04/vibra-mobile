@@ -1,6 +1,5 @@
 package com.example.vibramobile.presentation.screen
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -72,7 +71,7 @@ import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SearchResultShimmer
 import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.component.TopArtistsComponent
-import com.example.vibramobile.presentation.config.LayoutStyle
+import com.example.vibramobile.presentation.config.LayoutStyleConfig
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import com.example.vibramobile.presentation.viewmodel.SearchViewModel
@@ -217,7 +216,7 @@ fun SearchResultScreen(
                                                 )
                                             },
                                             onPlay = { mediaPlayerViewModel.playSong(it) },
-                                            layoutStyle = LayoutStyle.Vertical,
+                                            layoutStyle = LayoutStyleConfig.Vertical,
                                             songs = searchResult!!.songs.drop(1).take(20)
                                         )
                                     }
@@ -240,7 +239,7 @@ fun SearchResultScreen(
                                         )
                                         Spacer(Modifier.height(16.dp))
                                         ListArtistComponent(
-                                            layoutStyle = LayoutStyle.Vertical,
+                                            layoutStyle = LayoutStyleConfig.Vertical,
                                             artists = searchResult!!.artists.drop(10).take(20),
                                             onClick = { navigateToArtistDetail(it) }
                                         )
@@ -259,7 +258,7 @@ fun SearchResultScreen(
                                         )
                                         Spacer(Modifier.height(16.dp))
                                         ListAlbumComponent(
-                                            layoutStyle = LayoutStyle.Vertical,
+                                            layoutStyle = LayoutStyleConfig.Vertical,
                                             albums = searchResult!!.albums.drop(5).take(20),
                                             onClick = { }
                                         )

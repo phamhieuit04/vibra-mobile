@@ -39,19 +39,19 @@ import com.example.vibramobile.R
 import com.example.vibramobile.core.extension.noRippleClickable
 import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.core.extension.skeletonEffect
-import com.example.vibramobile.presentation.config.LayoutStyle
+import com.example.vibramobile.presentation.config.LayoutStyleConfig
 import io.ktor.http.encodeURLPath
 
 @Composable
 fun ListArtistComponent(
     modifier: Modifier = Modifier,
     artists: List<User>,
-    layoutStyle: LayoutStyle = LayoutStyle.Horizontal,
+    layoutStyle: LayoutStyleConfig = LayoutStyleConfig.Horizontal,
     onClick: (User) -> Unit = {}
 ) {
     when (layoutStyle) {
-        LayoutStyle.Horizontal -> HorizontalListArtist(artists = artists, onClick = onClick)
-        LayoutStyle.Vertical -> VerticalListArtist(artists = artists, onClick = onClick)
+        LayoutStyleConfig.Horizontal -> HorizontalListArtist(artists = artists, onClick = onClick)
+        LayoutStyleConfig.Vertical -> VerticalListArtist(artists = artists, onClick = onClick)
     }
 }
 

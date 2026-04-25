@@ -1,6 +1,6 @@
 package com.example.vibramobile.presentation.config
 
-enum class LayoutStyle {
+enum class LayoutStyleConfig {
     Horizontal,
     Vertical
 }

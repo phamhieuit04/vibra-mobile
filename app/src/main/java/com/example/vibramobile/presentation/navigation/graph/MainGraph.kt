@@ -84,8 +84,8 @@ fun MainGraph(
                                     navigateToArtistDetail = { artist ->
                                         navigator.navigate(MainDestination.ArtistDetail(artist))
                                     },
-                                    navigateToAlbumDetail = { playlist ->
-                                        navigator.navigate(MainDestination.AlbumDetail(playlist))
+                                    navigateToAlbumDetail = { album ->
+                                        navigator.navigate(MainDestination.AlbumDetail(album))
                                     }
                                 )
                             }
@@ -134,12 +134,15 @@ fun MainGraph(
                             entry<MainDestination.ArtistDetail> { route ->
                                 ArtistDetailScreen(
                                     artist = route.artist,
-                                    navigateBack = navigator::goBack
+                                    navigateBack = navigator::goBack,
+                                    navigateToAlbumDetail = { album ->
+                                        navigator.navigate(MainDestination.AlbumDetail(album))
+                                    }
                                 )
                             }
                             entry<MainDestination.AlbumDetail> { route ->
                                 AlbumDetailScreen(
-                                    playlist = route.playlist,
+                                    album = route.album,
                                     navigateBack = navigator::goBack
                                 )
                             }

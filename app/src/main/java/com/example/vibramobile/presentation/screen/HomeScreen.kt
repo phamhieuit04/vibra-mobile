@@ -52,7 +52,7 @@ import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.component.TopArtistsComponent
 import com.example.vibramobile.presentation.component.TopSongsComponent
-import com.example.vibramobile.presentation.config.LayoutStyle
+import com.example.vibramobile.presentation.config.LayoutStyleConfig
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.HomeViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
@@ -138,7 +138,7 @@ fun HomeScreen(
                                     title = "Lắng nghe gần đây"
                                 ) {
                                     ListSongComponent(
-                                        layoutStyle = LayoutStyle.Vertical,
+                                        layoutStyle = LayoutStyleConfig.Vertical,
                                         onClick = {
                                             contextMenuViewModel.show(
                                                 thumbnailPath = it.thumbnailPath,
@@ -195,7 +195,7 @@ fun HomeScreen(
                                     )
                                     Spacer(Modifier.height(16.dp))
                                     ListArtistComponent(
-                                        layoutStyle = LayoutStyle.Vertical,
+                                        layoutStyle = LayoutStyleConfig.Vertical,
                                         artists = popularArtists.drop(10).take(10),
                                         onClick = { navigateToArtistDetail(it) }
                                     )
@@ -223,7 +223,7 @@ fun HomeScreen(
                                     )
                                     Spacer(Modifier.height(16.dp))
                                     ListSongComponent(
-                                        layoutStyle = LayoutStyle.Vertical,
+                                        layoutStyle = LayoutStyleConfig.Vertical,
                                         onClick = {
                                             contextMenuViewModel.show(
                                                 thumbnailPath = it.thumbnailPath,
@@ -251,7 +251,7 @@ fun HomeScreen(
                                     )
                                     Spacer(Modifier.height(16.dp))
                                     ListAlbumComponent(
-                                        layoutStyle = LayoutStyle.Vertical,
+                                        layoutStyle = LayoutStyleConfig.Vertical,
                                         albums = popularAlbums.drop(5).take(20),
                                         onClick = { navigateToAlbumDetail(it) }
                                     )

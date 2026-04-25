@@ -28,7 +28,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,19 +38,19 @@ import com.example.vibramobile.R
 import com.example.vibramobile.core.extension.noRippleClickable
 import com.example.vibramobile.domain.model.Playlist
 import com.example.vibramobile.core.extension.skeletonEffect
-import com.example.vibramobile.presentation.config.LayoutStyle
+import com.example.vibramobile.presentation.config.LayoutStyleConfig
 import io.ktor.http.encodeURLPath
 
 @Composable
 fun ListAlbumComponent(
     modifier: Modifier = Modifier,
     albums: List<Playlist>,
-    layoutStyle: LayoutStyle = LayoutStyle.Horizontal,
+    layoutStyle: LayoutStyleConfig = LayoutStyleConfig.Horizontal,
     onClick: (Playlist) -> Unit
 ) {
     when (layoutStyle) {
-        LayoutStyle.Vertical -> VerticalListAlbum(albums = albums, onClick = onClick)
-        LayoutStyle.Horizontal -> HorizontalListAlbum(albums = albums, onClick = onClick)
+        LayoutStyleConfig.Vertical -> VerticalListAlbum(albums = albums, onClick = onClick)
+        LayoutStyleConfig.Horizontal -> HorizontalListAlbum(albums = albums, onClick = onClick)
     }
 
 }

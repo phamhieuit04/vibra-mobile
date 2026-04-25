@@ -17,9 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,7 +28,7 @@ import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
 import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
-import com.example.vibramobile.presentation.config.LayoutStyle
+import com.example.vibramobile.presentation.config.LayoutStyleConfig
 import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.state.UserState
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
@@ -138,7 +136,7 @@ fun LibraryScreen(
                             ) {
                                 ListSongComponent(
                                     songs = likedSongs,
-                                    layoutStyle = LayoutStyle.Vertical,
+                                    layoutStyle = LayoutStyleConfig.Vertical,
                                     onClick = {
                                         contextMenuViewModel.show(
                                             it.thumbnailPath,
@@ -162,7 +160,7 @@ fun LibraryScreen(
                             ) {
                                 ListAlbumComponent(
                                     albums = myPlaylists,
-                                    layoutStyle = LayoutStyle.Vertical,
+                                    layoutStyle = LayoutStyleConfig.Vertical,
                                     onClick = {
                                         contextMenuViewModel.show(
                                             it.thumbnailPath,

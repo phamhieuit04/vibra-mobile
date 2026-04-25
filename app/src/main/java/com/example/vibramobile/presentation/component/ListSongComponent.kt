@@ -38,25 +38,25 @@ import com.example.vibramobile.R
 import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.core.extension.noRippleClickable
 import com.example.vibramobile.core.extension.skeletonEffect
-import com.example.vibramobile.presentation.config.LayoutStyle
+import com.example.vibramobile.presentation.config.LayoutStyleConfig
 import io.ktor.http.encodeURLPath
 
 @Composable
 fun ListSongComponent(
     modifier: Modifier = Modifier,
     songs: List<Song>,
-    layoutStyle: LayoutStyle = LayoutStyle.Horizontal,
+    layoutStyle: LayoutStyleConfig = LayoutStyleConfig.Horizontal,
     onClick: (Song) -> Unit,
     onPlay: (Song) -> Unit
 ) {
     when (layoutStyle) {
-        LayoutStyle.Horizontal -> HorizontalListSong(
+        LayoutStyleConfig.Horizontal -> HorizontalListSong(
             songs = songs,
             onClick = onClick,
             onPlay = onPlay
         )
 
-        LayoutStyle.Vertical -> VerticalListSong(
+        LayoutStyleConfig.Vertical -> VerticalListSong(
             songs = songs,
             onClick = onClick,
             onPlay = onPlay
