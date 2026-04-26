@@ -48,6 +48,14 @@ class NavigationState(
     val backStacks: Map<NavKey, NavBackStack<NavKey>>
 ) {
     var topLevelRoute: NavKey by topLevelRoute
+
+    val currentRoute: NavKey
+        get() {
+            val currentTopLevel = topLevelRoute
+            val backStack = backStacks[currentTopLevel] ?: return currentTopLevel
+            return (backStack.lastOrNull() as? NavKey) ?: currentTopLevel
+        }
+
     val stacksInUse: List<NavKey>
         get() = if (topLevelRoute == startRoute) {
             listOf(startRoute)

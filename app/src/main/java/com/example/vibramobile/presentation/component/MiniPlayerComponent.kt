@@ -44,20 +44,21 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun MiniPlayerComponent(
     modifier: Modifier = Modifier,
-    viewModel: MediaPlayerViewModel = koinViewModel()
+    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
+    navigateToFullscreenPlayer: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by mediaPlayerViewModel.uiState.collectAsState()
 
-    val isPlaying by viewModel.isPlaying.collectAsState()
-    val progress by viewModel.progress.collectAsState()
-    val currentSong by viewModel.currentSong.collectAsState()
+    val isPlaying by mediaPlayerViewModel.isPlaying.collectAsState()
+    val progress by mediaPlayerViewModel.progress.collectAsState()
+    val currentSong by mediaPlayerViewModel.currentSong.collectAsState()
 
     if (!uiState.visible) return
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .noRippleClickable(onClick = { })
+            .noRippleClickable(onClick = navigateToFullscreenPlayer)
             .padding(8.dp)
             .clip(shape = RoundedCornerShape(8.dp))
             .background(color = MaterialTheme.colorScheme.primary)
@@ -114,7 +115,7 @@ fun MiniPlayerComponent(
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
-                IconButton(onClick = viewModel::toggle) {
+                IconButton(onClick = mediaPlayerViewModel::toggle) {
                     Icon(
                         modifier = Modifier.size(32.dp),
                         imageVector = if (isPlaying)

@@ -1,20 +1,29 @@
 package com.example.vibramobile.presentation.navigation.graph
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.vibramobile.core.util.Navigator
@@ -25,7 +34,7 @@ import com.example.vibramobile.presentation.component.MiniPlayerComponent
 import com.example.vibramobile.presentation.component.AppNavigationBar
 import com.example.vibramobile.presentation.component.TOP_LEVEL_DESTINATIONS
 import com.example.vibramobile.presentation.navigation.destination.MainDestination
-import com.example.vibramobile.presentation.screen.SongDetailScreen
+import com.example.vibramobile.presentation.screen.FullscreenPlayer
 import com.example.vibramobile.presentation.screen.AlbumDetailScreen
 import com.example.vibramobile.presentation.screen.ArtistDetailScreen
 import com.example.vibramobile.presentation.screen.GenreDetailScreen
@@ -34,6 +43,11 @@ import com.example.vibramobile.presentation.screen.LibraryScreen
 import com.example.vibramobile.presentation.screen.ProfileScreen
 import com.example.vibramobile.presentation.screen.SearchResultScreen
 import com.example.vibramobile.presentation.screen.SearchScreen
+import androidx.compose.animation.AnimatedVisibility
+
+private const val PUSH_DURATION = 340
+private const val POP_DURATION = 300
+private const val FULLSCREEN_DURATION = 380
 
 @Composable
 fun MainGraph(
@@ -46,7 +60,10 @@ fun MainGraph(
         startRoute = MainDestination.Home,
         topLevelRoutes = TOP_LEVEL_DESTINATIONS.keys
     )
+    val currentRoute: NavKey = navigationState.currentRoute
     val navigator = remember { Navigator(navigationState) }
+
+    val showBottomBar = currentRoute !is MainDestination.FullscreenPlayer
     val bottomContentPadding = 240.dp
 
     CompositionLocalProvider(LocalOverscrollFactory provides null) {
@@ -55,11 +72,39 @@ fun MainGraph(
                 .fillMaxSize()
                 .background(color = MaterialTheme.colorScheme.background)
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
+            Box(modifier = Modifier.fillMaxSize()) {
                 NavDisplay(
                     onBack = navigator::goBack,
+                    transitionSpec = {
+                        (slideInHorizontally(
+                            initialOffsetX = { it },
+                            animationSpec = tween(PUSH_DURATION)
+                        ) + fadeIn(animationSpec = tween(PUSH_DURATION / 2))) togetherWith
+                                (slideOutHorizontally(
+                                    targetOffsetX = { -(it / 4) },
+                                    animationSpec = tween(PUSH_DURATION)
+                                ) + fadeOut(animationSpec = tween(PUSH_DURATION / 2)))
+                    },
+                    popTransitionSpec = {
+                        (slideInHorizontally(
+                            initialOffsetX = { -(it / 4) },
+                            animationSpec = tween(POP_DURATION)
+                        ) + fadeIn(animationSpec = tween(POP_DURATION / 2))) togetherWith
+                                (slideOutHorizontally(
+                                    targetOffsetX = { it },
+                                    animationSpec = tween(POP_DURATION)
+                                ) + fadeOut(animationSpec = tween(POP_DURATION / 2)))
+                    },
+                    predictivePopTransitionSpec = {
+                        (slideInHorizontally(
+                            initialOffsetX = { -(it / 4) },
+                            animationSpec = tween(POP_DURATION)
+                        ) + fadeIn(animationSpec = tween(POP_DURATION / 2))) togetherWith
+                                (slideOutHorizontally(
+                                    targetOffsetX = { it },
+                                    animationSpec = tween(POP_DURATION)
+                                ) + fadeOut(animationSpec = tween(POP_DURATION / 2)))
+                    },
                     entries = navigationState.toEntries(
                         entryProvider {
                             entry<MainDestination.Home> {
@@ -143,10 +188,25 @@ fun MainGraph(
                                     navigateBack = navigator::goBack
                                 )
                             }
-                            entry<MainDestination.SongDetail> { route ->
-                                SongDetailScreen(
-                                    bottomContentPadding = bottomContentPadding,
-                                    song = route.song,
+                            entry<MainDestination.FullscreenPlayer>(
+                                metadata = NavDisplay.transitionSpec {
+                                    slideInVertically(
+                                        initialOffsetY = { it },
+                                        animationSpec = tween(FULLSCREEN_DURATION)
+                                    ) togetherWith ExitTransition.None
+                                } + NavDisplay.popTransitionSpec {
+                                    EnterTransition.None togetherWith slideOutVertically(
+                                        targetOffsetY = { it },
+                                        animationSpec = tween(FULLSCREEN_DURATION)
+                                    )
+                                } + NavDisplay.predictivePopTransitionSpec {
+                                    EnterTransition.None togetherWith slideOutVertically(
+                                        targetOffsetY = { it },
+                                        animationSpec = tween(FULLSCREEN_DURATION)
+                                    )
+                                }
+                            ) {
+                                FullscreenPlayer(
                                     navigateBack = navigator::goBack
                                 )
                             }
@@ -157,19 +217,26 @@ fun MainGraph(
                 AppContextMenu()
             }
 
-            Column(
+            AnimatedVisibility(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(alignment = Alignment.BottomCenter)
+                    .align(alignment = Alignment.BottomCenter),
+                visible = showBottomBar,
             ) {
-                MiniPlayerComponent()
+                Column {
+                    MiniPlayerComponent(
+                        navigateToFullscreenPlayer = {
+                            navigator.navigate(MainDestination.FullscreenPlayer)
+                        }
+                    )
 
-                AppNavigationBar(
-                    selectedKey = navigationState.topLevelRoute,
-                    onSelectKey = {
-                        navigator.navigate(it)
-                    }
-                )
+                    AppNavigationBar(
+                        selectedKey = navigationState.topLevelRoute,
+                        onSelectKey = {
+                            navigator.navigate(it)
+                        }
+                    )
+                }
             }
         }
     }

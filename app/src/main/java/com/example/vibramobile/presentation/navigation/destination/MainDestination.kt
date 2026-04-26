@@ -3,7 +3,6 @@ package com.example.vibramobile.presentation.navigation.destination
 import androidx.navigation3.runtime.NavKey
 import com.example.vibramobile.domain.model.Category
 import com.example.vibramobile.domain.model.Playlist
-import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.domain.model.User
 import kotlinx.serialization.Serializable
 
@@ -34,5 +33,5 @@ sealed class MainDestination : NavKey {
     data class AlbumDetail(val album: Playlist) : MainDestination()
 
     @Serializable
-    data class SongDetail(val song: Song) : MainDestination()
+    object FullscreenPlayer : MainDestination()
 }

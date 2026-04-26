@@ -7,6 +7,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -108,9 +109,9 @@ fun ProfileScreen(
                     start = 16.dp,
                     end = 16.dp,
                     top = statusBarHeight,
-                    bottom = bottomContentPadding
                 ),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+            contentPadding = PaddingValues(bottom = bottomContentPadding)
         ) {
             item(key = "header") {
                 Spacer(modifier = Modifier.height(24.dp))
