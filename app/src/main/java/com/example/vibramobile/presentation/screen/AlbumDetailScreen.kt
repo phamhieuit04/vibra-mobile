@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -52,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.example.vibramobile.domain.model.Playlist
 import com.example.vibramobile.presentation.component.DetailActionComponent
+import com.example.vibramobile.presentation.component.DetailTopbarComponent
 import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.config.DetailActionConfig
@@ -114,7 +117,8 @@ fun AlbumDetailScreen(
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(bottom = bottomContentPadding)
             ) {
                 item("header") {
                     AlbumDetailHeader(album = album)
@@ -159,8 +163,8 @@ fun AlbumDetailScreen(
             }
         }
 
-        AlbumDetailTopBar(
-            album = album,
+        DetailTopbarComponent(
+            title = album.name ?: "",
             topBarAlpha = topBarAlpha,
             onBackClick = navigateBack
         )
@@ -262,49 +266,6 @@ private fun AlbumDetailHeader(album: Playlist) {
                         fontSize = 13.sp
                     )
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun AlbumDetailTopBar(
-    album: Playlist,
-    topBarAlpha: Float,
-    onBackClick: () -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background.copy(alpha = topBarAlpha))
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .padding(horizontal = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-            AnimatedVisibility(
-                visible = topBarAlpha > 0.8f,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                Text(
-                    text = album.name ?: "",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
             }
         }
     }

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -120,7 +121,8 @@ fun SearchResultScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .statusBarsPadding(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 SearchBar(
@@ -191,7 +193,12 @@ fun SearchResultScreen(
                     else -> {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
+                            contentPadding = PaddingValues(
+                                top = 16.dp,
+                                start = 16.dp,
+                                end = 16.dp,
+                                bottom = bottomContentPadding
+                            ),
                             verticalArrangement = Arrangement.spacedBy(24.dp)
                         ) {
                             if (searchResult!!.songs.isNotEmpty()) {

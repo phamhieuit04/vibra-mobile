@@ -9,12 +9,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -55,6 +57,7 @@ import com.example.vibramobile.domain.model.Playlist
 import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.component.DetailActionComponent
+import com.example.vibramobile.presentation.component.DetailTopbarComponent
 import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
@@ -126,7 +129,8 @@ fun ArtistDetailScreen(
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                contentPadding = PaddingValues(bottom = bottomContentPadding)
             ) {
                 item("header") {
                     ArtistDetailHeader(
@@ -217,10 +221,10 @@ fun ArtistDetailScreen(
             }
         }
 
-        ArtistDetailTopBar(
-            artist = artist,
+        DetailTopbarComponent(
+            title = artist.name ?: "",
             topBarAlpha = topBarAlpha,
-            onClick = navigateBack
+            onBackClick = navigateBack
         )
     }
 }
@@ -332,49 +336,6 @@ private fun ArtistDetailIntroduction(artist: User) {
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
                     fontSize = 14.sp,
                     lineHeight = 20.sp
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ArtistDetailTopBar(
-    artist: User,
-    topBarAlpha: Float,
-    onClick: () -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background.copy(alpha = topBarAlpha))
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .padding(horizontal = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-            AnimatedVisibility(
-                visible = topBarAlpha > 0.8f,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                Text(
-                    text = artist.name ?: "",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
