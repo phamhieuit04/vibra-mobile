@@ -62,8 +62,6 @@ fun MainGraph(
     val navigator = remember { Navigator(navigationState) }
     val bottomContentPadding = 240.dp
 
-    val hazeState = rememberHazeState()
-
     CompositionLocalProvider(LocalOverscrollFactory provides null) {
         Box(
             modifier = Modifier
@@ -72,7 +70,6 @@ fun MainGraph(
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 NavDisplay(
-                    modifier = Modifier.hazeSource(hazeState),
                     onBack = navigator::goBack,
                     transitionSpec = {
                         (slideInHorizontally(
@@ -194,8 +191,7 @@ fun MainGraph(
                 AppContextMenu()
 
                 AppFullscreenPlayer(
-                    bottomContentPadding = bottomContentPadding,
-                    hazeState = hazeState
+                    bottomContentPadding = bottomContentPadding
                 )
             }
 

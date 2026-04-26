@@ -43,8 +43,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -58,12 +59,7 @@ import com.composables.core.Sheet
 import com.composables.core.SheetDetent
 import com.composables.core.rememberModalBottomSheetState
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.hazeEffect
-import dev.chrisbanes.haze.materials.CupertinoMaterials
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
-import dev.chrisbanes.haze.materials.HazeMaterials
-import dev.chrisbanes.haze.rememberHazeState
 import io.ktor.http.encodeURLPath
 import org.koin.androidx.compose.koinViewModel
 
@@ -72,12 +68,11 @@ import org.koin.androidx.compose.koinViewModel
 fun AppFullscreenPlayer(
     modifier: Modifier = Modifier,
     bottomContentPadding: Dp = 0.dp,
-    hazeState: HazeState = rememberHazeState(),
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel()
 ) {
     val isPlaying by mediaPlayerViewModel.isPlaying.collectAsState()
     val progress by mediaPlayerViewModel.progress.collectAsState()
-    val currentSong by mediaPlayerViewModel.currentSong.collectAsState()
+    val song by mediaPlayerViewModel.currentSong.collectAsState()
     val isFullscreenVisible by mediaPlayerViewModel.isFullscreenPlayerVisible.collectAsState()
 
     val FullyExpanded = SheetDetent.FullyExpanded
@@ -101,260 +96,273 @@ fun AppFullscreenPlayer(
         Scrim()
 
         Sheet(
-            modifier = modifier
-                .shadow(8.dp, RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp))
-                .clip(RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp))
-                .background(color = Color.Transparent)
-                .fillMaxSize()
-                .imePadding()
-                .hazeEffect(
-                    state = hazeState,
-                    style = HazeMaterials.thin()
-                )
+            modifier = modifier.imePadding()
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .statusBarsPadding(),
-                contentPadding = PaddingValues(
-                    start = 24.dp,
-                    end = 24.dp,
-                    top = 16.dp,
-                    bottom = bottomContentPadding
-                ),
-            ) {
-                item {
-                    CenterAlignedTopAppBar(
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = Color.Transparent
-                        ),
-                        navigationIcon = {
-                            IconButton(onClick = { mediaPlayerViewModel.hideFullscreenPlayer() }) {
-                                Icon(
-                                    modifier = Modifier.size(32.dp),
-                                    contentDescription = "Close",
-                                    imageVector = Icons.Default.KeyboardArrowDown,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        },
-                        actions = {
-                            IconButton(onClick = { }) {
-                                Icon(
-                                    modifier = Modifier.size(24.dp),
-                                    imageVector = Icons.Default.MoreHoriz,
-                                    contentDescription = "More",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        },
-                        title = { }
+            Box() {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    AsyncImage(
+                        model = song?.thumbnailPath?.encodeURLPath(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .matchParentSize()
+                            .blur(36.dp),
+                        contentScale = ContentScale.Crop
                     )
 
-                    Spacer(Modifier.height(16.dp))
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    colorStops = arrayOf(
+                                        0.0f to Color.Black.copy(alpha = 0.35f),
+                                        0.2f to MaterialTheme.colorScheme.surface.copy(alpha = 0.4f),
+                                        0.5f to Color.Transparent,
+                                        0.75f to MaterialTheme.colorScheme.surface.copy(alpha = 0.4f),
+                                        1.0f to MaterialTheme.colorScheme.surface.copy(alpha = 0.6f)
+                                    )
+                                )
+                            )
+                    )
                 }
 
-                item {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        AsyncImage(
-                            modifier = Modifier
-                                .size(320.dp)
-                                .clip(shape = RoundedCornerShape(12.dp)),
-                            contentDescription = "",
-                            model = currentSong?.thumbnailPath?.encodeURLPath(),
-                            contentScale = ContentScale.Crop
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .statusBarsPadding(),
+                    contentPadding = PaddingValues(
+                        start = 24.dp,
+                        end = 24.dp,
+                        top = 16.dp,
+                        bottom = bottomContentPadding
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    item {
+                        CenterAlignedTopAppBar(
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = Color.Transparent
+                            ),
+                            navigationIcon = {
+                                IconButton(onClick = { mediaPlayerViewModel.hideFullscreenPlayer() }) {
+                                    Icon(
+                                        modifier = Modifier.size(32.dp),
+                                        contentDescription = "Close",
+                                        imageVector = Icons.Default.KeyboardArrowDown,
+                                        tint = MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
+                            },
+                            actions = {
+                                IconButton(onClick = { }) {
+                                    Icon(
+                                        modifier = Modifier.size(24.dp),
+                                        imageVector = Icons.Default.MoreHoriz,
+                                        contentDescription = "More",
+                                        tint = MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
+                            },
+                            title = { }
                         )
                     }
 
-                    Spacer(Modifier.height(16.dp))
-                }
-
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(
-                                text = currentSong?.name.toString(),
-                                color = MaterialTheme.colorScheme.onBackground,
-                                fontSize = 24.sp,
-                                lineHeight = 24.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = currentSong?.author?.name.toString(),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 15.sp
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            AsyncImage(
+                                modifier = Modifier
+                                    .size(320.dp)
+                                    .clip(shape = RoundedCornerShape(12.dp)),
+                                contentDescription = "",
+                                model = song?.thumbnailPath?.encodeURLPath(),
+                                contentScale = ContentScale.Crop
                             )
                         }
+                    }
+
+                    item {
                         Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-//                            IconButton(onClick = { }) {
-//                                Icon(
-//                                    modifier = Modifier.size(28.dp),
-//                                    contentDescription = "",
-//                                    imageVector = Icons.Default.AddCircle,
-//                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-//                                )
-//                            }
+                            Column {
+                                Text(
+                                    text = song?.name.toString(),
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    fontSize = 18.sp,
+                                    lineHeight = 1.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = song?.author?.name.toString(),
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    fontSize = 12.sp,
+                                    lineHeight = 18.sp
+                                )
+                            }
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                IconButton(onClick = { }) {
+                                    Icon(
+                                        modifier = Modifier.size(28.dp),
+                                        contentDescription = "",
+                                        imageVector = Icons.Default.AddCircle,
+                                        tint = MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
+                                IconButton(onClick = { }) {
+                                    Icon(
+                                        modifier = Modifier.size(28.dp),
+                                        contentDescription = "",
+                                        imageVector = Icons.Default.FavoriteBorder,
+                                        tint = MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    item {
+                        Column {
+                            Box(
+                                modifier = Modifier
+                                    .height(4.dp)
+                                    .padding(horizontal = 2.dp)
+                                    .fillMaxWidth()
+                                    .clip(shape = RoundedCornerShape(8.dp))
+                                    .background(
+                                        color = MaterialTheme.colorScheme.onBackground.copy(
+                                            alpha = 0.28f
+                                        )
+                                    )
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .height(4.dp)
+                                        .fillMaxWidth(progress)
+                                        .clip(shape = RoundedCornerShape(8.dp))
+                                        .background(color = MaterialTheme.colorScheme.onBackground)
+                                )
+                            }
+
+                            Spacer(Modifier.height(8.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "0:08",
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    fontSize = 15.sp
+                                )
+                                Text(
+                                    text = "3:15",
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    fontSize = 15.sp
+                                )
+                            }
+                        }
+                    }
+
+                    item {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             IconButton(onClick = { }) {
                                 Icon(
                                     modifier = Modifier.size(28.dp),
                                     contentDescription = "",
-                                    imageVector = Icons.Default.FavoriteBorder,
+                                    imageVector = Icons.Default.Shuffle,
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+                            IconButton(
+                                onClick = { }
+                            ) {
+                                Icon(
+                                    modifier = Modifier.size(52.dp),
+                                    contentDescription = "",
+                                    imageVector = Icons.Default.SkipPrevious,
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+                            IconButton(
+                                modifier = Modifier.size(80.dp),
+                                onClick = { mediaPlayerViewModel.toggle() }
+                            ) {
+                                Icon(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentDescription = "",
+                                    imageVector = if (isPlaying)
+                                        Icons.Default.PauseCircleFilled
+                                    else
+                                        Icons.Default.PlayCircleFilled,
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+                            IconButton(
+                                onClick = { }
+                            ) {
+                                Icon(
+                                    modifier = Modifier.size(52.dp),
+                                    contentDescription = "",
+                                    imageVector = Icons.Default.SkipNext,
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+                            IconButton(onClick = { }) {
+                                Icon(
+                                    modifier = Modifier.size(28.dp),
+                                    contentDescription = "",
+                                    imageVector = Icons.Default.Loop,
                                     tint = MaterialTheme.colorScheme.onBackground
                                 )
                             }
                         }
                     }
 
-                    Spacer(Modifier.height(16.dp))
-                }
-
-                item {
-                    Column {
-                        Box(
-                            modifier = Modifier
-                                .height(4.dp)
-                                .padding(horizontal = 2.dp)
-                                .fillMaxWidth()
-                                .clip(shape = RoundedCornerShape(8.dp))
-                                .background(
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                        alpha = 0.28f
-                                    )
-                                )
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .height(4.dp)
-                                    .fillMaxWidth(progress)
-                                    .clip(shape = RoundedCornerShape(8.dp))
-                                    .background(color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            )
-                        }
-                        Spacer(Modifier.height(8.dp))
+                    item {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = "0:08",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                            Text(
-                                text = "3:15",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                            IconButton(onClick = { }) {
+                                Icon(
+                                    modifier = Modifier.size(28.dp),
+                                    contentDescription = "",
+                                    imageVector = Icons.Default.Queue,
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+                            IconButton(onClick = { }) {
+                                Icon(
+                                    modifier = Modifier.size(28.dp),
+                                    contentDescription = "",
+                                    imageVector = Icons.Default.LibraryMusic,
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
                         }
                     }
 
-                    Spacer(Modifier.height(16.dp))
-                }
-
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = { }) {
-                            Icon(
-                                modifier = Modifier.size(28.dp),
-                                contentDescription = "",
-                                imageVector = Icons.Default.Shuffle,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        IconButton(
-                            modifier = Modifier.size(64.dp),
-                            onClick = { }
-                        ) {
-                            Icon(
-                                modifier = Modifier.fillMaxSize(),
-                                contentDescription = "",
-                                imageVector = Icons.Default.SkipPrevious,
-                                tint = MaterialTheme.colorScheme.onBackground
-                            )
-                        }
-                        IconButton(
-                            modifier = Modifier.size(96.dp),
-                            onClick = { mediaPlayerViewModel.toggle() }
-                        ) {
-                            Icon(
-                                modifier = Modifier.fillMaxSize(),
-                                contentDescription = "",
-                                imageVector = if (isPlaying)
-                                    Icons.Default.PauseCircleFilled
-                                else
-                                    Icons.Default.PlayCircleFilled,
-                                tint = MaterialTheme.colorScheme.onBackground
-                            )
-                        }
-                        IconButton(
-                            modifier = Modifier.size(64.dp),
-                            onClick = { }
-                        ) {
-                            Icon(
-                                modifier = Modifier.fillMaxSize(),
-                                contentDescription = "",
-                                imageVector = Icons.Default.SkipNext,
-                                tint = MaterialTheme.colorScheme.onBackground
-                            )
-                        }
-                        IconButton(onClick = { }) {
-                            Icon(
-                                modifier = Modifier.size(28.dp),
-                                contentDescription = "",
-                                imageVector = Icons.Default.Loop,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                    item {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(260.dp)
+                        ) { }
                     }
-                    Spacer(Modifier.height(8.dp))
-                }
-
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = { }) {
-                            Icon(
-                                modifier = Modifier.size(28.dp),
-                                contentDescription = "",
-                                imageVector = Icons.Default.Queue,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        IconButton(onClick = { }) {
-                            Icon(
-                                modifier = Modifier.size(28.dp),
-                                contentDescription = "",
-                                imageVector = Icons.Default.LibraryMusic,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-
-                    Spacer(Modifier.height(32.dp))
-                }
-
-                item {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(260.dp)
-                    ) { }
                 }
             }
         }
