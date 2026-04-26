@@ -39,6 +39,9 @@ class MediaPlayerViewModel(
     private val _uiState = MutableStateFlow(MiniPlayerState())
     val uiState = _uiState.asStateFlow()
 
+    private val _isFullscreenPlayerVisible = MutableStateFlow(false)
+    val isFullscreenPlayerVisible = _isFullscreenPlayerVisible.asStateFlow()
+
     private var progressJob: Job? = null
 
     init {
@@ -84,6 +87,14 @@ class MediaPlayerViewModel(
         if (player.isPlaying) player.pause() else player.play()
     }
 
+    fun showFullscreenPlayer() {
+        _isFullscreenPlayerVisible.value = true
+    }
+
+    fun hideFullscreenPlayer() {
+        _isFullscreenPlayerVisible.value = false
+    }
+
     private fun startProgressUpdater() {
         if (progressJob != null) return
 
@@ -91,8 +102,7 @@ class MediaPlayerViewModel(
             while (isActive) {
                 val duration = player.duration
                 if (duration > 0) {
-                    _progress.value =
-                        player.currentPosition / duration.toFloat()
+                    _progress.value = player.currentPosition / duration.toFloat()
                 }
                 delay(500)
             }

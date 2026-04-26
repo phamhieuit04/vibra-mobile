@@ -1,14 +1,10 @@
 package com.example.vibramobile.presentation.navigation.graph
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.background
@@ -34,7 +30,7 @@ import com.example.vibramobile.presentation.component.MiniPlayerComponent
 import com.example.vibramobile.presentation.component.AppNavigationBar
 import com.example.vibramobile.presentation.component.TOP_LEVEL_DESTINATIONS
 import com.example.vibramobile.presentation.navigation.destination.MainDestination
-import com.example.vibramobile.presentation.screen.FullscreenPlayer
+import com.example.vibramobile.presentation.component.AppFullscreenPlayer
 import com.example.vibramobile.presentation.screen.AlbumDetailScreen
 import com.example.vibramobile.presentation.screen.ArtistDetailScreen
 import com.example.vibramobile.presentation.screen.GenreDetailScreen
@@ -44,10 +40,11 @@ import com.example.vibramobile.presentation.screen.ProfileScreen
 import com.example.vibramobile.presentation.screen.SearchResultScreen
 import com.example.vibramobile.presentation.screen.SearchScreen
 import androidx.compose.animation.AnimatedVisibility
+import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
+import org.koin.androidx.compose.koinViewModel
 
 private const val PUSH_DURATION = 340
 private const val POP_DURATION = 300
-private const val FULLSCREEN_DURATION = 380
 
 @Composable
 fun MainGraph(
@@ -60,10 +57,8 @@ fun MainGraph(
         startRoute = MainDestination.Home,
         topLevelRoutes = TOP_LEVEL_DESTINATIONS.keys
     )
-    val currentRoute: NavKey = navigationState.currentRoute
     val navigator = remember { Navigator(navigationState) }
 
-    val showBottomBar = currentRoute !is MainDestination.FullscreenPlayer
     val bottomContentPadding = 240.dp
 
     CompositionLocalProvider(LocalOverscrollFactory provides null) {
@@ -188,55 +183,30 @@ fun MainGraph(
                                     navigateBack = navigator::goBack
                                 )
                             }
-                            entry<MainDestination.FullscreenPlayer>(
-                                metadata = NavDisplay.transitionSpec {
-                                    slideInVertically(
-                                        initialOffsetY = { it },
-                                        animationSpec = tween(FULLSCREEN_DURATION)
-                                    ) togetherWith ExitTransition.None
-                                } + NavDisplay.popTransitionSpec {
-                                    EnterTransition.None togetherWith slideOutVertically(
-                                        targetOffsetY = { it },
-                                        animationSpec = tween(FULLSCREEN_DURATION)
-                                    )
-                                } + NavDisplay.predictivePopTransitionSpec {
-                                    EnterTransition.None togetherWith slideOutVertically(
-                                        targetOffsetY = { it },
-                                        animationSpec = tween(FULLSCREEN_DURATION)
-                                    )
-                                }
-                            ) {
-                                FullscreenPlayer(
-                                    navigateBack = navigator::goBack
-                                )
-                            }
                         }
                     )
                 )
 
                 AppContextMenu()
-            }
 
-            AnimatedVisibility(
+                AppFullscreenPlayer(
+                    bottomContentPadding = bottomContentPadding,
+                )
+            }
+            
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(alignment = Alignment.BottomCenter),
-                visible = showBottomBar,
             ) {
-                Column {
-                    MiniPlayerComponent(
-                        navigateToFullscreenPlayer = {
-                            navigator.navigate(MainDestination.FullscreenPlayer)
-                        }
-                    )
+                MiniPlayerComponent()
 
-                    AppNavigationBar(
-                        selectedKey = navigationState.topLevelRoute,
-                        onSelectKey = {
-                            navigator.navigate(it)
-                        }
-                    )
-                }
+                AppNavigationBar(
+                    selectedKey = navigationState.topLevelRoute,
+                    onSelectKey = {
+                        navigator.navigate(it)
+                    }
+                )
             }
         }
     }

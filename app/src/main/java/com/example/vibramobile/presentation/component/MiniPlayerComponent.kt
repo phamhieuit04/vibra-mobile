@@ -45,10 +45,8 @@ import org.koin.androidx.compose.koinViewModel
 fun MiniPlayerComponent(
     modifier: Modifier = Modifier,
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
-    navigateToFullscreenPlayer: () -> Unit
 ) {
     val uiState by mediaPlayerViewModel.uiState.collectAsState()
-
     val isPlaying by mediaPlayerViewModel.isPlaying.collectAsState()
     val progress by mediaPlayerViewModel.progress.collectAsState()
     val currentSong by mediaPlayerViewModel.currentSong.collectAsState()
@@ -58,7 +56,7 @@ fun MiniPlayerComponent(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .noRippleClickable(onClick = navigateToFullscreenPlayer)
+            .noRippleClickable(onClick = { mediaPlayerViewModel.showFullscreenPlayer() })
             .padding(8.dp)
             .clip(shape = RoundedCornerShape(8.dp))
             .background(color = MaterialTheme.colorScheme.primary)
@@ -90,7 +88,7 @@ fun MiniPlayerComponent(
                     contentScale = ContentScale.Crop
                 )
                 Spacer(Modifier.width(8.dp))
-                Column() {
+                Column {
                     Text(
                         text = currentSong?.name.toString(),
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -107,7 +105,7 @@ fun MiniPlayerComponent(
                     )
                 }
             }
-            Row() {
+            Row {
                 IconButton(onClick = { }) {
                     Icon(
                         imageVector = Icons.Default.Favorite,
@@ -118,10 +116,7 @@ fun MiniPlayerComponent(
                 IconButton(onClick = mediaPlayerViewModel::toggle) {
                     Icon(
                         modifier = Modifier.size(32.dp),
-                        imageVector = if (isPlaying)
-                            Icons.Default.Pause
-                        else
-                            Icons.Default.PlayArrow,
+                        imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                         contentDescription = "",
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
