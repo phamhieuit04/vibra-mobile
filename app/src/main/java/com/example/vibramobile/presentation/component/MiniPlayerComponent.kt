@@ -36,7 +36,6 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.vibramobile.R
-import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.core.extension.noRippleClickable
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import io.ktor.http.encodeURLPath
@@ -58,7 +57,7 @@ fun MiniPlayerComponent(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .noRippleClickable(onClick = { UiState.setDisplaySongDetail(true) })
+            .noRippleClickable(onClick = { })
             .padding(8.dp)
             .clip(shape = RoundedCornerShape(8.dp))
             .background(color = MaterialTheme.colorScheme.primary)

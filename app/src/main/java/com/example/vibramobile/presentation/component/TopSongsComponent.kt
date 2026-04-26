@@ -153,7 +153,7 @@ private fun TopSongRow(
                 modifier = Modifier.size(20.dp),
                 imageVector = Icons.Default.MoreHoriz,
                 contentDescription = "More",
-                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.45f)
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

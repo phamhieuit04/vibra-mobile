@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.vibramobile.core.util.Navigator
-import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.state.rememberNavigationState
 import com.example.vibramobile.presentation.state.toEntries
 import com.example.vibramobile.presentation.component.AppContextMenu
@@ -166,7 +165,6 @@ fun MainGraph(
                 MiniPlayerComponent()
 
                 AppNavigationBar(
-                    isVisible = UiState.getDisplayNavigationBar(),
                     selectedKey = navigationState.topLevelRoute,
                     onSelectKey = {
                         navigator.navigate(it)

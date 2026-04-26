@@ -49,7 +49,6 @@ import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.state.ArtistState
 import com.example.vibramobile.presentation.state.CategoryState
 import com.example.vibramobile.presentation.state.SongState
-import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.component.HomeShimmer
 import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
@@ -82,10 +81,6 @@ fun HomeScreen(
     navigateToArtistDetail: (User) -> Unit,
     navigateToAlbumDetail: (Playlist) -> Unit
 ) {
-    LaunchedEffect(Unit) {
-        UiState.setDisplayNavigationBar(true)
-    }
-
     val isRefreshing by homeViewModel.isRefreshing.collectAsState()
     val pullToRefreshState = rememberPullToRefreshState()
     val scrollState = rememberLazyListState()

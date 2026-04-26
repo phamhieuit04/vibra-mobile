@@ -65,12 +65,9 @@ val TOP_LEVEL_DESTINATIONS = mapOf(
 @Composable
 fun AppNavigationBar(
     modifier: Modifier = Modifier,
-    isVisible: Boolean,
     selectedKey: NavKey,
     onSelectKey: (NavKey) -> Unit,
 ) {
-    if (!isVisible) return
-
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface
     val gradientBase = MaterialTheme.colorScheme.background
 
