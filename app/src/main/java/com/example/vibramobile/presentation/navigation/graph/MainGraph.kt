@@ -41,6 +41,8 @@ import com.example.vibramobile.presentation.screen.SearchResultScreen
 import com.example.vibramobile.presentation.screen.SearchScreen
 import androidx.compose.animation.AnimatedVisibility
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.rememberHazeState
 import org.koin.androidx.compose.koinViewModel
 
 private const val PUSH_DURATION = 340
@@ -58,8 +60,9 @@ fun MainGraph(
         topLevelRoutes = TOP_LEVEL_DESTINATIONS.keys
     )
     val navigator = remember { Navigator(navigationState) }
-
     val bottomContentPadding = 240.dp
+
+    val hazeState = rememberHazeState()
 
     CompositionLocalProvider(LocalOverscrollFactory provides null) {
         Box(
@@ -69,6 +72,7 @@ fun MainGraph(
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 NavDisplay(
+                    modifier = Modifier.hazeSource(hazeState),
                     onBack = navigator::goBack,
                     transitionSpec = {
                         (slideInHorizontally(
@@ -191,9 +195,10 @@ fun MainGraph(
 
                 AppFullscreenPlayer(
                     bottomContentPadding = bottomContentPadding,
+                    hazeState = hazeState
                 )
             }
-            
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
