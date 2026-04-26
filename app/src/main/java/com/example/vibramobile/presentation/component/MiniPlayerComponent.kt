@@ -1,6 +1,5 @@
 package com.example.vibramobile.presentation.component
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,9 +47,13 @@ fun MiniPlayerComponent(
     modifier: Modifier = Modifier,
     viewModel: MediaPlayerViewModel = koinViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     val isPlaying by viewModel.isPlaying.collectAsState()
     val progress by viewModel.progress.collectAsState()
     val currentSong by viewModel.currentSong.collectAsState()
+
+    if (!uiState.visible) return
 
     Box(
         modifier = modifier

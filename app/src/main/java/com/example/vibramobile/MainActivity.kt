@@ -12,7 +12,6 @@ import com.example.vibramobile.presentation.navigation.graph.RootGraph
 import com.example.vibramobile.presentation.theme.DEFAULT_ACCENT_COLOR_HEX
 import com.example.vibramobile.presentation.theme.VibraMobileTheme
 import androidx.core.content.edit
-import com.example.vibramobile.core.di.controllerModule
 import com.example.vibramobile.core.di.jsonModule
 import com.example.vibramobile.core.di.networkModule
 import com.example.vibramobile.core.di.repositoryModule
@@ -28,7 +27,6 @@ class App : Application() {
         startKoin {
             androidContext(this@App)
             modules(
-                controllerModule,
                 jsonModule,
                 networkModule,
                 repositoryModule,
