@@ -77,6 +77,7 @@ import com.example.vibramobile.core.extension.noRippleClickable
 import com.example.vibramobile.core.util.FormatHelper
 import com.example.vibramobile.core.util.ImageHelper
 import com.example.vibramobile.domain.model.Song
+import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.state.SongState
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
@@ -88,6 +89,7 @@ import org.koin.androidx.compose.koinViewModel
 fun AppFullscreenPlayer(
     modifier: Modifier = Modifier,
     bottomContentPadding: Dp = 0.dp,
+    navigateToArtistDetail: (User) -> Unit,
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
@@ -409,7 +411,11 @@ fun AppFullscreenPlayer(
                             AboutArtistSection(
                                 artistName = artist.name ?: "",
                                 artistAvatarPath = artist.avatarPath,
-                                followers = artist.followers ?: 0
+                                followers = artist.followers ?: 0,
+                                navigateToArtistDetail = {
+                                    mediaPlayerViewModel.toggleFullscreen(false)
+                                    song?.author?.let { navigateToArtistDetail(it) }
+                                }
                             )
                         }
                     }
@@ -487,13 +493,15 @@ private fun LyricsPreviewSection(
 private fun AboutArtistSection(
     artistName: String,
     artistAvatarPath: String?,
-    followers: Int
+    followers: Int,
+    navigateToArtistDetail: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(Color.White.copy(alpha = 0.2f))
+            .noRippleClickable(onClick = navigateToArtistDetail)
     ) {
         Box(
             modifier = Modifier

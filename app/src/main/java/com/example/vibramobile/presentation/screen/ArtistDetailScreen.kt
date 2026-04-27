@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -274,12 +275,14 @@ private fun ArtistDetailHeader(
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(Modifier.height(4.dp))
-            Text(
-                text = artist.followers?.let { FormatHelper.formatMonthlyListeners(it) }
-                    ?: "0",
-                color = Color.White.copy(alpha = 0.8f),
-                fontSize = 14.sp
-            )
+
+            if (artist.followers != null) {
+                Text(
+                    text = artist.followers.let { FormatHelper.formatMonthlyListeners(it!!) },
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    fontSize = 13.sp
+                )
+            }
         }
     }
 }
@@ -298,7 +301,7 @@ private fun ArtistDetailIntroduction(artist: User) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(220.dp)
+                    .aspectRatio(3f / 4f)
                     .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
             )
         }
@@ -313,15 +316,30 @@ private fun ArtistDetailIntroduction(artist: User) {
                         text = artist.name ?: "",
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        lineHeight = 1.sp
                     )
-                    Text(
-                        text = artist.followers?.let { FormatHelper.formatMonthlyListeners(it) }
-                            ?: "0",
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                        fontSize = 13.sp
-                    )
+
+                    if (artist.followers != null) {
+                        Text(
+                            text = artist.followers.let { FormatHelper.formatMonthlyListeners(it!!) },
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            fontSize = 13.sp
+                        )
+                    }
+
+                    if (!artist.description.isNullOrBlank()) {
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            text = artist.description ?: "",
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp,
+                            maxLines = 5
+                        )
+                    }
                 }
+
                 OutlinedButton(onClick = { }, shape = RoundedCornerShape(50)) {
                     Text(
                         text = "Theo dõi",
@@ -329,15 +347,6 @@ private fun ArtistDetailIntroduction(artist: User) {
                         fontSize = 13.sp
                     )
                 }
-            }
-            if (!artist.description.isNullOrBlank()) {
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    text = artist.description ?: "",
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp
-                )
             }
         }
     }
