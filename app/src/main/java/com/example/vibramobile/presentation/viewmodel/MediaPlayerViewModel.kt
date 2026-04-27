@@ -106,9 +106,18 @@ class MediaPlayerViewModel(
         progressJob = viewModelScope.launch {
             while (isActive) {
                 val duration = player.duration
+                val position = player.currentPosition
+
                 if (duration > 0) {
-                    _uiState.update { it.copy(progress = player.currentPosition / duration.toFloat()) }
+                    _uiState.update {
+                        it.copy(
+                            progress = position / duration.toFloat(),
+                            currentPosition = position,
+                            duration = duration
+                        )
+                    }
                 }
+
                 delay(500)
             }
         }

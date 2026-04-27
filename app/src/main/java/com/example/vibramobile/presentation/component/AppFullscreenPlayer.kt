@@ -94,6 +94,9 @@ fun AppFullscreenPlayer(
     val context = LocalContext.current
 
     val uiState by mediaPlayerViewModel.uiState.collectAsState()
+    val currentTime = uiState.currentPosition
+    val totalTime = uiState.duration
+
     val song by mediaPlayerViewModel.currentSong.collectAsState()
     val lyrics = song?.listLyric ?: emptyList()
     val songsByArtist by SongState.songsByArtist.collectAsState()
@@ -299,8 +302,16 @@ fun AppFullscreenPlayer(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(text = "0:08", color = Color.White, fontSize = 15.sp)
-                                    Text(text = "3:15", color = Color.White, fontSize = 15.sp)
+                                    Text(
+                                        text = FormatHelper.formatTime(currentTime),
+                                        color = Color.White,
+                                        fontSize = 15.sp
+                                    )
+                                    Text(
+                                        text = FormatHelper.formatTime(totalTime),
+                                        color = Color.White,
+                                        fontSize = 15.sp
+                                    )
                                 }
                             }
                         }
