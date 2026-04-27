@@ -275,7 +275,8 @@ private fun ArtistDetailHeader(
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "${artist.followers?.let { FormatHelper.formatFollowers(it) } ?: "0"} người nghe hằng tháng",
+                text = artist.followers?.let { FormatHelper.formatMonthlyListeners(it) }
+                    ?: "0",
                 color = Color.White.copy(alpha = 0.8f),
                 fontSize = 14.sp
             )
@@ -315,7 +316,8 @@ private fun ArtistDetailIntroduction(artist: User) {
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "${artist.followers?.let { FormatHelper.formatFollowers(it) } ?: "0"} người nghe hằng tháng",
+                        text = artist.followers?.let { FormatHelper.formatMonthlyListeners(it) }
+                            ?: "0",
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         fontSize = 13.sp
                     )

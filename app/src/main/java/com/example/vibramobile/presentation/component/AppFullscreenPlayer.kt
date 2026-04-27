@@ -1,5 +1,10 @@
 package com.example.vibramobile.presentation.component
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,7 +20,12 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
@@ -29,18 +40,20 @@ import androidx.compose.material.icons.filled.Queue
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
-import androidx.compose.material3.Card
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -49,16 +62,18 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.composables.core.ModalBottomSheet
 import com.composables.core.Scrim
 import com.composables.core.Sheet
 import com.composables.core.SheetDetent
 import com.composables.core.rememberModalBottomSheetState
+import com.example.vibramobile.core.util.FormatHelper
+import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import io.ktor.http.encodeURLPath
@@ -81,6 +96,18 @@ fun AppFullscreenPlayer(
         detents = listOf(SheetDetent.Hidden, FullyExpanded)
     )
 
+    val listState = rememberLazyListState()
+    val scrollOffset by remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex * 1000f + listState.firstVisibleItemScrollOffset
+        }
+    }
+    val topBarAlpha by animateFloatAsState(
+        targetValue = (scrollOffset / 600f).coerceIn(0f, 1f),
+        animationSpec = tween(0),
+        label = "topBarAlpha"
+    )
+
     LaunchedEffect(uiState.isFullscreenVisible) {
         sheetState.targetDetent =
             if (uiState.isFullscreenVisible) FullyExpanded else SheetDetent.Hidden
@@ -95,10 +122,8 @@ fun AppFullscreenPlayer(
     ModalBottomSheet(state = sheetState) {
         Scrim()
 
-        Sheet(
-            modifier = modifier.imePadding()
-        ) {
-            Box() {
+        Sheet(modifier = modifier.imePadding()) {
+            Box {
                 Box(modifier = Modifier.fillMaxSize()) {
                     AsyncImage(
                         model = song?.thumbnailPath?.encodeURLPath(),
@@ -108,7 +133,6 @@ fun AppFullscreenPlayer(
                             .blur(36.dp),
                         contentScale = ContentScale.Crop
                     )
-
                     Box(
                         modifier = Modifier
                             .matchParentSize()
@@ -127,6 +151,7 @@ fun AppFullscreenPlayer(
                 }
 
                 LazyColumn(
+                    state = listState,
                     modifier = Modifier
                         .fillMaxSize()
                         .statusBarsPadding(),
@@ -138,235 +163,548 @@ fun AppFullscreenPlayer(
                     ),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    item {
-                        CenterAlignedTopAppBar(
-                            colors = TopAppBarDefaults.topAppBarColors(
-                                containerColor = Color.Transparent
-                            ),
-                            navigationIcon = {
-                                IconButton(onClick = {
-                                    mediaPlayerViewModel.toggleFullscreen(false)
-                                }) {
-                                    Icon(
-                                        modifier = Modifier.size(32.dp),
-                                        contentDescription = "Close",
-                                        imageVector = Icons.Default.KeyboardArrowDown,
-                                        tint = Color.White
-                                    )
-                                }
-                            },
-                            actions = {
-                                IconButton(onClick = { }) {
-                                    Icon(
-                                        modifier = Modifier.size(24.dp),
-                                        imageVector = Icons.Default.MoreHoriz,
-                                        contentDescription = "More",
-                                        tint = Color.White
-                                    )
-                                }
-                            },
-                            title = { }
-                        )
-                    }
-
-                    item {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            AsyncImage(
-                                modifier = Modifier
-                                    .size(320.dp)
-                                    .clip(shape = RoundedCornerShape(12.dp)),
-                                contentDescription = "",
-                                model = song?.thumbnailPath?.encodeURLPath(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                    }
-
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = song?.name.toString(),
-                                    color = Color.White,
-                                    fontSize = 18.sp,
-                                    lineHeight = 1.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    text = song?.author?.name.toString(),
-                                    color = Color.White,
-                                    fontSize = 12.sp,
-                                    lineHeight = 18.sp
-                                )
-                            }
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                IconButton(onClick = { }) {
-                                    Icon(
-                                        modifier = Modifier.size(28.dp),
-                                        contentDescription = "",
-                                        imageVector = Icons.Default.AddCircle,
-                                        tint = Color.White
-                                    )
-                                }
-                                IconButton(onClick = { }) {
-                                    Icon(
-                                        modifier = Modifier.size(28.dp),
-                                        contentDescription = "",
-                                        imageVector = Icons.Default.FavoriteBorder,
-                                        tint = Color.White
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    item {
-                        Column {
-                            Box(
-                                modifier = Modifier
-                                    .height(4.dp)
-                                    .padding(horizontal = 2.dp)
-                                    .fillMaxWidth()
-                                    .clip(shape = RoundedCornerShape(8.dp))
-                                    .background(
-                                        color = Color.White.copy(
-                                            alpha = 0.28f
+                    item("cover") {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            CenterAlignedTopAppBar(
+                                colors = TopAppBarDefaults.topAppBarColors(
+                                    containerColor = Color.Transparent
+                                ),
+                                navigationIcon = {
+                                    IconButton(onClick = {
+                                        mediaPlayerViewModel.toggleFullscreen(false)
+                                    }) {
+                                        Icon(
+                                            modifier = Modifier.size(32.dp),
+                                            contentDescription = "Close",
+                                            imageVector = Icons.Default.KeyboardArrowDown,
+                                            tint = Color.White
                                         )
-                                    )
+                                    }
+                                },
+                                actions = {
+                                    IconButton(onClick = { }) {
+                                        Icon(
+                                            modifier = Modifier.size(24.dp),
+                                            imageVector = Icons.Default.MoreHoriz,
+                                            contentDescription = "More",
+                                            tint = Color.White
+                                        )
+                                    }
+                                },
+                                title = { }
+                            )
+
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Box(
+                                AsyncImage(
                                     modifier = Modifier
-                                        .height(4.dp)
-                                        .fillMaxWidth(uiState.progress)
-                                        .clip(shape = RoundedCornerShape(8.dp))
-                                        .background(color = Color.White)
+                                        .size(320.dp)
+                                        .clip(shape = RoundedCornerShape(12.dp)),
+                                    contentDescription = "",
+                                    model = song?.thumbnailPath?.encodeURLPath(),
+                                    contentScale = ContentScale.Crop
                                 )
                             }
+                        }
+                    }
 
-                            Spacer(Modifier.height(8.dp))
+                    item("info") {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column {
+                                    Text(
+                                        text = song?.name.toString(),
+                                        color = Color.White,
+                                        fontSize = 18.sp,
+                                        lineHeight = 1.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = song?.author?.name.toString(),
+                                        color = Color.White,
+                                        fontSize = 12.sp,
+                                        lineHeight = 18.sp
+                                    )
+                                }
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    IconButton(
+                                        onClick = { },
+                                        modifier = Modifier.size(24.dp)
+                                    ) {
+                                        Icon(
+                                            contentDescription = "",
+                                            imageVector = Icons.Default.AddCircle,
+                                            tint = Color.White
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = { },
+                                        modifier = Modifier.size(24.dp)
+                                    ) {
+                                        Icon(
+                                            contentDescription = "",
+                                            imageVector = Icons.Default.FavoriteBorder,
+                                            tint = Color.White
+                                        )
+                                    }
+                                }
+                            }
+
+                            Column {
+                                FullscreenProgressBar(progress = uiState.progress)
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(text = "0:08", color = Color.White, fontSize = 15.sp)
+                                    Text(text = "3:15", color = Color.White, fontSize = 15.sp)
+                                }
+                            }
+                        }
+                    }
+
+                    item("controls") {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                IconButton(onClick = { }) {
+                                    Icon(
+                                        modifier = Modifier.size(28.dp),
+                                        contentDescription = "",
+                                        imageVector = Icons.Default.Shuffle,
+                                        tint = Color.White
+                                    )
+                                }
+                                IconButton(onClick = { }) {
+                                    Icon(
+                                        modifier = Modifier.size(52.dp),
+                                        contentDescription = "",
+                                        imageVector = Icons.Default.SkipPrevious,
+                                        tint = Color.White
+                                    )
+                                }
+                                IconButton(
+                                    modifier = Modifier.size(80.dp),
+                                    onClick = { mediaPlayerViewModel.toggle() }
+                                ) {
+                                    Icon(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentDescription = "",
+                                        imageVector = if (uiState.isPlaying)
+                                            Icons.Default.PauseCircleFilled
+                                        else
+                                            Icons.Default.PlayCircleFilled,
+                                        tint = Color.White
+                                    )
+                                }
+                                IconButton(onClick = { }) {
+                                    Icon(
+                                        modifier = Modifier.size(52.dp),
+                                        contentDescription = "",
+                                        imageVector = Icons.Default.SkipNext,
+                                        tint = Color.White
+                                    )
+                                }
+                                IconButton(onClick = { }) {
+                                    Icon(
+                                        modifier = Modifier.size(28.dp),
+                                        contentDescription = "",
+                                        imageVector = Icons.Default.Loop,
+                                        tint = Color.White
+                                    )
+                                }
+                            }
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = "0:08",
-                                    color = Color.White,
-                                    fontSize = 15.sp
-                                )
-                                Text(
-                                    text = "3:15",
-                                    color = Color.White,
-                                    fontSize = 15.sp
-                                )
+                                IconButton(onClick = { }) {
+                                    Icon(
+                                        modifier = Modifier.size(28.dp),
+                                        contentDescription = "",
+                                        imageVector = Icons.Default.Queue,
+                                        tint = Color.White
+                                    )
+                                }
+                                IconButton(onClick = { }) {
+                                    Icon(
+                                        modifier = Modifier.size(28.dp),
+                                        contentDescription = "",
+                                        imageVector = Icons.Default.LibraryMusic,
+                                        tint = Color.White
+                                    )
+                                }
                             }
                         }
                     }
 
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            IconButton(onClick = { }) {
+                    item("explore_artist") {
+                        song?.author?.let { artist ->
+                            ExploreArtistSection(
+                                artistName = artist.name ?: "",
+                                artistAvatarPath = artist.avatarPath,
+                                song = song
+                            )
+                        }
+                    }
+
+                    item("lyrics_preview") {
+                        song?.listLyric?.let { lyrics ->
+                            if (lyrics.isNotEmpty()) {
+                                LyricsPreviewSection(lyrics = lyrics)
+                            }
+                        }
+                    }
+
+                    item("about_artist") {
+                        song?.author?.let { artist ->
+                            AboutArtistSection(
+                                artistName = artist.name ?: "",
+                                artistAvatarPath = artist.avatarPath,
+                                followers = artist.followers ?: 0
+                            )
+                        }
+                    }
+
+                    item("bottom_spacer") {
+                        Spacer(Modifier.height(32.dp))
+                    }
+                }
+
+                FullscreenTopbar(
+                    song = song!!,
+                    topBarAlpha = topBarAlpha,
+                    isPlaying = uiState.isPlaying,
+                    progress = uiState.progress
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExploreArtistSection(
+    artistName: String,
+    artistAvatarPath: String?,
+    song: Song?
+) {
+    val cardBg = Color.White.copy(alpha = 0.1f)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(cardBg)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        Text(
+            text = "Explore $artistName",
+            color = Color.White,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        val exploreItems = listOf(
+            "Songs by $artistName" to artistAvatarPath,
+            "Similar to $artistName" to song?.thumbnailPath,
+            "Similar to ${song?.name}" to artistAvatarPath,
+        )
+
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(exploreItems) { (label, imagePath) ->
+                ExploreCard(label = label, imagePath = imagePath)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExploreCard(
+    label: String,
+    imagePath: String?
+) {
+    Box(
+        modifier = Modifier
+            .size(width = 110.dp, height = 110.dp)
+            .clip(RoundedCornerShape(8.dp))
+    ) {
+        AsyncImage(
+            model = imagePath?.encodeURLPath(),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
+                    )
+                )
+        )
+        Text(
+            text = label,
+            color = Color.White,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(8.dp)
+        )
+    }
+}
+
+@Composable
+private fun LyricsPreviewSection(lyrics: List<String>) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.White.copy(alpha = 0.1f))
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(0.dp)
+    ) {
+        Text(
+            text = "Lyrics preview",
+            color = Color.White,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        lyrics.take(5).forEach { line ->
+            Text(
+                text = line,
+                color = Color.White,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                lineHeight = 36.sp
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        Button(
+            onClick = { },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White,
+                contentColor = Color.Black
+            ),
+            shape = RoundedCornerShape(50)
+        ) {
+            Text(
+                text = "Show lyrics",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+    }
+}
+
+@Composable
+private fun AboutArtistSection(
+    artistName: String,
+    artistAvatarPath: String?,
+    followers: Int
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color(0xFF1A1A1A))
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(3f / 4f)
+        ) {
+            AsyncImage(
+                model = artistAvatarPath?.encodeURLPath(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+
+            Text(
+                text = "About the artist",
+                color = Color.White,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(14.dp)
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    text = artistName,
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = FormatHelper.formatMonthlyListeners(followers),
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontSize = 13.sp
+                )
+            }
+            Button(
+                onClick = { },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = Color.White
+                ),
+                border = androidx.compose.foundation.BorderStroke(
+                    width = 1.dp,
+                    color = Color.White.copy(alpha = 0.8f)
+                ),
+                shape = RoundedCornerShape(50),
+                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = "Follow",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FullscreenTopbar(
+    song: Song,
+    topBarAlpha: Float,
+    isPlaying: Boolean,
+    progress: Float
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Black.copy(alpha = topBarAlpha))
+            .statusBarsPadding()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .padding(horizontal = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AnimatedVisibility(
+                visible = topBarAlpha > 0.8f,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
+                            Text(
+                                text = song.name.toString(),
+                                color = Color.White,
+                                fontSize = 18.sp,
+                                lineHeight = 1.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = song.author?.name.toString(),
+                                color = Color.White,
+                                fontSize = 12.sp,
+                                lineHeight = 18.sp
+                            )
+                        }
+                        Column {
+                            IconButton(
+                                onClick = { },
+                                modifier = Modifier.size(24.dp)
+                            ) {
                                 Icon(
-                                    modifier = Modifier.size(28.dp),
                                     contentDescription = "",
-                                    imageVector = Icons.Default.Shuffle,
+                                    imageVector = Icons.Default.AddCircle,
                                     tint = Color.White
                                 )
                             }
                             IconButton(
-                                onClick = { }
+                                onClick = { },
+                                modifier = Modifier.size(24.dp)
                             ) {
                                 Icon(
-                                    modifier = Modifier.size(52.dp),
                                     contentDescription = "",
-                                    imageVector = Icons.Default.SkipPrevious,
-                                    tint = Color.White
-                                )
-                            }
-                            IconButton(
-                                modifier = Modifier.size(80.dp),
-                                onClick = { mediaPlayerViewModel.toggle() }
-                            ) {
-                                Icon(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentDescription = "",
-                                    imageVector = if (uiState.isPlaying)
+                                    imageVector = if (isPlaying)
                                         Icons.Default.PauseCircleFilled
                                     else
                                         Icons.Default.PlayCircleFilled,
                                     tint = Color.White
                                 )
                             }
-                            IconButton(
-                                onClick = { }
-                            ) {
-                                Icon(
-                                    modifier = Modifier.size(52.dp),
-                                    contentDescription = "",
-                                    imageVector = Icons.Default.SkipNext,
-                                    tint = Color.White
-                                )
-                            }
-                            IconButton(onClick = { }) {
-                                Icon(
-                                    modifier = Modifier.size(28.dp),
-                                    contentDescription = "",
-                                    imageVector = Icons.Default.Loop,
-                                    tint = Color.White
-                                )
-                            }
                         }
                     }
-
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            IconButton(onClick = { }) {
-                                Icon(
-                                    modifier = Modifier.size(28.dp),
-                                    contentDescription = "",
-                                    imageVector = Icons.Default.Queue,
-                                    tint = Color.White
-                                )
-                            }
-                            IconButton(onClick = { }) {
-                                Icon(
-                                    modifier = Modifier.size(28.dp),
-                                    contentDescription = "",
-                                    imageVector = Icons.Default.LibraryMusic,
-                                    tint = Color.White
-                                )
-                            }
-                        }
-                    }
-
-                    item {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(260.dp)
-                        ) { }
-                    }
+                    FullscreenProgressBar(progress = progress)
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun FullscreenProgressBar(
+    modifier: Modifier = Modifier,
+    progress: Float
+) {
+    Box(
+        modifier = modifier
+            .height(4.dp)
+            .padding(horizontal = 2.dp)
+            .fillMaxWidth()
+            .clip(shape = RoundedCornerShape(8.dp))
+            .background(color = Color.White.copy(alpha = 0.28f))
+    ) {
+        Box(
+            modifier = Modifier
+                .height(4.dp)
+                .fillMaxWidth(progress)
+                .clip(shape = RoundedCornerShape(8.dp))
+                .background(color = Color.White)
+        )
     }
 }
