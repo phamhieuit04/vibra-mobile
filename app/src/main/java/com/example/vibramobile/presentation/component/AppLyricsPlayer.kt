@@ -1,16 +1,31 @@
 package com.example.vibramobile.presentation.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Loop
 import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.PauseCircleFilled
+import androidx.compose.material.icons.filled.PlayCircleFilled
+import androidx.compose.material.icons.filled.Shuffle
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,6 +41,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -86,17 +102,43 @@ fun AppLyricsPlayer(
             Scaffold(
                 containerColor = dominantColor,
                 topBar = {
-                    LyricsTopbar(
+                    LyricsTopBar(
                         songName = song?.name ?: "",
                         authorName = song?.author?.name ?: "",
                         onClick = { mediaPlayerViewModel.toggleLyrics(false) }
                     )
                 },
                 bottomBar = {
-
+                    LyricsBottomBar(
+                        progress = uiState.progress,
+                        currentTime = currentTime,
+                        totalTime = totalTime,
+                        isPlaying = uiState.isPlaying,
+                        onTogglePlay = { mediaPlayerViewModel.toggle() }
+                    )
                 }
             ) { padding ->
-
+                Box(
+                    modifier = Modifier.padding(paddingValues = padding)
+                ) {
+                    LazyColumn(
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+                        state = listState
+                    ) {
+                        itemsIndexed(lyrics) { index, line ->
+                            Text(
+                                text = line,
+                                color = Color.White,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Normal,
+                                lineHeight = 24.sp
+                            )
+                            if (index < lyrics.lastIndex) {
+                                Spacer(Modifier.height(24.dp))
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -104,7 +146,7 @@ fun AppLyricsPlayer(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LyricsTopbar(
+private fun LyricsTopBar(
     songName: String,
     authorName: String,
     onClick: () -> Unit,
@@ -146,4 +188,80 @@ private fun LyricsTopbar(
             }
         }
     )
+}
+
+@Composable
+private fun LyricsBottomBar(
+    progress: Float,
+    currentTime: Long,
+    totalTime: Long,
+    isPlaying: Boolean,
+    onTogglePlay: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+            .navigationBarsPadding(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        ProgressBarComponent(
+            progress = progress,
+            currentTime = currentTime,
+            totalTime = totalTime
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { }) {
+                Icon(
+                    modifier = Modifier.size(28.dp),
+                    contentDescription = "",
+                    imageVector = Icons.Default.Shuffle,
+                    tint = Color.White
+                )
+            }
+            IconButton(onClick = { }) {
+                Icon(
+                    modifier = Modifier.size(52.dp),
+                    contentDescription = "",
+                    imageVector = Icons.Default.SkipPrevious,
+                    tint = Color.White
+                )
+            }
+            IconButton(
+                modifier = Modifier.size(80.dp),
+                onClick = onTogglePlay
+            ) {
+                Icon(
+                    modifier = Modifier.fillMaxSize(),
+                    contentDescription = "",
+                    imageVector = if (isPlaying)
+                        Icons.Default.PauseCircleFilled
+                    else
+                        Icons.Default.PlayCircleFilled,
+                    tint = Color.White
+                )
+            }
+            IconButton(onClick = { }) {
+                Icon(
+                    modifier = Modifier.size(52.dp),
+                    contentDescription = "",
+                    imageVector = Icons.Default.SkipNext,
+                    tint = Color.White
+                )
+            }
+            IconButton(onClick = { }) {
+                Icon(
+                    modifier = Modifier.size(28.dp),
+                    contentDescription = "",
+                    imageVector = Icons.Default.Loop,
+                    tint = Color.White
+                )
+            }
+        }
+    }
 }

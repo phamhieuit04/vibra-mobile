@@ -398,7 +398,7 @@ fun AppFullscreenPlayer(
                     if (lyrics.any { it.isNotBlank() }) {
                         item("lyrics_preview") {
                             LyricsPreviewSection(
-                                lyrics = lyrics,
+                                lyrics = lyrics.take(3),
                                 onClick = { mediaPlayerViewModel.toggleLyrics(true) }
                             )
                         }
@@ -449,8 +449,7 @@ private fun LyricsPreviewSection(
 
         Spacer(Modifier.height(16.dp))
 
-        val visibleLyrics = lyrics.take(3)
-        visibleLyrics.forEachIndexed { index, line ->
+        lyrics.forEachIndexed { index, line ->
             Text(
                 text = line,
                 color = Color.White,
@@ -458,7 +457,7 @@ private fun LyricsPreviewSection(
                 fontWeight = FontWeight.Normal,
                 lineHeight = 24.sp
             )
-            if (index < visibleLyrics.lastIndex) {
+            if (index < lyrics.lastIndex) {
                 Spacer(Modifier.height(24.dp))
             }
         }
