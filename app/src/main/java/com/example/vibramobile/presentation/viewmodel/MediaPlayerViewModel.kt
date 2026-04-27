@@ -1,15 +1,21 @@
 package com.example.vibramobile.presentation.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import com.example.vibramobile.domain.contract.IPlaylistRepository
+import com.example.vibramobile.domain.contract.ISongRepository
 import com.example.vibramobile.domain.model.Song
+import com.example.vibramobile.presentation.state.ArtistState
 import com.example.vibramobile.presentation.state.MediaPlayerState
+import com.example.vibramobile.presentation.state.SessionStore
 import com.example.vibramobile.presentation.state.SongState
 import io.ktor.http.encodeURLPath
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,10 +24,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MediaPlayerViewModel(
-    context: Context
+    context: Context,
+    private val songRepository: ISongRepository,
+    private val sessionStore: SessionStore
 ) : ViewModel() {
+    private fun accessToken() = sessionStore.currentAccessToken()
 
     private val player = ExoPlayer.Builder(context).build()
 
@@ -78,6 +88,18 @@ class MediaPlayerViewModel(
 
     fun toggleFullscreen(value: Boolean) {
         _uiState.update { it.copy(isFullscreenVisible = value) }
+
+        if (value) {
+            val tokenSnapshot = accessToken()
+            if (tokenSnapshot.isBlank()) {
+                return
+            }
+
+            val artistId = currentSong.value?.author?.id ?: return
+            viewModelScope.launch {
+                fetchSongsByArtist(artistId, tokenSnapshot)
+            }
+        }
     }
 
     private fun startProgressUpdater() {
@@ -102,5 +124,16 @@ class MediaPlayerViewModel(
     override fun onCleared() {
         player.release()
         super.onCleared()
+    }
+
+    suspend fun fetchSongsByArtist(artistId: Int, accessToken: String) {
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val result = songRepository.getSongsByArtist(artistId, accessToken)
+                SongState.setSongsByArtist(result)
+            }.onFailure { exception ->
+                Log.e("MyApp", exception.toString())
+            }
+        }
     }
 }

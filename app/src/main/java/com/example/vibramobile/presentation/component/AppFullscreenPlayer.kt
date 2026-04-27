@@ -1,10 +1,6 @@
 package com.example.vibramobile.presentation.component
 
-import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -22,12 +18,10 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -79,6 +73,7 @@ import com.composables.core.SheetDetent
 import com.composables.core.rememberModalBottomSheetState
 import com.example.vibramobile.core.util.FormatHelper
 import com.example.vibramobile.domain.model.Song
+import com.example.vibramobile.presentation.state.SongState
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import io.ktor.http.encodeURLPath
@@ -94,6 +89,7 @@ fun AppFullscreenPlayer(
     val uiState by mediaPlayerViewModel.uiState.collectAsState()
     val song by mediaPlayerViewModel.currentSong.collectAsState()
     val lyrics = song?.listLyric ?: emptyList()
+    val songsByArtist by SongState.songsByArtist.collectAsState()
 
     val FullyExpanded = SheetDetent.FullyExpanded
 
@@ -372,10 +368,19 @@ fun AppFullscreenPlayer(
                         }
                     }
 
+                    if (songsByArtist.isNotEmpty()) {
+                        item("explore_songs") {
+                            Spacer(Modifier.height(16.dp))
+
+                            ExploreSongsSection(
+                                artistName = song?.author?.name ?: "",
+                                songs = songsByArtist.filter { it.id != song?.id }.take(10)
+                            )
+                        }
+                    }
+
                     if (lyrics.any { it.isNotBlank() }) {
                         item("lyrics_preview") {
-                            Spacer(modifier = Modifier.height(16.dp))
-
                             LyricsPreviewSection(lyrics = lyrics)
                         }
                     }
@@ -634,6 +639,75 @@ private fun FullscreenProgressBar(
                 .fillMaxWidth(progress)
                 .clip(shape = roundedCornerShape)
                 .background(color = Color.White)
+        )
+    }
+}
+
+@Composable
+private fun ExploreSongsSection(
+    artistName: String,
+    songs: List<Song>
+) {
+    val cardBg = Color.White.copy(alpha = 0.1f)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(cardBg)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        Text(
+            text = "Explore $artistName",
+            color = Color.White,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(songs) { song ->
+                ExploreCard(label = song.name, imagePath = song.thumbnailPath)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExploreCard(
+    label: String?,
+    imagePath: String?
+) {
+    Box(
+        modifier = Modifier
+            .size(width = 110.dp, height = 110.dp)
+            .clip(RoundedCornerShape(8.dp))
+    ) {
+        AsyncImage(
+            model = imagePath?.encodeURLPath(),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
+                    )
+                )
+        )
+        Text(
+            text = label ?: "",
+            color = Color.White,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(8.dp)
         )
     }
 }
