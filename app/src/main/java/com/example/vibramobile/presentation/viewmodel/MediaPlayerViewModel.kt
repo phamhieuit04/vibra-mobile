@@ -7,7 +7,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.example.vibramobile.domain.model.Song
-import com.example.vibramobile.presentation.state.MiniPlayerState
+import com.example.vibramobile.presentation.state.MediaPlayerState
 import com.example.vibramobile.presentation.state.SongState
 import io.ktor.http.encodeURLPath
 import kotlinx.coroutines.Job
@@ -25,37 +25,26 @@ class MediaPlayerViewModel(
 
     private val player = ExoPlayer.Builder(context).build()
 
-    private val _isPlaying = MutableStateFlow(false)
-    val isPlaying = _isPlaying.asStateFlow()
-
-    private val _progress = MutableStateFlow(0f)
-    val progress = _progress.asStateFlow()
-
     val currentSong: StateFlow<Song?> = SongState.currentSong
     private var currentSongValue: Song?
         get() = SongState.currentSong.value
         set(value) = SongState.setCurrentSong(value)
 
-    private val _uiState = MutableStateFlow(MiniPlayerState())
+    private val _uiState = MutableStateFlow(MediaPlayerState())
     val uiState = _uiState.asStateFlow()
-
-    private val _isFullscreenPlayerVisible = MutableStateFlow(false)
-    val isFullscreenPlayerVisible = _isFullscreenPlayerVisible.asStateFlow()
 
     private var progressJob: Job? = null
 
     init {
         player.addListener(object : Player.Listener {
-
             override fun onIsPlayingChanged(isPlaying: Boolean) {
-                _isPlaying.value = isPlaying
-                if (isPlaying) startProgressUpdater()
-                else stopProgressUpdater()
+                _uiState.update { it.copy(isPlaying = isPlaying) }
+                if (isPlaying) startProgressUpdater() else stopProgressUpdater()
             }
 
             override fun onPlaybackStateChanged(state: Int) {
                 if (state == Player.STATE_ENDED) {
-                    _progress.value = 1f
+                    _uiState.update { it.copy(progress = 1f) }
                     stopProgressUpdater()
                 }
             }
@@ -65,7 +54,7 @@ class MediaPlayerViewModel(
     fun playSong(song: Song?) {
         if (song == null) return
 
-        _uiState.update { it.copy(visible = true) }
+        _uiState.update { it.copy(isMiniVisible = true) }
 
         if (currentSongValue?.id != song.id) {
             currentSongValue = song
@@ -77,7 +66,7 @@ class MediaPlayerViewModel(
             player.prepare()
             player.play()
 
-            _progress.value = 0f
+            _uiState.update { it.copy(progress = 0f) }
         } else {
             toggle()
         }
@@ -87,12 +76,8 @@ class MediaPlayerViewModel(
         if (player.isPlaying) player.pause() else player.play()
     }
 
-    fun showFullscreenPlayer() {
-        _isFullscreenPlayerVisible.value = true
-    }
-
-    fun hideFullscreenPlayer() {
-        _isFullscreenPlayerVisible.value = false
+    fun toggleFullscreen(value: Boolean) {
+        _uiState.update { it.copy(isFullscreenVisible = value) }
     }
 
     private fun startProgressUpdater() {
@@ -102,7 +87,7 @@ class MediaPlayerViewModel(
             while (isActive) {
                 val duration = player.duration
                 if (duration > 0) {
-                    _progress.value = player.currentPosition / duration.toFloat()
+                    _uiState.update { it.copy(progress = player.currentPosition / duration.toFloat()) }
                 }
                 delay(500)
             }

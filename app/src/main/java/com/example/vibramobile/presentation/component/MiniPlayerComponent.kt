@@ -44,19 +44,17 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun MiniPlayerComponent(
     modifier: Modifier = Modifier,
-    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
+    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel()
 ) {
     val uiState by mediaPlayerViewModel.uiState.collectAsState()
-    val isPlaying by mediaPlayerViewModel.isPlaying.collectAsState()
-    val progress by mediaPlayerViewModel.progress.collectAsState()
     val currentSong by mediaPlayerViewModel.currentSong.collectAsState()
 
-    if (!uiState.visible) return
+    if (!uiState.isMiniVisible) return
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .noRippleClickable(onClick = { mediaPlayerViewModel.showFullscreenPlayer() })
+            .noRippleClickable(onClick = { mediaPlayerViewModel.toggleFullscreen(true) })
             .padding(8.dp)
             .clip(shape = RoundedCornerShape(8.dp))
             .background(color = MaterialTheme.colorScheme.primary)
@@ -116,7 +114,7 @@ fun MiniPlayerComponent(
                 IconButton(onClick = mediaPlayerViewModel::toggle) {
                     Icon(
                         modifier = Modifier.size(32.dp),
-                        imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                        imageVector = if (uiState.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                         contentDescription = "",
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
@@ -135,7 +133,7 @@ fun MiniPlayerComponent(
             Box(
                 modifier = Modifier
                     .height(2.dp)
-                    .fillMaxWidth(progress)
+                    .fillMaxWidth(uiState.progress)
                     .clip(shape = RoundedCornerShape(8.dp))
                     .background(color = MaterialTheme.colorScheme.onPrimary)
             )
