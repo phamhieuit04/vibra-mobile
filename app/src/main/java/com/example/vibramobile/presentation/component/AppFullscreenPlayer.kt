@@ -131,6 +131,8 @@ fun AppFullscreenPlayer(
     LaunchedEffect(uiState.isFullscreenVisible) {
         sheetState.targetDetent =
             if (uiState.isFullscreenVisible) FullyExpanded else SheetDetent.Hidden
+
+        listState.scrollToItem(0)
     }
 
     LaunchedEffect(sheetState.currentDetent) {
@@ -435,9 +437,8 @@ private fun LyricsPreviewSection(lyrics: List<String>) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(Color.White.copy(alpha = 0.1f))
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(0.dp)
+            .background(Color.White.copy(alpha = 0.2f))
+            .padding(horizontal = 20.dp, vertical = 18.dp)
     ) {
         Text(
             text = "Lyrics preview",
@@ -446,20 +447,23 @@ private fun LyricsPreviewSection(lyrics: List<String>) {
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(16.dp))
 
-        lyrics.take(3).forEach { line ->
+        val visibleLyrics = lyrics.take(3)
+        visibleLyrics.forEachIndexed { index, line ->
             Text(
                 text = line,
                 color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Normal,
+                lineHeight = 24.sp
             )
-
-            Spacer(Modifier.height(8.dp))
+            if (index < visibleLyrics.lastIndex) {
+                Spacer(Modifier.height(24.dp))
+            }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(20.dp))
 
         Button(
             onClick = { },
@@ -467,11 +471,13 @@ private fun LyricsPreviewSection(lyrics: List<String>) {
                 containerColor = Color.White,
                 contentColor = Color.Black
             ),
-            shape = RoundedCornerShape(50)
+            shape = RoundedCornerShape(50),
+            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
+            elevation = ButtonDefaults.buttonElevation(0.dp)
         ) {
             Text(
                 text = "Show lyrics",
-                fontSize = 14.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold
             )
         }
@@ -488,7 +494,7 @@ private fun AboutArtistSection(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFF1A1A1A))
+            .background(Color.White.copy(alpha = 0.2f))
     ) {
         Box(
             modifier = Modifier
@@ -525,12 +531,14 @@ private fun AboutArtistSection(
                     text = artistName,
                     color = Color.White,
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 1.sp
                 )
                 Text(
                     text = FormatHelper.formatMonthlyListeners(followers),
                     color = Color.White.copy(alpha = 0.6f),
-                    fontSize = 13.sp
+                    fontSize = 13.sp,
+                    lineHeight = 8.sp
                 )
             }
             Button(
@@ -669,13 +677,11 @@ private fun ExploreSongsSection(
     songs: List<Song>,
     onClick: (Song) -> Unit
 ) {
-    val cardBg = Color.White.copy(alpha = 0.1f)
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(cardBg)
+            .background(Color.White.copy(alpha = 0.2f))
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
