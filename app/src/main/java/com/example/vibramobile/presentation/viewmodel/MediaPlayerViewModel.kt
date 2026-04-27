@@ -77,6 +77,16 @@ class MediaPlayerViewModel(
             player.play()
 
             _uiState.update { it.copy(progress = 0f) }
+
+            val tokenSnapshot = accessToken()
+            if (tokenSnapshot.isBlank()) {
+                return
+            }
+
+            val artistId = currentSongValue?.author?.id ?: return
+            viewModelScope.launch {
+                fetchSongsByArtist(artistId, tokenSnapshot)
+            }
         } else {
             toggle()
         }
@@ -88,18 +98,6 @@ class MediaPlayerViewModel(
 
     fun toggleFullscreen(value: Boolean) {
         _uiState.update { it.copy(isFullscreenVisible = value) }
-
-        if (value) {
-            val tokenSnapshot = accessToken()
-            if (tokenSnapshot.isBlank()) {
-                return
-            }
-
-            val artistId = currentSong.value?.author?.id ?: return
-            viewModelScope.launch {
-                fetchSongsByArtist(artistId, tokenSnapshot)
-            }
-        }
     }
 
     private fun startProgressUpdater() {

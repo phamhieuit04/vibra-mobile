@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -52,6 +53,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +62,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -71,7 +74,9 @@ import com.composables.core.Scrim
 import com.composables.core.Sheet
 import com.composables.core.SheetDetent
 import com.composables.core.rememberModalBottomSheetState
+import com.example.vibramobile.core.extension.noRippleClickable
 import com.example.vibramobile.core.util.FormatHelper
+import com.example.vibramobile.core.util.ImageHelper
 import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.presentation.state.SongState
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
@@ -86,6 +91,8 @@ fun AppFullscreenPlayer(
     bottomContentPadding: Dp = 0.dp,
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel()
 ) {
+    val context = LocalContext.current
+
     val uiState by mediaPlayerViewModel.uiState.collectAsState()
     val song by mediaPlayerViewModel.currentSong.collectAsState()
     val lyrics = song?.listLyric ?: emptyList()
@@ -114,6 +121,13 @@ fun AppFullscreenPlayer(
         }
     }
 
+    val dominantColor by produceState<Color>(
+        initialValue = Color.Gray,
+        key1 = song?.thumbnailPath
+    ) {
+        value = ImageHelper.getDominantColor(context, song?.thumbnailPath)
+    }
+
     LaunchedEffect(uiState.isFullscreenVisible) {
         sheetState.targetDetent =
             if (uiState.isFullscreenVisible) FullyExpanded else SheetDetent.Hidden
@@ -129,8 +143,12 @@ fun AppFullscreenPlayer(
         Scrim()
 
         Sheet(modifier = modifier.imePadding()) {
-            Box {
-                Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+            ) {
+                Box(modifier = Modifier.matchParentSize()) {
                     AsyncImage(
                         model = song?.thumbnailPath?.encodeURLPath(),
                         contentDescription = null,
@@ -139,6 +157,7 @@ fun AppFullscreenPlayer(
                             .blur(36.dp),
                         contentScale = ContentScale.Crop
                     )
+
                     Box(
                         modifier = Modifier
                             .matchParentSize()
@@ -370,11 +389,12 @@ fun AppFullscreenPlayer(
 
                     if (songsByArtist.isNotEmpty()) {
                         item("explore_songs") {
-                            Spacer(Modifier.height(16.dp))
+                            Spacer(Modifier.height(24.dp))
 
                             ExploreSongsSection(
                                 artistName = song?.author?.name ?: "",
-                                songs = songsByArtist.filter { it.id != song?.id }.take(10)
+                                songs = songsByArtist,
+                                onClick = { mediaPlayerViewModel.playSong(it) }
                             )
                         }
                     }
@@ -399,6 +419,7 @@ fun AppFullscreenPlayer(
                 FullscreenTopbar(
                     song = song!!,
                     topBarAlpha = topBarAlpha,
+                    dominantColor = dominantColor,
                     isPlaying = uiState.isPlaying,
                     progress = uiState.progress,
                     onToggle = { mediaPlayerViewModel.toggle() }
@@ -538,6 +559,7 @@ private fun AboutArtistSection(
 @Composable
 private fun FullscreenTopbar(
     song: Song,
+    dominantColor: Color,
     topBarAlpha: Float,
     isPlaying: Boolean,
     progress: Float,
@@ -546,74 +568,72 @@ private fun FullscreenTopbar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.Black.copy(alpha = topBarAlpha))
+            .background(dominantColor.copy(alpha = topBarAlpha))
             .statusBarsPadding()
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            verticalAlignment = Alignment.CenterVertically
+        AnimatedVisibility(
+            visible = topBarAlpha > 0.8f,
+            enter = fadeIn(),
+            exit = fadeOut()
         ) {
-            AnimatedVisibility(
-                visible = topBarAlpha > 0.8f,
-                enter = fadeIn(),
-                exit = fadeOut()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(
+                        modifier = Modifier.padding(start = 20.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.padding(start = 20.dp)
-                        ) {
-                            Text(
-                                text = song.name.toString(),
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                lineHeight = 1.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = song.author?.name.toString(),
-                                color = Color.White,
-                                fontSize = 12.sp,
-                                lineHeight = 18.sp
+                        Text(
+                            text = song.name.toString(),
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            lineHeight = 1.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = song.author?.name.toString(),
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            lineHeight = 18.sp
+                        )
+                    }
+                    Row(modifier = Modifier.padding(end = 10.dp)) {
+                        IconButton(onClick = { }) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "",
+                                tint = Color.White,
+                                modifier = Modifier.size(28.dp)
                             )
                         }
-                        Row(modifier = Modifier.padding(end = 10.dp)) {
-                            IconButton(onClick = { }) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(28.dp)
-                                )
-                            }
 
-                            IconButton(onClick = onToggle) {
-                                Icon(
-                                    imageVector = if (isPlaying)
-                                        Icons.Default.Pause
-                                    else
-                                        Icons.Default.PlayArrow,
-                                    contentDescription = "",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(30.dp)
-                                )
-                            }
+                        IconButton(onClick = onToggle) {
+                            Icon(
+                                imageVector = if (isPlaying)
+                                    Icons.Default.Pause
+                                else
+                                    Icons.Default.PlayArrow,
+                                contentDescription = "",
+                                tint = Color.White,
+                                modifier = Modifier.size(30.dp)
+                            )
                         }
                     }
-
-                    FullscreenProgressBar(
-                        progress = progress,
-                        height = 3.dp,
-                        roundedCornerShape = RoundedCornerShape(0.dp)
-                    )
                 }
+
+                FullscreenProgressBar(
+                    progress = progress,
+                    height = 3.dp,
+                    roundedCornerShape = RoundedCornerShape(0.dp)
+                )
             }
         }
     }
@@ -646,7 +666,8 @@ private fun FullscreenProgressBar(
 @Composable
 private fun ExploreSongsSection(
     artistName: String,
-    songs: List<Song>
+    songs: List<Song>,
+    onClick: (Song) -> Unit
 ) {
     val cardBg = Color.White.copy(alpha = 0.1f)
 
@@ -661,53 +682,49 @@ private fun ExploreSongsSection(
         Text(
             text = "Explore $artistName",
             color = Color.White,
-            fontSize = 16.sp,
+            fontSize = 15.sp,
             fontWeight = FontWeight.Bold
         )
 
         LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             items(songs) { song ->
-                ExploreCard(label = song.name, imagePath = song.thumbnailPath)
+                Box(
+                    modifier = Modifier
+                        .size(width = 110.dp, height = 110.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .noRippleClickable(onClick = { onClick(song) })
+                ) {
+                    AsyncImage(
+                        model = song.thumbnailPath?.encodeURLPath(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        Color.Black.copy(alpha = 0.7f)
+                                    )
+                                )
+                            )
+                    )
+                    Text(
+                        text = song.name ?: "",
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(8.dp)
+                    )
+                }
             }
         }
-    }
-}
-
-@Composable
-private fun ExploreCard(
-    label: String?,
-    imagePath: String?
-) {
-    Box(
-        modifier = Modifier
-            .size(width = 110.dp, height = 110.dp)
-            .clip(RoundedCornerShape(8.dp))
-    ) {
-        AsyncImage(
-            model = imagePath?.encodeURLPath(),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
-                    )
-                )
-        )
-        Text(
-            text = label ?: "",
-            color = Color.White,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(8.dp)
-        )
     }
 }
