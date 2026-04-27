@@ -100,6 +100,10 @@ class MediaPlayerViewModel(
         _uiState.update { it.copy(isFullscreenVisible = value) }
     }
 
+    fun toggleLyrics(value: Boolean) {
+        _uiState.update { it.copy(isLyricsVisible = value) }
+    }
+
     private fun startProgressUpdater() {
         if (progressJob != null) return
 

@@ -6,5 +6,6 @@ data class MediaPlayerState(
     val currentPosition: Long = 0L,
     val duration: Long = 0L,
     val isMiniVisible: Boolean = false,
-    val isFullscreenVisible: Boolean = false
+    val isFullscreenVisible: Boolean = false,
+    val isLyricsVisible: Boolean = false
 )

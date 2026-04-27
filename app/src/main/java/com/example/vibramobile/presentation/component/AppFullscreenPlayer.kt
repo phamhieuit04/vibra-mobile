@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -147,7 +146,7 @@ fun AppFullscreenPlayer(
     ModalBottomSheet(state = sheetState) {
         Scrim()
 
-        Sheet(modifier = modifier.imePadding()) {
+        Sheet(modifier = Modifier.imePadding()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -292,28 +291,12 @@ fun AppFullscreenPlayer(
                                 }
                             }
 
-                            Column {
-                                FullscreenProgressBar(
-                                    modifier = Modifier.padding(horizontal = 2.dp),
-                                    progress = uiState.progress
-                                )
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = FormatHelper.formatTime(currentTime),
-                                        color = Color.White,
-                                        fontSize = 15.sp
-                                    )
-                                    Text(
-                                        text = FormatHelper.formatTime(totalTime),
-                                        color = Color.White,
-                                        fontSize = 15.sp
-                                    )
-                                }
-                            }
+                            ProgressBarComponent(
+                                modifier = Modifier.padding(horizontal = 2.dp),
+                                progress = uiState.progress,
+                                currentTime = currentTime,
+                                totalTime = totalTime
+                            )
                         }
                     }
 
@@ -414,7 +397,10 @@ fun AppFullscreenPlayer(
 
                     if (lyrics.any { it.isNotBlank() }) {
                         item("lyrics_preview") {
-                            LyricsPreviewSection(lyrics = lyrics)
+                            LyricsPreviewSection(
+                                lyrics = lyrics,
+                                onClick = { mediaPlayerViewModel.toggleLyrics(true) }
+                            )
                         }
                     }
 
@@ -443,7 +429,10 @@ fun AppFullscreenPlayer(
 }
 
 @Composable
-private fun LyricsPreviewSection(lyrics: List<String>) {
+private fun LyricsPreviewSection(
+    lyrics: List<String>,
+    onClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -477,7 +466,7 @@ private fun LyricsPreviewSection(lyrics: List<String>) {
         Spacer(Modifier.height(20.dp))
 
         Button(
-            onClick = { },
+            onClick = onClick,
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.White,
                 contentColor = Color.Black
@@ -648,37 +637,13 @@ private fun FullscreenTopbar(
                     }
                 }
 
-                FullscreenProgressBar(
+                ProgressBarComponent(
                     progress = progress,
                     height = 3.dp,
-                    roundedCornerShape = RoundedCornerShape(0.dp)
+                    roundedCornerShape = RoundedCornerShape(0.dp),
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun FullscreenProgressBar(
-    modifier: Modifier = Modifier,
-    progress: Float,
-    height: Dp = 4.dp,
-    roundedCornerShape: RoundedCornerShape = RoundedCornerShape(8.dp)
-) {
-    Box(
-        modifier = modifier
-            .height(height)
-            .fillMaxWidth()
-            .clip(shape = roundedCornerShape)
-            .background(color = Color.White.copy(alpha = 0.28f))
-    ) {
-        Box(
-            modifier = Modifier
-                .height(height)
-                .fillMaxWidth(progress)
-                .clip(shape = roundedCornerShape)
-                .background(color = Color.White)
-        )
     }
 }
 

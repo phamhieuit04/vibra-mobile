@@ -121,22 +121,12 @@ fun MiniPlayerComponent(
                 }
             }
         }
-        Box(
-            modifier = Modifier
-                .height(2.dp)
-                .padding(horizontal = 2.dp)
-                .fillMaxWidth()
-                .clip(shape = RoundedCornerShape(8.dp))
-                .background(color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.28f))
-                .align(alignment = Alignment.BottomCenter)
-        ) {
-            Box(
-                modifier = Modifier
-                    .height(2.dp)
-                    .fillMaxWidth(uiState.progress)
-                    .clip(shape = RoundedCornerShape(8.dp))
-                    .background(color = MaterialTheme.colorScheme.onPrimary)
-            )
-        }
+
+        ProgressBarComponent(
+            modifier = Modifier.align(alignment = Alignment.BottomCenter),
+            progress = uiState.progress,
+            height = 2.dp,
+            roundedCornerShape = RoundedCornerShape(4.dp)
+        )
     }
 }
