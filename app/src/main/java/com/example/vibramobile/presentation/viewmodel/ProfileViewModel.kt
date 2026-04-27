@@ -39,6 +39,7 @@ class ProfileViewModel(
             _isRefreshing.value = true
             try {
                 fetchProfile(tokenSnapshot)
+                fetchMyPlaylists(tokenSnapshot)
                 fetchFollowedArtists(tokenSnapshot)
                 fetchMyAlbums(tokenSnapshot)
                 fetchPaymentHistory(tokenSnapshot)
@@ -82,6 +83,16 @@ class ProfileViewModel(
         withContext(Dispatchers.IO) {
             runCatching {
                 UserState.setPaymentHistory(billRepository.getPaymentHistory(token))
+            }.onFailure { exception ->
+                Log.e("MyApp", exception.toString())
+            }
+        }
+    }
+
+    suspend fun fetchMyPlaylists(token: String = accessToken()) {
+        withContext(Dispatchers.IO) {
+            runCatching {
+                UserState.setMyPlaylists(playlistRepository.getMyPlaylists(token))
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }

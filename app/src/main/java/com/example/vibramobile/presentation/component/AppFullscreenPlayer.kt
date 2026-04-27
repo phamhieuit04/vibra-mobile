@@ -1,5 +1,6 @@
 package com.example.vibramobile.presentation.component
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -97,16 +98,20 @@ fun AppFullscreenPlayer(
     )
 
     val listState = rememberLazyListState()
-    val scrollOffset by remember {
+
+    val topBarAlpha by remember {
         derivedStateOf {
-            listState.firstVisibleItemIndex * 1000f + listState.firstVisibleItemScrollOffset
+            val item = listState.layoutInfo.visibleItemsInfo
+                .find { it.index == 2 }
+
+            if (item != null) {
+                val offset = item.offset
+                (-offset / 300f).coerceIn(0f, 1f)
+            } else {
+                if (listState.firstVisibleItemIndex > 2) 1f else 0f
+            }
         }
     }
-    val topBarAlpha by animateFloatAsState(
-        targetValue = (scrollOffset / 600f).coerceIn(0f, 1f),
-        animationSpec = tween(0),
-        label = "topBarAlpha"
-    )
 
     LaunchedEffect(uiState.isFullscreenVisible) {
         sheetState.targetDetent =
@@ -359,17 +364,9 @@ fun AppFullscreenPlayer(
                         }
                     }
 
-                    item("explore_artist") {
-                        song?.author?.let { artist ->
-                            ExploreArtistSection(
-                                artistName = artist.name ?: "",
-                                artistAvatarPath = artist.avatarPath,
-                                song = song
-                            )
-                        }
-                    }
-
                     item("lyrics_preview") {
+                        Spacer(modifier = Modifier.height(16.dp))
+
                         song?.listLyric?.let { lyrics ->
                             if (lyrics.isNotEmpty()) {
                                 LyricsPreviewSection(lyrics = lyrics)
@@ -386,10 +383,6 @@ fun AppFullscreenPlayer(
                             )
                         }
                     }
-
-                    item("bottom_spacer") {
-                        Spacer(Modifier.height(32.dp))
-                    }
                 }
 
                 FullscreenTopbar(
@@ -400,82 +393,6 @@ fun AppFullscreenPlayer(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun ExploreArtistSection(
-    artistName: String,
-    artistAvatarPath: String?,
-    song: Song?
-) {
-    val cardBg = Color.White.copy(alpha = 0.1f)
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(cardBg)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
-    ) {
-        Text(
-            text = "Explore $artistName",
-            color = Color.White,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        val exploreItems = listOf(
-            "Songs by $artistName" to artistAvatarPath,
-            "Similar to $artistName" to song?.thumbnailPath,
-            "Similar to ${song?.name}" to artistAvatarPath,
-        )
-
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            items(exploreItems) { (label, imagePath) ->
-                ExploreCard(label = label, imagePath = imagePath)
-            }
-        }
-    }
-}
-
-@Composable
-private fun ExploreCard(
-    label: String,
-    imagePath: String?
-) {
-    Box(
-        modifier = Modifier
-            .size(width = 110.dp, height = 110.dp)
-            .clip(RoundedCornerShape(8.dp))
-    ) {
-        AsyncImage(
-            model = imagePath?.encodeURLPath(),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
-                    )
-                )
-        )
-        Text(
-            text = label,
-            color = Color.White,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(8.dp)
-        )
     }
 }
 
@@ -498,14 +415,15 @@ private fun LyricsPreviewSection(lyrics: List<String>) {
 
         Spacer(Modifier.height(12.dp))
 
-        lyrics.take(5).forEach { line ->
+        lyrics.take(3).forEach { line ->
             Text(
                 text = line,
                 color = Color.White,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
-                lineHeight = 36.sp
             )
+
+            Spacer(Modifier.height(8.dp))
         }
 
         Spacer(Modifier.height(16.dp))
