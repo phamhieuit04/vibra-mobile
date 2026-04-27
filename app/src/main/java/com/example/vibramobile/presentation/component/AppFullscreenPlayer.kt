@@ -1,6 +1,7 @@
 package com.example.vibramobile.presentation.component
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -29,13 +30,16 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.Loop
 import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PauseCircleFilled
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PlayCircleFilled
 import androidx.compose.material.icons.filled.Queue
 import androidx.compose.material.icons.filled.Shuffle
@@ -89,6 +93,7 @@ fun AppFullscreenPlayer(
 ) {
     val uiState by mediaPlayerViewModel.uiState.collectAsState()
     val song by mediaPlayerViewModel.currentSong.collectAsState()
+    val lyrics = song?.listLyric ?: emptyList()
 
     val FullyExpanded = SheetDetent.FullyExpanded
 
@@ -268,7 +273,10 @@ fun AppFullscreenPlayer(
                             }
 
                             Column {
-                                FullscreenProgressBar(progress = uiState.progress)
+                                FullscreenProgressBar(
+                                    modifier = Modifier.padding(horizontal = 2.dp),
+                                    progress = uiState.progress
+                                )
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -364,13 +372,11 @@ fun AppFullscreenPlayer(
                         }
                     }
 
-                    item("lyrics_preview") {
-                        Spacer(modifier = Modifier.height(16.dp))
+                    if (lyrics.any { it.isNotBlank() }) {
+                        item("lyrics_preview") {
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                        song?.listLyric?.let { lyrics ->
-                            if (lyrics.isNotEmpty()) {
-                                LyricsPreviewSection(lyrics = lyrics)
-                            }
+                            LyricsPreviewSection(lyrics = lyrics)
                         }
                     }
 
@@ -389,7 +395,8 @@ fun AppFullscreenPlayer(
                     song = song!!,
                     topBarAlpha = topBarAlpha,
                     isPlaying = uiState.isPlaying,
-                    progress = uiState.progress
+                    progress = uiState.progress,
+                    onToggle = { mediaPlayerViewModel.toggle() }
                 )
             }
         }
@@ -409,7 +416,7 @@ private fun LyricsPreviewSection(lyrics: List<String>) {
         Text(
             text = "Lyrics preview",
             color = Color.White,
-            fontSize = 16.sp,
+            fontSize = 15.sp,
             fontWeight = FontWeight.Bold
         )
 
@@ -472,7 +479,7 @@ private fun AboutArtistSection(
             Text(
                 text = "About the artist",
                 color = Color.White,
-                fontSize = 13.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .align(Alignment.TopStart)
@@ -528,7 +535,8 @@ private fun FullscreenTopbar(
     song: Song,
     topBarAlpha: Float,
     isPlaying: Boolean,
-    progress: Float
+    progress: Float,
+    onToggle: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -539,8 +547,7 @@ private fun FullscreenTopbar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
-                .padding(horizontal = 4.dp),
+                .height(56.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             AnimatedVisibility(
@@ -548,15 +555,16 @@ private fun FullscreenTopbar(
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp),
+                            .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Column {
+                        Column(
+                            modifier = Modifier.padding(start = 20.dp)
+                        ) {
                             Text(
                                 text = song.name.toString(),
                                 color = Color.White,
@@ -571,33 +579,35 @@ private fun FullscreenTopbar(
                                 lineHeight = 18.sp
                             )
                         }
-                        Column {
-                            IconButton(
-                                onClick = { },
-                                modifier = Modifier.size(24.dp)
-                            ) {
+                        Row(modifier = Modifier.padding(end = 10.dp)) {
+                            IconButton(onClick = { }) {
                                 Icon(
+                                    imageVector = Icons.Default.Add,
                                     contentDescription = "",
-                                    imageVector = Icons.Default.AddCircle,
-                                    tint = Color.White
+                                    tint = Color.White,
+                                    modifier = Modifier.size(28.dp)
                                 )
                             }
-                            IconButton(
-                                onClick = { },
-                                modifier = Modifier.size(24.dp)
-                            ) {
+
+                            IconButton(onClick = onToggle) {
                                 Icon(
-                                    contentDescription = "",
                                     imageVector = if (isPlaying)
-                                        Icons.Default.PauseCircleFilled
+                                        Icons.Default.Pause
                                     else
-                                        Icons.Default.PlayCircleFilled,
-                                    tint = Color.White
+                                        Icons.Default.PlayArrow,
+                                    contentDescription = "",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(30.dp)
                                 )
                             }
                         }
                     }
-                    FullscreenProgressBar(progress = progress)
+
+                    FullscreenProgressBar(
+                        progress = progress,
+                        height = 3.dp,
+                        roundedCornerShape = RoundedCornerShape(0.dp)
+                    )
                 }
             }
         }
@@ -607,21 +617,22 @@ private fun FullscreenTopbar(
 @Composable
 private fun FullscreenProgressBar(
     modifier: Modifier = Modifier,
-    progress: Float
+    progress: Float,
+    height: Dp = 4.dp,
+    roundedCornerShape: RoundedCornerShape = RoundedCornerShape(8.dp)
 ) {
     Box(
         modifier = modifier
-            .height(4.dp)
-            .padding(horizontal = 2.dp)
+            .height(height)
             .fillMaxWidth()
-            .clip(shape = RoundedCornerShape(8.dp))
+            .clip(shape = roundedCornerShape)
             .background(color = Color.White.copy(alpha = 0.28f))
     ) {
         Box(
             modifier = Modifier
-                .height(4.dp)
+                .height(height)
                 .fillMaxWidth(progress)
-                .clip(shape = RoundedCornerShape(8.dp))
+                .clip(shape = roundedCornerShape)
                 .background(color = Color.White)
         )
     }
