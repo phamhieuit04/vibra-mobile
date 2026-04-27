@@ -68,9 +68,6 @@ fun AppNavigationBar(
     selectedKey: NavKey,
     onSelectKey: (NavKey) -> Unit,
 ) {
-    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
-    val gradientBase = MaterialTheme.colorScheme.background
-
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -78,10 +75,10 @@ fun AppNavigationBar(
                 brush = Brush.verticalGradient(
                     colors = listOf(
                         Color.Transparent,
-                        gradientBase.copy(alpha = 0.2f),
-                        gradientBase.copy(alpha = 0.5f),
-                        gradientBase.copy(alpha = 0.8f),
-                        gradientBase.copy(alpha = 0.95f)
+                        Color.Black.copy(alpha = 0.3f),
+                        Color.Black.copy(alpha = 0.5f),
+                        Color.Black.copy(alpha = 0.7f),
+                        Color.Black.copy(alpha = 0.80f)
                     ),
                     startY = 0f,
                     endY = Float.POSITIVE_INFINITY
@@ -100,10 +97,10 @@ fun AppNavigationBar(
                     onClick = { onSelectKey(destination) },
                     isSelected = destination == selectedKey,
                     icon = data.icon,
-                    iconColor = onSurfaceColor,
+                    iconColor = Color.White,
                     selectedIcon = data.selectedIcon,
                     label = data.label,
-                    labelColor = onSurfaceColor,
+                    labelColor = Color.White,
                 )
             }
         }
