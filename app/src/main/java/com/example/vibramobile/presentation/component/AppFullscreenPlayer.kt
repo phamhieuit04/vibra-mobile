@@ -76,6 +76,8 @@ import com.composables.core.rememberModalBottomSheetState
 import com.example.vibramobile.core.extension.noRippleClickable
 import com.example.vibramobile.core.util.FormatHelper
 import com.example.vibramobile.core.util.ImageHelper
+import com.example.vibramobile.core.util.LyricLine
+import com.example.vibramobile.core.util.LyricsHelper
 import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.state.SongState
@@ -99,7 +101,11 @@ fun AppFullscreenPlayer(
     val totalTime = uiState.duration
 
     val song by mediaPlayerViewModel.currentSong.collectAsState()
-    val lyrics = song?.listLyric ?: emptyList()
+    val rawLyrics = song?.listLyric ?: emptyList()
+    val lyricLines = remember(rawLyrics) { LyricsHelper.parseLyrics(rawLyrics) }
+    val activeLyricIndex by remember(lyricLines, currentTime) {
+        derivedStateOf { LyricsHelper.findActiveIndex(lyricLines, currentTime) }
+    }
     val songsByArtist by SongState.songsByArtist.collectAsState()
 
     val FullyExpanded = SheetDetent.FullyExpanded
@@ -349,10 +355,11 @@ fun AppFullscreenPlayer(
                         }
                     }
 
-                    if (lyrics.any { it.isNotBlank() }) {
+                    if (lyricLines.any { it.text.isNotBlank() }) {
                         item("lyrics_preview") {
                             LyricsPreviewSection(
-                                lyrics = lyrics.take(3),
+                                lyricLines = lyricLines,
+                                activeIndex = activeLyricIndex,
                                 onClick = { mediaPlayerViewModel.toggleLyrics(true) }
                             )
                         }
@@ -388,9 +395,18 @@ fun AppFullscreenPlayer(
 
 @Composable
 private fun LyricsPreviewSection(
-    lyrics: List<String>,
+    lyricLines: List<LyricLine>,
+    activeIndex: Int,
     onClick: () -> Unit
 ) {
+    val startIndex = if (activeIndex >= 0) activeIndex else 0
+    val previewLines = remember(lyricLines, startIndex) {
+        (0 until 3).map { offset ->
+            lyricLines.getOrNull(startIndex + offset)?.text.orEmpty()
+        }
+    }
+    val highlightedIndex = if (previewLines.isNotEmpty()) 0 else -1
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -407,16 +423,21 @@ private fun LyricsPreviewSection(
 
         Spacer(Modifier.height(16.dp))
 
-        lyrics.forEachIndexed { index, line ->
-            Text(
-                text = line,
-                color = Color.White,
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Normal,
-                lineHeight = 24.sp
-            )
-            if (index < lyrics.lastIndex) {
-                Spacer(Modifier.height(24.dp))
+        previewLines.forEachIndexed { index, line ->
+            if (line.isBlank()) {
+                Spacer(Modifier.height(20.dp))
+            } else {
+                val isActive = index == highlightedIndex
+                Text(
+                    text = line,
+                    color = if (isActive) Color.White else Color.White.copy(alpha = 0.65f),
+                    fontSize = if (isActive) 19.sp else 16.sp,
+                    fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
+                    lineHeight = if (isActive) 26.sp else 22.sp
+                )
+            }
+            if (index < previewLines.lastIndex) {
+                Spacer(Modifier.height(18.dp))
             }
         }
 

@@ -36,6 +36,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,6 +52,7 @@ import com.composables.core.Sheet
 import com.composables.core.SheetDetent
 import com.composables.core.rememberModalBottomSheetState
 import com.example.vibramobile.core.util.ImageHelper
+import com.example.vibramobile.core.util.LyricsHelper
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -63,7 +66,11 @@ fun AppLyricsPlayer(
     val currentTime = uiState.currentPosition
     val totalTime = uiState.duration
     val song by mediaPlayerViewModel.currentSong.collectAsState()
-    val lyrics = song?.listLyric ?: emptyList()
+    val rawLyrics = song?.listLyric ?: emptyList()
+    val lyricLines = remember(rawLyrics) { LyricsHelper.parseLyrics(rawLyrics) }
+    val activeLyricIndex by remember(lyricLines, currentTime) {
+        derivedStateOf { LyricsHelper.findActiveIndex(lyricLines, currentTime) }
+    }
 
     val FullyExpanded = SheetDetent.FullyExpanded
     val sheetState = rememberModalBottomSheetState(
@@ -83,6 +90,12 @@ fun AppLyricsPlayer(
     LaunchedEffect(uiState.isLyricsVisible) {
         sheetState.targetDetent =
             if (uiState.isLyricsVisible) FullyExpanded else SheetDetent.Hidden
+    }
+
+    LaunchedEffect(activeLyricIndex) {
+        if (activeLyricIndex >= 0) {
+            listState.animateScrollToItem((activeLyricIndex - 2).coerceAtLeast(0))
+        }
     }
 
     LaunchedEffect(sheetState.currentDetent) {
@@ -121,16 +134,21 @@ fun AppLyricsPlayer(
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
                         state = listState
                     ) {
-                        itemsIndexed(lyrics) { index, line ->
-                            Text(
-                                text = line,
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Normal,
-                                lineHeight = 24.sp
-                            )
-                            if (index < lyrics.lastIndex) {
-                                Spacer(Modifier.height(24.dp))
+                        itemsIndexed(lyricLines) { index, line ->
+                            val isActive = index == activeLyricIndex
+                            if (line.text.isBlank()) {
+                                Spacer(Modifier.height(20.dp))
+                            } else {
+                                Text(
+                                    text = line.text,
+                                    color = if (isActive) Color.White else Color.White.copy(alpha = 0.55f),
+                                    fontSize = if (isActive) 22.sp else 18.sp,
+                                    fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
+                                    lineHeight = if (isActive) 30.sp else 24.sp
+                                )
+                            }
+                            if (index < lyricLines.lastIndex) {
+                                Spacer(Modifier.height(20.dp))
                             }
                         }
                     }
