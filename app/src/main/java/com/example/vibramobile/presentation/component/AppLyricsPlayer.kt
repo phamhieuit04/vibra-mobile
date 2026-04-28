@@ -45,9 +45,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -72,6 +74,11 @@ fun AppLyricsPlayer(
     val uiState by mediaPlayerViewModel.uiState.collectAsState()
     val currentTime = uiState.currentPosition
     val totalTime = uiState.duration
+    val onSeek: (Float) -> Unit = { fraction ->
+        if (totalTime > 0) {
+            mediaPlayerViewModel.seekTo((totalTime.toFloat() * fraction).toLong())
+        }
+    }
     val song by mediaPlayerViewModel.currentSong.collectAsState()
     val rawLyrics = song?.listLyric ?: emptyList()
     val lyricLines = remember(rawLyrics) { LyricsHelper.parseLyrics(rawLyrics) }
@@ -131,6 +138,7 @@ fun AppLyricsPlayer(
                         totalTime = totalTime,
                         isPlaying = uiState.isPlaying,
                         onPlay = { mediaPlayerViewModel.toggle() },
+                        onSeek = onSeek
                     )
                 }
             ) { padding ->
@@ -204,8 +212,6 @@ private fun LyricLineItem(
     distance: Int,
     isActive: Boolean
 ) {
-    val absDist = abs(distance)
-
     val targetAlpha = when {
         isActive -> 1f
         else -> 0.8f
@@ -253,7 +259,14 @@ private fun LyricLineItem(
         fontSize = animatedFontSize.sp,
         fontWeight = if (isActive) FontWeight.Bold else FontWeight.Medium,
         lineHeight = (animatedFontSize * 1.45f).sp,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        style = if (isActive) TextStyle(
+            shadow = Shadow(
+                color = Color.White.copy(alpha = 0.8f),
+                offset = androidx.compose.ui.geometry.Offset(0f, 0f),
+                blurRadius = 12f
+            )
+        ) else TextStyle.Default
     )
 }
 
@@ -310,6 +323,7 @@ private fun LyricsBottomBar(
     totalTime: Long,
     isPlaying: Boolean,
     onPlay: () -> Unit = { },
+    onSeek: (Float) -> Unit = { },
     onShuffle: () -> Unit = { },
     onPrevious: () -> Unit = { },
     onNext: () -> Unit = { },
@@ -325,7 +339,8 @@ private fun LyricsBottomBar(
         ProgressBarComponent(
             progress = progress,
             currentTime = currentTime,
-            totalTime = totalTime
+            totalTime = totalTime,
+            onSeek = onSeek
         )
 
         MediaControlsComponent(

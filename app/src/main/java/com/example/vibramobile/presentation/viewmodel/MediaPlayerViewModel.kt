@@ -104,6 +104,22 @@ class MediaPlayerViewModel(
         _uiState.update { it.copy(isLyricsVisible = value) }
     }
 
+    fun seekTo(positionMs: Long) {
+        if (positionMs < 0L) return
+        player.seekTo(positionMs)
+
+        val duration = player.duration
+        if (duration > 0) {
+            _uiState.update {
+                it.copy(
+                    progress = positionMs / duration.toFloat(),
+                    currentPosition = positionMs,
+                    duration = duration
+                )
+            }
+        }
+    }
+
     private fun startProgressUpdater() {
         if (progressJob != null) return
 

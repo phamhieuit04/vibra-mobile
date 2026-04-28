@@ -48,6 +48,12 @@ fun MiniPlayerComponent(
 ) {
     val uiState by mediaPlayerViewModel.uiState.collectAsState()
     val currentSong by mediaPlayerViewModel.currentSong.collectAsState()
+    val onSeek: (Float) -> Unit = { fraction ->
+        val duration = uiState.duration
+        if (duration > 0) {
+            mediaPlayerViewModel.seekTo((duration.toFloat() * fraction).toLong())
+        }
+    }
 
     if (!uiState.isMiniVisible) return
 
@@ -126,7 +132,8 @@ fun MiniPlayerComponent(
             modifier = Modifier.align(alignment = Alignment.BottomCenter),
             progress = uiState.progress,
             height = 2.dp,
-            roundedCornerShape = RoundedCornerShape(4.dp)
+            roundedCornerShape = RoundedCornerShape(4.dp),
+            onSeek = onSeek
         )
     }
 }

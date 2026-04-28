@@ -99,6 +99,11 @@ fun AppFullscreenPlayer(
     val uiState by mediaPlayerViewModel.uiState.collectAsState()
     val currentTime = uiState.currentPosition
     val totalTime = uiState.duration
+    val onSeek: (Float) -> Unit = { fraction ->
+        if (totalTime > 0) {
+            mediaPlayerViewModel.seekTo((totalTime.toFloat() * fraction).toLong())
+        }
+    }
 
     val song by mediaPlayerViewModel.currentSong.collectAsState()
     val rawLyrics = song?.listLyric ?: emptyList()
@@ -303,7 +308,8 @@ fun AppFullscreenPlayer(
                                 modifier = Modifier.padding(horizontal = 2.dp),
                                 progress = uiState.progress,
                                 currentTime = currentTime,
-                                totalTime = totalTime
+                                totalTime = totalTime,
+                                onSeek = onSeek
                             )
                         }
                     }
@@ -386,7 +392,8 @@ fun AppFullscreenPlayer(
                     dominantColor = dominantColor,
                     isPlaying = uiState.isPlaying,
                     progress = uiState.progress,
-                    onToggle = { mediaPlayerViewModel.toggle() }
+                    onToggle = { mediaPlayerViewModel.toggle() },
+                    onSeek = onSeek
                 )
             }
         }
@@ -551,7 +558,8 @@ private fun FullscreenTopbar(
     topBarAlpha: Float,
     isPlaying: Boolean,
     progress: Float,
-    onToggle: () -> Unit
+    onToggle: () -> Unit,
+    onSeek: (Float) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -621,6 +629,7 @@ private fun FullscreenTopbar(
                     progress = progress,
                     height = 3.dp,
                     roundedCornerShape = RoundedCornerShape(0.dp),
+                    onSeek = onSeek
                 )
             }
         }
