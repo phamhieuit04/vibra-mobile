@@ -1,10 +1,12 @@
 package com.example.vibramobile.presentation.component
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,13 +36,17 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -55,6 +61,7 @@ import com.example.vibramobile.core.util.ImageHelper
 import com.example.vibramobile.core.util.LyricsHelper
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import org.koin.androidx.compose.koinViewModel
+import kotlin.math.abs
 
 @Composable
 fun AppLyricsPlayer(
@@ -81,7 +88,7 @@ fun AppLyricsPlayer(
     val listState = rememberLazyListState()
 
     val dominantColor by produceState<Color>(
-        initialValue = Color.Gray,
+        initialValue = Color(0xFF1A1A2E),
         key1 = song?.thumbnailPath
     ) {
         value = ImageHelper.getDominantColor(context, song?.thumbnailPath)
@@ -128,34 +135,126 @@ fun AppLyricsPlayer(
                 }
             ) { padding ->
                 Box(
-                    modifier = Modifier.padding(paddingValues = padding)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues = padding)
                 ) {
                     LazyColumn(
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            horizontal = 24.dp,
+                            vertical = 80.dp
+                        ),
                         state = listState
                     ) {
                         itemsIndexed(lyricLines) { index, line ->
-                            val isActive = index == activeLyricIndex
                             if (line.text.isBlank()) {
-                                Spacer(Modifier.height(20.dp))
+                                Spacer(Modifier.height(28.dp))
                             } else {
-                                Text(
+                                LyricLineItem(
                                     text = line.text,
-                                    color = if (isActive) Color.White else Color.White.copy(alpha = 0.55f),
-                                    fontSize = if (isActive) 22.sp else 18.sp,
-                                    fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
-                                    lineHeight = if (isActive) 30.sp else 24.sp
+                                    distance = index - activeLyricIndex,
+                                    isActive = index == activeLyricIndex
                                 )
                             }
                             if (index < lyricLines.lastIndex) {
-                                Spacer(Modifier.height(20.dp))
+                                Spacer(Modifier.height(18.dp))
                             }
                         }
                     }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp)
+                            .align(Alignment.TopCenter)
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        dominantColor,
+                                        Color.Transparent
+                                    )
+                                )
+                            )
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp)
+                            .align(Alignment.BottomCenter)
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        dominantColor
+                                    )
+                                )
+                            )
+                    )
                 }
             }
         }
     }
+}
+
+@Composable
+private fun LyricLineItem(
+    text: String,
+    distance: Int,
+    isActive: Boolean
+) {
+    val absDist = abs(distance)
+
+    val targetAlpha = when {
+        isActive -> 1f
+        else -> 0.8f
+    }
+
+    val targetScale = when {
+        isActive -> 1f
+        else -> 0.86f
+    }
+
+    val targetFontSize = when {
+        isActive -> 22f
+        else -> 18f
+    }
+
+    val animatedAlpha by animateFloatAsState(
+        targetValue = targetAlpha,
+        animationSpec = tween(durationMillis = 400),
+        label = "lyric_alpha_$text"
+    )
+
+    val animatedScale by animateFloatAsState(
+        targetValue = targetScale,
+        animationSpec = spring(dampingRatio = 0.7f, stiffness = 200f),
+        label = "lyric_scale_$text"
+    )
+
+    val animatedFontSize by animateFloatAsState(
+        targetValue = targetFontSize,
+        animationSpec = tween(durationMillis = 350),
+        label = "lyric_size_$text"
+    )
+
+    Text(
+        text = text,
+        modifier = Modifier
+            .fillMaxWidth()
+            .graphicsLayer {
+                alpha = animatedAlpha
+                scaleX = animatedScale
+                scaleY = animatedScale
+                transformOrigin = TransformOrigin(0.5f, 0.5f)
+            },
+        color = Color.White,
+        fontSize = animatedFontSize.sp,
+        fontWeight = if (isActive) FontWeight.Bold else FontWeight.Medium,
+        lineHeight = (animatedFontSize * 1.45f).sp,
+        textAlign = TextAlign.Center
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -194,7 +293,7 @@ private fun LyricsTopBar(
                 )
                 Text(
                     text = authorName,
-                    color = Color.White,
+                    color = Color.White.copy(alpha = 0.7f),
                     fontSize = 12.sp,
                     lineHeight = 18.sp,
                     textAlign = TextAlign.Center
@@ -218,7 +317,7 @@ private fun LyricsBottomBar(
 ) {
     Column(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth()
             .navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
