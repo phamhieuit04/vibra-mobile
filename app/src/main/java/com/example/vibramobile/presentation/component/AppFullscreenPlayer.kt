@@ -307,58 +307,10 @@ fun AppFullscreenPlayer(
                             modifier = Modifier.fillMaxWidth(),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                IconButton(onClick = { }) {
-                                    Icon(
-                                        modifier = Modifier.size(28.dp),
-                                        contentDescription = "",
-                                        imageVector = Icons.Default.Shuffle,
-                                        tint = Color.White
-                                    )
-                                }
-                                IconButton(onClick = { }) {
-                                    Icon(
-                                        modifier = Modifier.size(52.dp),
-                                        contentDescription = "",
-                                        imageVector = Icons.Default.SkipPrevious,
-                                        tint = Color.White
-                                    )
-                                }
-                                IconButton(
-                                    modifier = Modifier.size(80.dp),
-                                    onClick = { mediaPlayerViewModel.toggle() }
-                                ) {
-                                    Icon(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentDescription = "",
-                                        imageVector = if (uiState.isPlaying)
-                                            Icons.Default.PauseCircleFilled
-                                        else
-                                            Icons.Default.PlayCircleFilled,
-                                        tint = Color.White
-                                    )
-                                }
-                                IconButton(onClick = { }) {
-                                    Icon(
-                                        modifier = Modifier.size(52.dp),
-                                        contentDescription = "",
-                                        imageVector = Icons.Default.SkipNext,
-                                        tint = Color.White
-                                    )
-                                }
-                                IconButton(onClick = { }) {
-                                    Icon(
-                                        modifier = Modifier.size(28.dp),
-                                        contentDescription = "",
-                                        imageVector = Icons.Default.Loop,
-                                        tint = Color.White
-                                    )
-                                }
-                            }
+                            MediaControlsComponent(
+                                isPlaying = uiState.isPlaying,
+                                onPlay = { mediaPlayerViewModel.toggle() }
+                            )
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),

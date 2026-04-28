@@ -1,6 +1,5 @@
 package com.example.vibramobile.presentation.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +19,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Loop
-import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.PauseCircleFilled
 import androidx.compose.material.icons.filled.PlayCircleFilled
 import androidx.compose.material.icons.filled.Shuffle
@@ -31,7 +29,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -41,7 +38,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -114,7 +110,7 @@ fun AppLyricsPlayer(
                         currentTime = currentTime,
                         totalTime = totalTime,
                         isPlaying = uiState.isPlaying,
-                        onTogglePlay = { mediaPlayerViewModel.toggle() }
+                        onPlay = { mediaPlayerViewModel.toggle() },
                     )
                 }
             ) { padding ->
@@ -196,7 +192,11 @@ private fun LyricsBottomBar(
     currentTime: Long,
     totalTime: Long,
     isPlaying: Boolean,
-    onTogglePlay: () -> Unit
+    onPlay: () -> Unit = { },
+    onShuffle: () -> Unit = { },
+    onPrevious: () -> Unit = { },
+    onNext: () -> Unit = { },
+    onLoop: () -> Unit = { }
 ) {
     Column(
         modifier = Modifier
@@ -211,57 +211,9 @@ private fun LyricsBottomBar(
             totalTime = totalTime
         )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { }) {
-                Icon(
-                    modifier = Modifier.size(28.dp),
-                    contentDescription = "",
-                    imageVector = Icons.Default.Shuffle,
-                    tint = Color.White
-                )
-            }
-            IconButton(onClick = { }) {
-                Icon(
-                    modifier = Modifier.size(52.dp),
-                    contentDescription = "",
-                    imageVector = Icons.Default.SkipPrevious,
-                    tint = Color.White
-                )
-            }
-            IconButton(
-                modifier = Modifier.size(80.dp),
-                onClick = onTogglePlay
-            ) {
-                Icon(
-                    modifier = Modifier.fillMaxSize(),
-                    contentDescription = "",
-                    imageVector = if (isPlaying)
-                        Icons.Default.PauseCircleFilled
-                    else
-                        Icons.Default.PlayCircleFilled,
-                    tint = Color.White
-                )
-            }
-            IconButton(onClick = { }) {
-                Icon(
-                    modifier = Modifier.size(52.dp),
-                    contentDescription = "",
-                    imageVector = Icons.Default.SkipNext,
-                    tint = Color.White
-                )
-            }
-            IconButton(onClick = { }) {
-                Icon(
-                    modifier = Modifier.size(28.dp),
-                    contentDescription = "",
-                    imageVector = Icons.Default.Loop,
-                    tint = Color.White
-                )
-            }
-        }
+        MediaControlsComponent(
+            isPlaying = isPlaying,
+            onPlay = onPlay
+        )
     }
 }
