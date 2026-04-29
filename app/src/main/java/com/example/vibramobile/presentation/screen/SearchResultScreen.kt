@@ -55,6 +55,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -142,7 +143,7 @@ fun SearchResultScreen(
                             onExpandedChange = {},
                             placeholder = {
                                 Text(
-                                    "Nội dung...",
+                                    stringResource(R.string.search_placeholder),
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 16.sp
                                 )
@@ -213,7 +214,7 @@ fun SearchResultScreen(
                             if (searchResult!!.songs.drop(1).isNotEmpty()) {
                                 item(key = "songs") {
                                     SpotifySection(
-                                        title = "Bài hát"
+                                        title = stringResource(R.string.label_song)
                                     ) {
                                         ListSongComponent(
                                             onClick = {
@@ -230,7 +231,7 @@ fun SearchResultScreen(
                             if (searchResult!!.artists.isNotEmpty()) {
                                 item(key = "artists") {
                                     SpotifySection(
-                                        title = "Nghệ sĩ"
+                                        title = stringResource(R.string.label_artist)
                                     ) {
                                         TopArtistsComponent(
                                             artists = searchResult!!.artists.take(5),
@@ -254,7 +255,7 @@ fun SearchResultScreen(
                             if (searchResult!!.albums.isNotEmpty()) {
                                 item(key = "albums") {
                                     SpotifySection(
-                                        title = "Album"
+                                        title = stringResource(R.string.label_album)
                                     ) {
                                         ListAlbumComponent(
                                             albums = searchResult!!.albums.take(5),
@@ -307,7 +308,7 @@ private fun EmptySearchState(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Tìm kiếm bài hát, nghệ sĩ, album",
+            text = stringResource(R.string.search_empty_title),
             color = MaterialTheme.colorScheme.onBackground,
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold
@@ -316,7 +317,7 @@ private fun EmptySearchState(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Khám phá âm nhạc yêu thích của bạn",
+            text = stringResource(R.string.search_empty_subtitle),
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             fontSize = 14.sp
         )
@@ -369,7 +370,7 @@ private fun TopResultCard(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Top tìm kiếm",
+                text = stringResource(R.string.search_top_result),
                 color = Color.White.copy(alpha = 0.92f),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
@@ -390,13 +391,13 @@ private fun TopResultCard(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "Bài hát",
+                        text = stringResource(R.string.label_song),
                         color = Color.White.copy(alpha = 0.82f),
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = " • ",
+                        text = stringResource(R.string.separator_dot),
                         color = Color.White.copy(alpha = 0.7f),
                         fontSize = 13.sp
                     )

@@ -48,10 +48,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.vibramobile.R
 import com.example.vibramobile.domain.model.Bill
 import com.example.vibramobile.presentation.state.UserState
 import com.example.vibramobile.presentation.theme.AccentColorHexList
@@ -129,7 +131,7 @@ fun ProfileScreen(
 
             item(key = "settings") {
                 SpotifySection(
-                    title = "Cài đặt"
+                    title = stringResource(R.string.profile_settings)
                 ) {
                     SettingsSection(
                         isDarkMode = isDarkMode,
@@ -143,7 +145,7 @@ fun ProfileScreen(
             if (myAlbums.isNotEmpty()) {
                 item(key = "albums") {
                     SpotifySection(
-                        title = "Album của tôi"
+                        title = stringResource(R.string.profile_my_albums)
                     ) {
                         ListAlbumComponent(
                             albums = myAlbums,
@@ -155,7 +157,7 @@ fun ProfileScreen(
 
             item(key = "payment_history") {
                 SpotifySection(
-                    title = "Lịch sử giao dịch"
+                    title = stringResource(R.string.profile_payment_history)
                 ) {
                     PaymentHistorySection(bills = paymentHistory)
                 }
@@ -174,7 +176,7 @@ private fun PaymentHistorySection(bills: List<Bill>) {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Chưa có giao dịch nào",
+                text = stringResource(R.string.profile_no_transactions),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 14.sp
@@ -205,7 +207,7 @@ private fun PaymentHistorySection(bills: List<Bill>) {
 
 @Composable
 private fun BillItem(bill: Bill) {
-    val itemName = bill.song?.name ?: bill.playlist?.name ?: "Không rõ"
+    val itemName = bill.song?.name ?: bill.playlist?.name ?: stringResource(R.string.bill_unknown)
     val itemPrice = bill.song?.price ?: bill.playlist?.price ?: 0
     val thumbnailPath = bill.song?.thumbnailPath ?: bill.playlist?.thumbnailPath
     val isPlaylist = bill.playlist != null
@@ -225,9 +227,9 @@ private fun BillItem(bill: Bill) {
     }
 
     val statusText = when (bill.status) {
-        "1" -> "Thất bại"
-        "2" -> "Thành công"
-        else -> "Không rõ"
+        "1" -> stringResource(R.string.bill_failed)
+        "2" -> stringResource(R.string.bill_success)
+        else -> stringResource(R.string.bill_unknown)
     }
 
     val statusColor = when (bill.status) {
@@ -286,7 +288,7 @@ private fun BillItem(bill: Bill) {
                 )
                 Spacer(modifier = Modifier.height(3.dp))
                 Text(
-                    text = if (isPlaylist) "Playlist" else "Bài hát",
+                    text = if (isPlaylist) stringResource(R.string.bill_playlist) else stringResource(R.string.bill_song),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 13.sp
@@ -347,7 +349,7 @@ private fun ProfileHeader(userName: String, avatar: String) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Hồ sơ",
+            text = stringResource(R.string.profile_title),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -369,9 +371,9 @@ private fun StatsRow(playlistCount: Int, followedArtistsCount: Int) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
-        StatItem(value = playlistCount.toString(), label = "Playlist")
+        StatItem(value = playlistCount.toString(), label = stringResource(R.string.bill_playlist))
         Spacer(modifier = Modifier.width(48.dp))
-        StatItem(value = followedArtistsCount.toString(), label = "Đang theo dõi")
+        StatItem(value = followedArtistsCount.toString(), label = stringResource(R.string.stats_following))
     }
 }
 
@@ -426,7 +428,7 @@ private fun SettingsSection(
                 Spacer(modifier = Modifier.width(14.dp))
 
                 Text(
-                    text = "Giao diện tối",
+                    text = stringResource(R.string.settings_dark_mode),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -455,7 +457,7 @@ private fun SettingsSection(
                 .padding(horizontal = 16.dp, vertical = 14.dp)
         ) {
             Text(
-                text = "Màu chủ đạo",
+                text = stringResource(R.string.settings_accent_color),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )

@@ -5,10 +5,12 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
@@ -24,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -89,7 +92,7 @@ fun HorizontalListArtist(
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    text = "${artist.followers} người theo dõi",
+                    text = stringResource(R.string.followers_count, artist.followers ?: 0),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 12.sp,
                     maxLines = 1,
@@ -115,6 +118,7 @@ fun VerticalListArtist(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(bottom = 5.dp)
                     .noRippleClickable(onClick = { onClick(artist) }),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -144,7 +148,7 @@ fun VerticalListArtist(
                         )
                         Spacer(Modifier.height(2.dp))
                         Text(
-                            text = "${artist.followers ?: 0} người theo dõi",
+                            text = stringResource(R.string.followers_count, artist.followers ?: 0),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 12.sp,
                             lineHeight = 12.sp

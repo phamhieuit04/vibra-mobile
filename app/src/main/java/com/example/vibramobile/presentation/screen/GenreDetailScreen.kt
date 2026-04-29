@@ -54,6 +54,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -154,7 +155,7 @@ fun GenreDetailScreen(
 
                             item(key = "featured_songs") {
                                 SpotifySection(
-                                    title = "Danh sách nhạc nổi bật",
+                                    title = stringResource(R.string.genre_featured_songs),
                                     modifier = Modifier.padding(
                                         start = 16.dp,
                                         end = 16.dp
@@ -173,7 +174,7 @@ fun GenreDetailScreen(
                             if (songsByCategory.size > 5) {
                                 item(key = "list_song") {
                                     SpotifySection(
-                                        title = "Bài hát",
+                                        title = stringResource(R.string.genre_songs),
                                         modifier = Modifier.padding(
                                             start = 16.dp,
                                             end = 16.dp,
@@ -265,7 +266,7 @@ private fun GenreDetailHeader(
                     .align(Alignment.Bottom)
             ) {
                 Text(
-                    text = "Thể loại",
+                    text = stringResource(R.string.genre_label),
                     color = Color.White.copy(alpha = 0.85f),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium
@@ -327,7 +328,7 @@ private fun EmptyStateView(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Chưa có bài hát",
+            text = stringResource(R.string.empty_no_songs),
             color = MaterialTheme.colorScheme.onBackground,
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold
@@ -336,7 +337,7 @@ private fun EmptyStateView(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Giai điệu cho từng khoảnh khắc",
+            text = stringResource(R.string.empty_melody),
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             fontSize = 14.sp
         )
@@ -352,7 +353,7 @@ private fun EmptyStateView(
             contentPadding = PaddingValues(horizontal = 32.dp, vertical = 12.dp)
         ) {
             Text(
-                text = "Khám phá ngay",
+                text = stringResource(R.string.action_explore_now),
                 color = Color.Black,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold

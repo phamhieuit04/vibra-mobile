@@ -23,9 +23,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.vibramobile.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,22 +64,22 @@ fun SignUpPasswordScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Create a password",
+                text = stringResource(R.string.auth_create_password),
                 color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
-            FormPasswordField(placeholder = "********")
+            FormPasswordField(placeholder = stringResource(R.string.password_mask_placeholder))
             Text(
-                text = "Enter password again",
+                text = stringResource(R.string.auth_enter_password_again),
                 color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
-            FormPasswordField(placeholder = "********")
+            FormPasswordField(placeholder = stringResource(R.string.password_mask_placeholder))
             FormButton(
                 onClick = navigateToLogin,
-                text = "Sign up"
+                text = stringResource(R.string.action_sign_up)
             )
         }
     }

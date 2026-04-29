@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -59,6 +60,7 @@ import com.composables.core.Scrim
 import com.composables.core.Sheet
 import com.composables.core.SheetDetent
 import com.composables.core.rememberModalBottomSheetState
+import com.example.vibramobile.R
 import com.example.vibramobile.core.util.ImageHelper
 import com.example.vibramobile.core.util.LyricsHelper
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
@@ -291,7 +293,7 @@ private fun LyricsTopBar(
             IconButton(onClick = onClick) {
                 Icon(
                     modifier = Modifier.size(32.dp),
-                    contentDescription = "Close",
+                    contentDescription = stringResource(R.string.cd_close),
                     imageVector = Icons.Default.KeyboardArrowDown,
                     tint = Color.White
                 )

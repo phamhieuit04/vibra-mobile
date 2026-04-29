@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -65,13 +66,13 @@ fun SignUpScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Already have an account?",
+                    text = stringResource(R.string.auth_already_have_account),
                     color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 16.sp
                 )
                 TextButton(onClick = navigateToLogin) {
                     Text(
-                        text = "Log in",
+                        text = stringResource(R.string.action_log_in),
                         color = MaterialTheme.colorScheme.onBackground,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
@@ -104,14 +105,14 @@ fun SignUpScreen(
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "Sign up to",
+                    text = stringResource(R.string.auth_sign_up_to),
                     color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp,
                     lineHeight = 32.sp
                 )
                 Text(
-                    text = "start listening",
+                    text = stringResource(R.string.auth_start_listening),
                     color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp,
@@ -125,26 +126,26 @@ fun SignUpScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 FormInput(
-                    placeholder = "What's your email?",
+                    placeholder = stringResource(R.string.auth_email_placeholder),
                 )
                 FormButton(
                     onClick = navigateToSignUpPassword,
-                    text = "Continue"
+                    text = stringResource(R.string.auth_continue)
                 )
                 Text(
-                    text = "or",
+                    text = stringResource(R.string.auth_or),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     fontSize = 12.sp
                 )
                 SocialMethod(
                     onClick = {},
-                    provider = "Google",
+                    provider = stringResource(R.string.auth_provider_google),
                     painter = painterResource(R.drawable.google_logo)
                 )
                 SocialMethod(
                     onClick = {},
-                    provider = "Facebook",
+                    provider = stringResource(R.string.auth_provider_facebook),
                     painter = painterResource(R.drawable.facebook_logo)
                 )
             }

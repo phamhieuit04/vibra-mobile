@@ -47,12 +47,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.example.vibramobile.R
 import com.example.vibramobile.core.util.FormatHelper
 import com.example.vibramobile.domain.model.Playlist
 import com.example.vibramobile.domain.model.Song
@@ -144,13 +146,14 @@ fun ArtistDetailScreen(
                     DetailActionComponent(
                         config = DetailActionConfig.Artist(
                             avatarPath = artist.avatarPath,
+                            followLabelRes = R.string.action_follow,
                             dropdownItems = listOf(
-                                "Thêm vào danh sách phát" to {
+                                R.string.menu_add_to_queue to {
                                     mediaPlayerViewModel.enqueueSongs(
                                         songs
                                     )
                                 },
-                                "Hạn chế nghệ sĩ" to {}
+                                R.string.artist_restrict to {}
                             ),
                             onFollow = {}
                         ),
@@ -176,7 +179,7 @@ fun ArtistDetailScreen(
                 if (songs.isNotEmpty()) {
                     item("popular_songs") {
                         SpotifySection(
-                            title = "Bài hát phổ biến",
+                            title = stringResource(R.string.artist_popular_songs),
                             modifier = Modifier.padding(horizontal = 16.dp)
                         ) {
                             TopSongsComponent(
@@ -192,7 +195,7 @@ fun ArtistDetailScreen(
                     if (songs.size > 5) {
                         item("songs") {
                             SpotifySection(
-                                title = "Danh sách bài hát",
+                                title = stringResource(R.string.artist_song_list),
                                 modifier = Modifier
                                     .padding(horizontal = 16.dp)
                                     .padding(top = 12.dp)
@@ -213,7 +216,7 @@ fun ArtistDetailScreen(
                 if (albums.isNotEmpty()) {
                     item("popular_albums") {
                         SpotifySection(
-                            title = "Albums phổ biến",
+                            title = stringResource(R.string.artist_popular_albums),
                             modifier = Modifier.padding(horizontal = 16.dp)
                         ) {
                             ListAlbumComponent(
@@ -225,7 +228,7 @@ fun ArtistDetailScreen(
 
                 item("introduction") {
                     SpotifySection(
-                        title = "Giới thiệu",
+                        title = stringResource(R.string.artist_introduction),
                         modifier = Modifier.padding(horizontal = 16.dp)
                     ) {
                         ArtistDetailIntroduction(artist = artist)
@@ -355,7 +358,7 @@ private fun ArtistDetailIntroduction(artist: User) {
 
                 OutlinedButton(onClick = { }, shape = RoundedCornerShape(50)) {
                     Text(
-                        text = "Theo dõi",
+                        text = stringResource(R.string.action_follow),
                         color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 13.sp
                     )

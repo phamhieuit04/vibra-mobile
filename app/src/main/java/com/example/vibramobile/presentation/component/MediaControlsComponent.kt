@@ -18,9 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.vibramobile.R
 import com.example.vibramobile.presentation.state.RepeatMode
 
 @Composable
@@ -47,7 +49,7 @@ fun MediaControlsComponent(
         IconButton(onClick = onShuffle) {
             Icon(
                 modifier = Modifier.size(28.dp),
-                contentDescription = "Shuffle",
+                contentDescription = stringResource(R.string.cd_shuffle),
                 imageVector = Icons.Default.Shuffle,
                 tint = shuffleTint
             )
@@ -55,7 +57,7 @@ fun MediaControlsComponent(
         IconButton(onClick = onPrevious) {
             Icon(
                 modifier = Modifier.size(52.dp),
-                contentDescription = "Previous",
+                contentDescription = stringResource(R.string.cd_previous),
                 imageVector = Icons.Default.SkipPrevious,
                 tint = inactiveColor
             )
@@ -66,7 +68,7 @@ fun MediaControlsComponent(
         ) {
             Icon(
                 modifier = Modifier.fillMaxSize(),
-                contentDescription = "Play/Pause",
+                contentDescription = stringResource(R.string.cd_play_pause),
                 imageVector = if (isPlaying)
                     Icons.Default.PauseCircleFilled
                 else
@@ -77,7 +79,7 @@ fun MediaControlsComponent(
         IconButton(onClick = onNext) {
             Icon(
                 modifier = Modifier.size(52.dp),
-                contentDescription = "Next",
+                contentDescription = stringResource(R.string.cd_next),
                 imageVector = Icons.Default.SkipNext,
                 tint = inactiveColor
             )
@@ -88,7 +90,7 @@ fun MediaControlsComponent(
                     modifier = Modifier
                         .size(28.dp)
                         .rotate(-45f),
-                    contentDescription = "Repeat",
+                    contentDescription = stringResource(R.string.cd_repeat),
                     imageVector = Icons.Default.Loop,
                     tint = repeatTint
                 )

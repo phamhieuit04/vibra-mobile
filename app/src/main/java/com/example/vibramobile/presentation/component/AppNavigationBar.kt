@@ -35,30 +35,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation3.runtime.NavKey
+import com.example.vibramobile.R
 import com.example.vibramobile.presentation.navigation.destination.MainDestination
 
 data class BottomNavItem(
-    val label: String,
+    val labelResId: Int,
     val icon: ImageVector,
     val selectedIcon: ImageVector
 )
 
 val TOP_LEVEL_DESTINATIONS = mapOf(
     MainDestination.Home to BottomNavItem(
-        "Home", Icons.Outlined.Home, Icons.Default.Home
+        R.string.nav_home, Icons.Outlined.Home, Icons.Default.Home
     ),
     MainDestination.Search to BottomNavItem(
-        "Search", Icons.Outlined.Search, Icons.Default.Search
+        R.string.nav_search, Icons.Outlined.Search, Icons.Default.Search
     ),
     MainDestination.Library to BottomNavItem(
-        "Library", Icons.Outlined.LibraryMusic, Icons.Default.LibraryMusic
+        R.string.nav_library, Icons.Outlined.LibraryMusic, Icons.Default.LibraryMusic
     ),
     MainDestination.Profile to BottomNavItem(
-        "Profile", Icons.Outlined.AccountCircle, Icons.Default.AccountCircle
+        R.string.nav_profile, Icons.Outlined.AccountCircle, Icons.Default.AccountCircle
     )
 )
 
@@ -99,7 +101,7 @@ fun AppNavigationBar(
                     icon = data.icon,
                     iconColor = Color.White,
                     selectedIcon = data.selectedIcon,
-                    label = data.label,
+                    label = stringResource(data.labelResId),
                     labelColor = Color.White,
                 )
             }

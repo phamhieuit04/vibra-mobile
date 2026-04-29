@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -157,7 +158,7 @@ fun HorizontalListSong(
                         Icon(
                             modifier = Modifier.size(20.dp),
                             imageVector = Icons.Default.MoreHoriz,
-                            contentDescription = "",
+                            contentDescription = stringResource(R.string.cd_more),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -240,7 +241,7 @@ fun VerticalListSong(
                     Icon(
                         modifier = Modifier.size(20.dp),
                         imageVector = Icons.Default.MoreHoriz,
-                        contentDescription = "",
+                        contentDescription = stringResource(R.string.cd_more),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -349,7 +350,7 @@ fun ListSongSkeleton(modifier: Modifier = Modifier) {
                         Icon(
                             modifier = Modifier.size(20.dp),
                             imageVector = Icons.Default.MoreHoriz,
-                            contentDescription = "",
+                            contentDescription = stringResource(R.string.cd_more),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
                         )
                     }
@@ -395,7 +396,7 @@ fun ListSongRowSkeleton(modifier: Modifier = Modifier) {
                     Icon(
                         modifier = Modifier.size(20.dp),
                         imageVector = Icons.Default.MoreHoriz,
-                        contentDescription = "",
+                        contentDescription = stringResource(R.string.cd_more),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
                     )
                 }

@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -121,7 +122,7 @@ fun TopArtistCard(
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "${artist.followers} người theo dõi",
+                text = stringResource(R.string.followers_count, artist.followers ?: 0),
                 fontSize = 13.sp,
                 color = Color.White.copy(alpha = 0.82f),
                 maxLines = 1,
