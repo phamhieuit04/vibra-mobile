@@ -100,8 +100,8 @@ fun SearchResultScreen(
     val searchResult by searchViewModel.searchResult.collectAsState()
     val isLoading by searchViewModel.isLoading.collectAsState()
 
-    val currentSong by mediaPlayerViewModel.currentSong.collectAsState()
     val mediaState by mediaPlayerViewModel.uiState.collectAsState()
+    val currentSong = mediaState.currentSong
 
     val topSong = searchResult?.songs?.firstOrNull()
     val isPlaying by remember(currentSong, mediaState.isPlaying, topSong) {

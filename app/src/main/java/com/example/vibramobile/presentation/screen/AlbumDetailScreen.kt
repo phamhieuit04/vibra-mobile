@@ -124,11 +124,7 @@ fun AlbumDetailScreen(
 
                     DetailActionComponent(
                         config = DetailActionConfig.Album(
-                            dropdownItems = listOf(
-                                "Thêm vào danh sách phát" to {},
-                                "Chia sẻ" to {},
-                            ),
-                            onAddToLibrary = {},
+                            onAddToQueue = { mediaPlayerViewModel.enqueueSongs(songs = songs) },
                             onDownload = {},
                         ),
                         onShuffle = {

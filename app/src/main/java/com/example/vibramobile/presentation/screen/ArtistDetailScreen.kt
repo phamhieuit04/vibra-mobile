@@ -144,8 +144,15 @@ fun ArtistDetailScreen(
                     DetailActionComponent(
                         config = DetailActionConfig.Artist(
                             avatarPath = artist.avatarPath,
-                            dropdownItems = listOf("Hạn chế nghệ sĩ" to {}),
-                            onFollow = {},
+                            dropdownItems = listOf(
+                                "Thêm vào danh sách phát" to {
+                                    mediaPlayerViewModel.enqueueSongs(
+                                        songs
+                                    )
+                                },
+                                "Hạn chế nghệ sĩ" to {}
+                            ),
+                            onFollow = {}
                         ),
                         onShuffle = {
                             mediaPlayerViewModel.playAll(

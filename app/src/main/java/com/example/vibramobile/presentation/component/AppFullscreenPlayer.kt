@@ -110,7 +110,7 @@ fun AppFullscreenPlayer(
         }
     }
 
-    val song by mediaPlayerViewModel.currentSong.collectAsState()
+    val song = uiState.currentSong
     val rawLyrics = song?.listLyric ?: emptyList()
     val lyricLines = remember(rawLyrics) { LyricsHelper.parseLyrics(rawLyrics) }
     val activeLyricIndex by remember(lyricLines, currentTime) {

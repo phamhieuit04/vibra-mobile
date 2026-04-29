@@ -47,7 +47,7 @@ fun MiniPlayerComponent(
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel()
 ) {
     val uiState by mediaPlayerViewModel.uiState.collectAsState()
-    val currentSong by mediaPlayerViewModel.currentSong.collectAsState()
+    val currentSong = uiState.currentSong
     val onSeek: (Float) -> Unit = { fraction ->
         val duration = uiState.duration
         if (duration > 0) {

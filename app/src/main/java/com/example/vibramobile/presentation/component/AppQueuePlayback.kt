@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import com.composables.core.DragIndication
@@ -41,11 +42,12 @@ import kotlin.collections.emptyList
 
 @Composable
 fun AppQueuePlayback(
+    bottomContentPadding: Dp = 0.dp,
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
     contextMenuViewModel: ContextMenuViewModel = koinViewModel()
 ) {
     val uiState by mediaPlayerViewModel.uiState.collectAsState()
-    val currentSong by mediaPlayerViewModel.currentSong.collectAsState()
+    val currentSong = uiState.currentSong
     val queuePlaybacks = uiState.queue
 
     val Peek = SheetDetent(identifier = "peek") { containerHeight, sheetHeight ->
@@ -138,6 +140,8 @@ fun AppQueuePlayback(
                     currentSongId = currentSong?.id,
                     currentSongPath = currentSong?.songPath
                 )
+
+                Spacer(modifier = Modifier.height(bottomContentPadding))
             }
         }
     }

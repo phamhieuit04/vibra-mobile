@@ -205,7 +205,9 @@ fun MainGraph(
 
                 AppLyricsPlayer()
 
-                AppQueuePlayback()
+                AppQueuePlayback(
+                    bottomContentPadding = bottomContentPadding,
+                )
             }
 
             Column(

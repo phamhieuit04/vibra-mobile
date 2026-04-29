@@ -61,7 +61,6 @@ import org.koin.androidx.compose.koinViewModel
 fun AppContextMenu(
     modifier: Modifier = Modifier,
     contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
-    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
     navigateToArtist: (artist: User) -> Unit
 ) {
     val uiState by contextMenuViewModel.uiState.collectAsState()
@@ -133,7 +132,9 @@ fun AppContextMenu(
                     artistName = uiState.artistName,
                     onMenuItemClick = { action ->
                         when (action) {
-                            is MenuAction.AddToQueue -> {}
+                            is MenuAction.AddToQueue -> {
+                            }
+
                             is MenuAction.AddToLiked -> {}
                             is MenuAction.AddToPlaylist -> {}
                             is MenuAction.GoToArtist -> {}

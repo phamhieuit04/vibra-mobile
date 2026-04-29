@@ -20,5 +20,6 @@ data class MediaPlayerState(
     val queue: List<Song> = emptyList(),
     val currentIndex: Int = -1,
     val isShuffleEnabled: Boolean = false,
-    val repeatMode: RepeatMode = RepeatMode.OFF
+    val repeatMode: RepeatMode = RepeatMode.OFF,
+    val currentSong: Song? = null
 )

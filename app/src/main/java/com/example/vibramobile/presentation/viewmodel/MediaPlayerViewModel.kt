@@ -36,13 +36,10 @@ class MediaPlayerViewModel(
 
     private val player = ExoPlayer.Builder(context).build()
 
-    val currentSong: StateFlow<Song?> = SongState.currentSong
-    private var currentSongValue: Song?
-        get() = SongState.currentSong.value
-        set(value) = SongState.setCurrentSong(value)
-
     private val _uiState = MutableStateFlow(MediaPlayerState())
     val uiState = _uiState.asStateFlow()
+
+    var currentSongValue = _uiState.value.currentSong
 
     private var progressJob: Job? = null
 
@@ -86,7 +83,11 @@ class MediaPlayerViewModel(
         if (song == null) return
         if (song.songPath.isNullOrBlank()) return
 
-        _uiState.update { it.copy(isMiniVisible = true) }
+        _uiState.update {
+            it.copy(
+                isMiniVisible = true, currentSong = song
+            )
+        }
 
         val isSameSong = currentSongValue?.id == song.id &&
                 currentSongValue?.songPath == song.songPath

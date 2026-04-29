@@ -9,8 +9,7 @@ sealed class DetailActionConfig {
     ) : DetailActionConfig()
 
     data class Album(
-        val dropdownItems: List<Pair<String, () -> Unit>> = emptyList(),
-        val onAddToLibrary: () -> Unit = {},
+        val onAddToQueue: () -> Unit = {},
         val onDownload: () -> Unit = {},
     ) : DetailActionConfig()
 }
