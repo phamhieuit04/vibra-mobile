@@ -68,6 +68,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.adamglin.PhosphorIcons
+import com.adamglin.phosphoricons.Bold
+import com.adamglin.phosphoricons.Regular
+import com.adamglin.phosphoricons.bold.Playlist
+import com.adamglin.phosphoricons.regular.Playlist
 import com.composables.core.ModalBottomSheet
 import com.composables.core.Scrim
 import com.composables.core.Sheet
@@ -324,27 +329,16 @@ fun AppFullscreenPlayer(
                                 onPlay = { mediaPlayerViewModel.toggle() }
                             )
 
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                            IconButton(
+                                modifier = Modifier.align(Alignment.End),
+                                onClick = { mediaPlayerViewModel.toggleQueue(true) }
                             ) {
-                                IconButton(onClick = { }) {
-                                    Icon(
-                                        modifier = Modifier.size(28.dp),
-                                        contentDescription = "",
-                                        imageVector = Icons.Default.Queue,
-                                        tint = Color.White
-                                    )
-                                }
-                                IconButton(onClick = { }) {
-                                    Icon(
-                                        modifier = Modifier.size(28.dp),
-                                        contentDescription = "",
-                                        imageVector = Icons.Default.LibraryMusic,
-                                        tint = Color.White
-                                    )
-                                }
+                                Icon(
+                                    modifier = Modifier.size(28.dp),
+                                    contentDescription = "",
+                                    imageVector = PhosphorIcons.Bold.Playlist,
+                                    tint = Color.White
+                                )
                             }
                         }
                     }

@@ -1,7 +1,5 @@
 package com.example.vibramobile.presentation.component
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -94,12 +92,6 @@ fun AppContextMenu(
         }
     }
 
-    val scrimAlpha by animateFloatAsState(
-        targetValue = if (sheetState.currentDetent != SheetDetent.Hidden) 0.5f else 0f,
-        animationSpec = tween(durationMillis = 300),
-        label = "scrim_alpha"
-    )
-
     ModalBottomSheet(state = sheetState) {
         Scrim(
             modifier = Modifier.noRippleClickable(
@@ -107,7 +99,7 @@ fun AppContextMenu(
         )
 
         Sheet(
-            modifier = modifier
+            modifier = Modifier
                 .padding(top = 48.dp)
                 .shadow(4.dp, RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
@@ -174,7 +166,7 @@ private fun ContextMenuContent(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
     ) {
-        SongHeader(
+        TopSongComponent(
             thumbnailPath = thumbnailPath,
             songTitle = songTitle,
             artistName = artistName
@@ -260,55 +252,6 @@ private fun ContextMenuContent(
                     icon = Icons.Default.Info,
                     text = "View song credits",
                     onClick = { onMenuItemClick(MenuAction.ViewCredits) }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun SongHeader(
-    thumbnailPath: String,
-    songTitle: String,
-    artistName: String
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        AsyncImage(
-            modifier = Modifier
-                .size(64.dp)
-                .clip(shape = RoundedCornerShape(4.dp)),
-            contentDescription = "",
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(thumbnailPath.encodeURLPath())
-                .size(400)
-                .crossfade(true)
-                .build(),
-            placeholder = painterResource(R.drawable.default_image),
-            error = painterResource(R.drawable.default_image),
-            contentScale = ContentScale.Crop
-        )
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        Column {
-            Text(
-                text = songTitle,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                lineHeight = 1.sp
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            if (artistName.isNotBlank()) {
-                Text(
-                    text = artistName,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 12.sp
                 )
             }
         }

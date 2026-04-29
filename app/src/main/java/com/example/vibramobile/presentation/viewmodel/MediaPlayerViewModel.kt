@@ -104,6 +104,10 @@ class MediaPlayerViewModel(
         _uiState.update { it.copy(isLyricsVisible = value) }
     }
 
+    fun toggleQueue(value: Boolean) {
+        _uiState.update { it.copy(isQueueVisible = value) }
+    }
+
     fun seekTo(positionMs: Long) {
         if (positionMs < 0L) return
         player.seekTo(positionMs)

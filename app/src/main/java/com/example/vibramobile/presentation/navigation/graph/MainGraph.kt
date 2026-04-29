@@ -41,6 +41,7 @@ import com.example.vibramobile.presentation.screen.SearchResultScreen
 import com.example.vibramobile.presentation.screen.SearchScreen
 import androidx.compose.animation.AnimatedVisibility
 import com.example.vibramobile.presentation.component.AppLyricsPlayer
+import com.example.vibramobile.presentation.component.AppQueuePlayback
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
@@ -199,6 +200,8 @@ fun MainGraph(
                 )
 
                 AppLyricsPlayer()
+
+                AppQueuePlayback()
             }
 
             Column(
