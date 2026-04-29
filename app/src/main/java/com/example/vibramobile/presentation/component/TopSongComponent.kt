@@ -1,14 +1,21 @@
 package com.example.vibramobile.presentation.component
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PauseCircleFilled
+import androidx.compose.material.icons.filled.PlayCircleFilled
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,40 +44,42 @@ fun TopSongComponent(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        AsyncImage(
-            modifier = Modifier
-                .size(64.dp)
-                .clip(shape = RoundedCornerShape(4.dp)),
-            contentDescription = "",
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(thumbnailPath.encodeURLPath())
-                .size(400)
-                .crossfade(true)
-                .build(),
-            placeholder = painterResource(R.drawable.default_image),
-            error = painterResource(R.drawable.default_image),
-            contentScale = ContentScale.Crop
-        )
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        Column {
-            Text(
-                text = songTitle,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                lineHeight = 1.sp
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            AsyncImage(
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(shape = RoundedCornerShape(4.dp)),
+                contentDescription = "",
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(thumbnailPath.encodeURLPath())
+                    .size(400)
+                    .crossfade(true)
+                    .build(),
+                placeholder = painterResource(R.drawable.default_image),
+                error = painterResource(R.drawable.default_image),
+                contentScale = ContentScale.Crop
             )
-            Spacer(modifier = Modifier.height(2.dp))
-            if (artistName.isNotBlank()) {
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column {
                 Text(
-                    text = artistName,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 12.sp
+                    text = songTitle,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    lineHeight = 1.sp
                 )
+                Spacer(modifier = Modifier.height(2.dp))
+                if (artistName.isNotBlank()) {
+                    Text(
+                        text = artistName,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 12.sp
+                    )
+                }
             }
         }
     }

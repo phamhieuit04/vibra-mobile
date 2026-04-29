@@ -1,5 +1,12 @@
 package com.example.vibramobile.presentation.component
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,13 +29,17 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -38,8 +49,10 @@ import com.example.vibramobile.R
 import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.core.extension.noRippleClickable
 import com.example.vibramobile.core.extension.skeletonEffect
+import com.example.vibramobile.core.util.SongHelper
 import com.example.vibramobile.presentation.config.LayoutStyleConfig
 import io.ktor.http.encodeURLPath
+import kotlin.math.sin
 
 @Composable
 fun ListSongComponent(
@@ -47,19 +60,25 @@ fun ListSongComponent(
     songs: List<Song>,
     layoutStyle: LayoutStyleConfig = LayoutStyleConfig.Horizontal,
     onClick: (Song) -> Unit,
-    onPlay: (Song) -> Unit
+    onPlay: (Song) -> Unit,
+    currentSongId: Int? = null,
+    currentSongPath: String? = null
 ) {
     when (layoutStyle) {
         LayoutStyleConfig.Horizontal -> HorizontalListSong(
             songs = songs,
             onClick = onClick,
-            onPlay = onPlay
+            onPlay = onPlay,
+            currentSongId = currentSongId,
+            currentSongPath = currentSongPath
         )
 
         LayoutStyleConfig.Vertical -> VerticalListSong(
             songs = songs,
             onClick = onClick,
-            onPlay = onPlay
+            onPlay = onPlay,
+            currentSongId = currentSongId,
+            currentSongPath = currentSongPath
         )
     }
 }
@@ -69,42 +88,59 @@ fun HorizontalListSong(
     modifier: Modifier = Modifier,
     songs: List<Song>,
     onClick: (Song) -> Unit,
-    onPlay: (Song) -> Unit
+    onPlay: (Song) -> Unit,
+    currentSongId: Int? = null,
+    currentSongPath: String? = null
 ) {
-    LazyRow() {
-        itemsIndexed(songs, key = { index, song -> song.id!! }) { index, song ->
+    LazyRow {
+        itemsIndexed(songs, key = { _, song -> song.id!! }) { _, song ->
+            val isActive = SongHelper.songMatches(song, currentSongId, currentSongPath)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .noRippleClickable(onClick = { onPlay(song) }),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                AsyncImage(
-                    modifier = Modifier
-                        .size(140.dp)
-                        .clip(
-                            shape = CircleShape
-                        ),
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(song.thumbnailPath?.encodeURLPath())
-                        .size(400)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop,
-                    placeholder = painterResource(R.drawable.default_image),
-                    error = painterResource(R.drawable.default_image)
-                )
+                Box {
+                    AsyncImage(
+                        modifier = Modifier
+                            .size(140.dp)
+                            .clip(CircleShape),
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(song.thumbnailPath?.encodeURLPath())
+                            .size(400)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        placeholder = painterResource(R.drawable.default_image),
+                        error = painterResource(R.drawable.default_image)
+                    )
+                    if (isActive) {
+                        Box(
+                            modifier = Modifier
+                                .size(140.dp)
+                                .clip(CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            WaveformIcon(
+                                color = Color.White,
+                                size = 24.dp
+                            )
+                        }
+                    }
+                }
                 Spacer(Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column() {
+                    Column {
                         Text(
                             text = song.name.toString(),
-                            color = MaterialTheme.colorScheme.onBackground,
+                            color = if (isActive) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onBackground,
                             fontSize = 15.sp,
                             lineHeight = 16.sp,
                             fontWeight = FontWeight.SemiBold
@@ -137,10 +173,13 @@ fun VerticalListSong(
     modifier: Modifier = Modifier,
     songs: List<Song>,
     onClick: (Song) -> Unit,
-    onPlay: (Song) -> Unit
+    onPlay: (Song) -> Unit,
+    currentSongId: Int? = null,
+    currentSongPath: String? = null
 ) {
-    Column() {
+    Column {
         for (song in songs) {
+            val isActive = SongHelper.songMatches(song, currentSongId, currentSongPath)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -148,30 +187,42 @@ fun VerticalListSong(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row() {
-                    AsyncImage(
-                        modifier = Modifier
-                            .size(42.dp)
-                            .clip(
-                                shape = RoundedCornerShape(
-                                    4.dp
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box {
+                        AsyncImage(
+                            modifier = Modifier
+                                .size(42.dp)
+                                .clip(RoundedCornerShape(4.dp)),
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop,
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(song.thumbnailPath?.encodeURLPath())
+                                .size(400)
+                                .crossfade(true)
+                                .build(),
+                            placeholder = painterResource(R.drawable.default_image),
+                            error = painterResource(R.drawable.default_image)
+                        )
+                        if (isActive) {
+                            Box(
+                                modifier = Modifier
+                                    .size(42.dp)
+                                    .clip(RoundedCornerShape(4.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                WaveformIcon(
+                                    color = Color.White,
+                                    size = 14.dp
                                 )
-                            ),
-                        contentDescription = "",
-                        contentScale = ContentScale.Crop,
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(song.thumbnailPath?.encodeURLPath())
-                            .size(400)
-                            .crossfade(true)
-                            .build(),
-                        placeholder = painterResource(R.drawable.default_image),
-                        error = painterResource(R.drawable.default_image)
-                    )
+                            }
+                        }
+                    }
                     Spacer(Modifier.width(12.dp))
-                    Column() {
+                    Column {
                         Text(
                             text = song.name.toString(),
-                            color = MaterialTheme.colorScheme.onBackground,
+                            color = if (isActive) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onBackground,
                             fontSize = 15.sp,
                             lineHeight = 18.sp,
                             fontWeight = FontWeight.SemiBold
@@ -200,6 +251,67 @@ fun VerticalListSong(
 }
 
 @Composable
+fun WaveformIcon(
+    modifier: Modifier = Modifier,
+    color: Color = Color.White,
+    size: Dp = 18.dp
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "waveform")
+
+    val phase1 by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = (2 * Math.PI).toFloat(),
+        animationSpec = infiniteRepeatable(
+            animation = tween(900, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "phase1"
+    )
+    val phase2 by infiniteTransition.animateFloat(
+        initialValue = (Math.PI / 2).toFloat(),
+        targetValue = ((2 * Math.PI) + (Math.PI / 2)).toFloat(),
+        animationSpec = infiniteRepeatable(
+            animation = tween(700, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "phase2"
+    )
+    val phase3 by infiniteTransition.animateFloat(
+        initialValue = (Math.PI).toFloat(),
+        targetValue = ((2 * Math.PI) + Math.PI).toFloat(),
+        animationSpec = infiniteRepeatable(
+            animation = tween(1100, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "phase3"
+    )
+
+    Canvas(modifier = modifier.size(size)) {
+        val barCount = 3
+        val totalWidth = this.size.width
+        val barWidth = totalWidth * 0.22f
+        val gap = (totalWidth - barWidth * barCount) / (barCount + 1)
+        val maxHeight = this.size.height
+        val minHeight = maxHeight * 0.25f
+        val phases = listOf(phase1, phase2, phase3)
+
+        phases.forEachIndexed { i, phase ->
+            val x = gap + i * (barWidth + gap)
+            val heightFraction = ((sin(phase) + 1f) / 2f)
+            val barHeight = minHeight + heightFraction * (maxHeight - minHeight)
+            val top = (maxHeight - barHeight) / 2f
+
+            drawRoundRect(
+                color = color,
+                topLeft = Offset(x, top),
+                size = androidx.compose.ui.geometry.Size(barWidth, barHeight),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(barWidth / 2)
+            )
+        }
+    }
+}
+
+@Composable
 fun ListSongSkeleton(modifier: Modifier = Modifier) {
     Row(modifier = modifier.horizontalScroll(state = rememberScrollState())) {
         for (i in 0..4) {
@@ -211,9 +323,7 @@ fun ListSongSkeleton(modifier: Modifier = Modifier) {
                 Box(
                     modifier = Modifier
                         .size(140.dp)
-                        .clip(
-                            shape = CircleShape
-                        )
+                        .clip(CircleShape)
                         .skeletonEffect()
                 )
                 Spacer(Modifier.height(8.dp))
@@ -252,7 +362,7 @@ fun ListSongSkeleton(modifier: Modifier = Modifier) {
 
 @Composable
 fun ListSongRowSkeleton(modifier: Modifier = Modifier) {
-    Column() {
+    Column {
         for (i in 0..3) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -263,15 +373,11 @@ fun ListSongRowSkeleton(modifier: Modifier = Modifier) {
                     Box(
                         modifier = Modifier
                             .size(42.dp)
-                            .clip(
-                                shape = RoundedCornerShape(
-                                    4.dp
-                                )
-                            )
+                            .clip(RoundedCornerShape(4.dp))
                             .skeletonEffect()
                     )
                     Spacer(Modifier.width(12.dp))
-                    Column() {
+                    Column {
                         Box(
                             modifier = Modifier
                                 .size(width = 160.dp, height = 15.dp)

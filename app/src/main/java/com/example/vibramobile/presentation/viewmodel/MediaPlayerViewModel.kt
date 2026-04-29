@@ -139,6 +139,40 @@ class MediaPlayerViewModel(
         playFromQueue(mergedQueue, safeIndex)
     }
 
+    fun enqueueSong(song: Song?) {
+        if (song == null) return
+        enqueueSongs(listOf(song))
+    }
+
+    fun enqueueAlbum(songs: List<Song>) {
+        enqueueSongs(songs)
+    }
+
+    fun enqueuePlaylist(songs: List<Song>) {
+        enqueueSongs(songs)
+    }
+
+    fun enqueueSongs(songs: List<Song>) {
+        val normalized = normalizeQueue(songs)
+        if (normalized.isEmpty()) return
+
+        val queueSnapshot = _uiState.value.queue
+        val additions = normalized.filterNot { candidate ->
+            queueSnapshot.any { existing -> isSameSong(existing, candidate) }
+        }
+        if (additions.isEmpty()) return
+
+        val updatedQueue = queueSnapshot + additions
+        _uiState.update { it.copy(queue = updatedQueue) }
+
+        if (player.mediaItemCount > 0) {
+            val mediaItems = additions.mapNotNull { buildMediaItem(it) }
+            if (mediaItems.isNotEmpty()) {
+                player.addMediaItems(mediaItems)
+            }
+        }
+    }
+
     fun toggleShuffle() {
         setShuffleEnabled(!_uiState.value.isShuffleEnabled)
     }

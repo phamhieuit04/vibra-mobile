@@ -37,33 +37,28 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.request.crossfade
 import com.composables.core.DragIndication
 import com.composables.core.ModalBottomSheet
 import com.composables.core.Scrim
 import com.composables.core.Sheet
 import com.composables.core.SheetDetent
 import com.composables.core.rememberModalBottomSheetState
-import com.example.vibramobile.R
 import com.example.vibramobile.core.extension.noRippleClickable
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
-import io.ktor.http.encodeURLPath
+import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AppContextMenu(
     modifier: Modifier = Modifier,
-    viewModel: ContextMenuViewModel = koinViewModel()
+    contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
+    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by contextMenuViewModel.uiState.collectAsState()
+    val mediaState by mediaPlayerViewModel.uiState.collectAsState()
 
     val Peek = SheetDetent(identifier = "peek") { containerHeight, sheetHeight ->
         containerHeight * 0.6f
@@ -88,14 +83,14 @@ fun AppContextMenu(
 
     LaunchedEffect(sheetState.currentDetent) {
         if (sheetState.currentDetent == SheetDetent.Hidden && uiState.visible) {
-            viewModel.hide()
+            contextMenuViewModel.hide()
         }
     }
 
     ModalBottomSheet(state = sheetState) {
         Scrim(
             modifier = Modifier.noRippleClickable(
-                onClick = { viewModel.hide() })
+                onClick = { contextMenuViewModel.hide() })
         )
 
         Sheet(
@@ -142,7 +137,7 @@ fun AppContextMenu(
                             is MenuAction.GoToConcerts -> {}
                             is MenuAction.ViewCredits -> {}
                         }
-                        viewModel.hide()
+                        contextMenuViewModel.hide()
                     }
                 )
 
@@ -157,7 +152,7 @@ private fun ContextMenuContent(
     thumbnailPath: String,
     songTitle: String,
     artistName: String,
-    onMenuItemClick: (MenuAction) -> Unit
+    onMenuItemClick: (MenuAction) -> Unit,
 ) {
     val scrollState = rememberLazyListState()
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import com.composables.core.DragIndication
 import com.composables.core.ModalBottomSheet
 import com.composables.core.Scrim
@@ -90,7 +92,7 @@ fun AppQueuePlayback(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
                 DragIndication(
@@ -107,31 +109,35 @@ fun AppQueuePlayback(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Column {
+                SpotifySection(
+                    title = "Danh sách phát của bạn"
+                ) {
                     TopSongComponent(
                         thumbnailPath = currentSong?.thumbnailPath ?: "",
                         songTitle = currentSong?.name ?: "",
                         artistName = currentSong?.author?.name ?: ""
                     )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(top = 12.dp, bottom = 18.dp),
-                        thickness = 2.dp
-                    )
-
-                    ListSongComponent(
-                        songs = queuePlaybacks,
-                        layoutStyle = LayoutStyleConfig.Vertical,
-                        onPlay = { mediaPlayerViewModel.playSong(it) },
-                        onClick = {
-                            contextMenuViewModel.show(
-                                thumbnailPath = it.thumbnailPath,
-                                songTitle = it.name,
-                                artistName = it.author?.name
-                            )
-                        }
-                    )
                 }
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(top = 12.dp, bottom = 18.dp),
+                    thickness = 2.dp
+                )
+
+                ListSongComponent(
+                    songs = queuePlaybacks,
+                    layoutStyle = LayoutStyleConfig.Vertical,
+                    onPlay = { mediaPlayerViewModel.playSong(it) },
+                    onClick = {
+                        contextMenuViewModel.show(
+                            thumbnailPath = it.thumbnailPath,
+                            songTitle = it.name,
+                            artistName = it.author?.name
+                        )
+                    },
+                    currentSongId = currentSong?.id,
+                    currentSongPath = currentSong?.songPath
+                )
             }
         }
     }

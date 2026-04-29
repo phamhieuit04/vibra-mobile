@@ -1,25 +1,26 @@
 package com.example.vibramobile.presentation.component
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Loop
 import androidx.compose.material.icons.filled.PauseCircleFilled
 import androidx.compose.material.icons.filled.PlayCircleFilled
 import androidx.compose.material.icons.filled.Shuffle
+import androidx.compose.material.icons.filled.ShuffleOn
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.vibramobile.presentation.state.RepeatMode
 
 @Composable
@@ -82,12 +83,26 @@ fun MediaControlsComponent(
             )
         }
         IconButton(onClick = onLoop) {
-            Icon(
-                modifier = Modifier.size(28.dp),
-                contentDescription = "Repeat",
-                imageVector = Icons.Default.Loop,
-                tint = repeatTint
-            )
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .rotate(-45f),
+                    contentDescription = "Repeat",
+                    imageVector = Icons.Default.Loop,
+                    tint = repeatTint
+                )
+                if (repeatMode == RepeatMode.ONE) {
+                    Text(
+                        text = "1",
+                        color = Color.White,
+                        fontSize = 8.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                    )
+                }
+            }
         }
     }
 }
