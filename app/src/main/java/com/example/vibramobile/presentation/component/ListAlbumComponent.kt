@@ -14,10 +14,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -67,8 +63,7 @@ fun VerticalListAlbum(
                 modifier = Modifier
                     .fillMaxWidth()
                     .noRippleClickable(onClick = { onClick(album) }),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -113,14 +108,6 @@ fun VerticalListAlbum(
                             )
                         }
                     }
-                }
-                IconButton(onClick = { onClick(album) }) {
-                    Icon(
-                        modifier = Modifier.size(20.dp),
-                        imageVector = Icons.Default.MoreHoriz,
-                        contentDescription = "",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
                 }
             }
             Spacer(Modifier.height(12.dp))
@@ -224,8 +211,7 @@ fun ListAlbumRowSkeleton(modifier: Modifier = Modifier) {
         for (i in 0..3) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
@@ -248,14 +234,6 @@ fun ListAlbumRowSkeleton(modifier: Modifier = Modifier) {
                                 .skeletonEffect()
                         )
                     }
-                }
-                IconButton(onClick = {}) {
-                    Icon(
-                        modifier = Modifier.size(20.dp),
-                        imageVector = Icons.Default.MoreHoriz,
-                        contentDescription = "",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
-                    )
                 }
             }
             Spacer(Modifier.height(12.dp))

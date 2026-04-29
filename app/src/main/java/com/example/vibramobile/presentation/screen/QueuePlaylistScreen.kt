@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.vibramobile.R
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -47,8 +48,7 @@ fun QueuePlaylistScreen(
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel()
 ) {
     val state = rememberModalBottomSheetState()
-    val isPlaying by mediaPlayerViewModel.isPlaying.collectAsState()
-    val progress by mediaPlayerViewModel.progress.collectAsState()
+    val mediaState by mediaPlayerViewModel.uiState.collectAsState()
 
     if (isVisible) {
         ModalBottomSheet(
@@ -117,7 +117,7 @@ fun QueuePlaylistScreen(
                                 Icon(
                                     modifier = Modifier.fillMaxSize(),
                                     contentDescription = "",
-                                    imageVector = if (isPlaying) Icons.Default.PauseCircleFilled
+                                    imageVector = if (mediaState.isPlaying) Icons.Default.PauseCircleFilled
                                     else Icons.Default.PlayCircleFilled,
                                     tint = MaterialTheme.colorScheme.onSurface
                                 )
@@ -128,10 +128,4 @@ fun QueuePlaylistScreen(
             }
         }
     }
-}
-
-@Preview(showBackground = true, device = "id:pixel_3", backgroundColor = 0xff000000)
-@Composable
-fun Preview(modifier: Modifier = Modifier) {
-    QueuePlaylistScreen(isVisible = true, onVisibleChange = {})
 }

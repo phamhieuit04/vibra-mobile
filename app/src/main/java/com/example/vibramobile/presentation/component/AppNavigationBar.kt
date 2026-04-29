@@ -65,15 +65,9 @@ val TOP_LEVEL_DESTINATIONS = mapOf(
 @Composable
 fun AppNavigationBar(
     modifier: Modifier = Modifier,
-    isVisible: Boolean,
     selectedKey: NavKey,
     onSelectKey: (NavKey) -> Unit,
 ) {
-    if (!isVisible) return
-
-    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
-    val gradientBase = MaterialTheme.colorScheme.background
-
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -81,10 +75,10 @@ fun AppNavigationBar(
                 brush = Brush.verticalGradient(
                     colors = listOf(
                         Color.Transparent,
-                        gradientBase.copy(alpha = 0.2f),
-                        gradientBase.copy(alpha = 0.5f),
-                        gradientBase.copy(alpha = 0.8f),
-                        gradientBase.copy(alpha = 0.95f)
+                        Color.Black.copy(alpha = 0.3f),
+                        Color.Black.copy(alpha = 0.5f),
+                        Color.Black.copy(alpha = 0.7f),
+                        Color.Black.copy(alpha = 0.80f)
                     ),
                     startY = 0f,
                     endY = Float.POSITIVE_INFINITY
@@ -95,7 +89,7 @@ fun AppNavigationBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             TOP_LEVEL_DESTINATIONS.forEach { (destination, data) ->
@@ -103,10 +97,10 @@ fun AppNavigationBar(
                     onClick = { onSelectKey(destination) },
                     isSelected = destination == selectedKey,
                     icon = data.icon,
-                    iconColor = onSurfaceColor,
+                    iconColor = Color.White,
                     selectedIcon = data.selectedIcon,
                     label = data.label,
-                    labelColor = onSurfaceColor,
+                    labelColor = Color.White,
                 )
             }
         }

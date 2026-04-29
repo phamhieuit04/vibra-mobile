@@ -7,13 +7,17 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -45,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vibramobile.domain.model.Bill
@@ -55,22 +60,20 @@ import org.koin.androidx.compose.koinViewModel
 import androidx.core.graphics.toColorInt
 import coil3.compose.AsyncImage
 import com.example.vibramobile.presentation.component.ListAlbumComponent
-import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.component.SpotifySection
-import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
 fun ProfileScreen(
+    modifier: Modifier = Modifier,
+    bottomContentPadding: Dp = 0.dp,
     isDarkMode: Boolean,
     onDarkModeChange: (Boolean) -> Unit,
     selectedAccentColorHex: String,
     onAccentColorChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    profileViewModel: ProfileViewModel = koinViewModel(),
-    contextMenuViewModel: ContextMenuViewModel = koinViewModel()
+    profileViewModel: ProfileViewModel = koinViewModel()
 ) {
     val currentUser by UserState.currentUser.collectAsState()
     val followedArtists by UserState.followedArtists.collectAsState()
@@ -79,6 +82,10 @@ fun ProfileScreen(
     val paymentHistory by UserState.paymentHistory.collectAsState()
     val isRefreshing by profileViewModel.isRefreshing.collectAsState()
     val pullToRefreshState = rememberPullToRefreshState()
+
+    val statusBarHeight = WindowInsets.statusBars
+        .asPaddingValues()
+        .calculateTopPadding()
 
     PullToRefreshBox(
         modifier = modifier.fillMaxSize(),
@@ -96,8 +103,13 @@ fun ProfileScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = statusBarHeight,
+                ),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+            contentPadding = PaddingValues(bottom = bottomContentPadding)
         ) {
             item(key = "header") {
                 Spacer(modifier = Modifier.height(24.dp))
@@ -135,13 +147,7 @@ fun ProfileScreen(
                     ) {
                         ListAlbumComponent(
                             albums = myAlbums,
-                            onClick = {
-                                contextMenuViewModel.show(
-                                    it.thumbnailPath,
-                                    it.name,
-                                    it.author?.name
-                                )
-                            }
+                            onClick = { }
                         )
                     }
                 }
@@ -153,16 +159,6 @@ fun ProfileScreen(
                 ) {
                     PaymentHistorySection(bills = paymentHistory)
                 }
-            }
-
-            item(key = "bottom_spacer") {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(
-                            if (UiState.getDisplayMediaPlayer()) 192.dp else 96.dp
-                        )
-                )
             }
         }
     }

@@ -95,4 +95,6 @@ dependencies {
     implementation(libs.composeunstyled.primitives)
     implementation(libs.composeunstyled.platformtheme)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.palette.ktx)
+    implementation(libs.phosphor.icon)
 }

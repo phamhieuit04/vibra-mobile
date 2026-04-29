@@ -1,7 +1,5 @@
 package com.example.vibramobile.presentation.component
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,14 +15,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Album
-import androidx.compose.material.icons.filled.Diamond
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Radio
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Theaters
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,33 +31,35 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.request.crossfade
+import com.adamglin.PhosphorIcons
+import com.adamglin.phosphoricons.Regular
+import com.adamglin.phosphoricons.regular.Playlist
 import com.composables.core.DragIndication
 import com.composables.core.ModalBottomSheet
 import com.composables.core.Scrim
 import com.composables.core.Sheet
 import com.composables.core.SheetDetent
 import com.composables.core.rememberModalBottomSheetState
-import com.example.vibramobile.R
 import com.example.vibramobile.core.extension.noRippleClickable
+import com.example.vibramobile.domain.model.Song
+import com.example.vibramobile.domain.model.User
+import com.example.vibramobile.presentation.config.ContextMenuConfig
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
-import io.ktor.http.encodeURLPath
+import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AppContextMenu(
     modifier: Modifier = Modifier,
-    viewModel: ContextMenuViewModel = koinViewModel()
+    contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
+    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
+    navigateToArtist: (artist: User) -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by contextMenuViewModel.uiState.collectAsState()
+    val config = uiState.config
 
     val Peek = SheetDetent(identifier = "peek") { containerHeight, sheetHeight ->
         containerHeight * 0.6f
@@ -90,24 +84,18 @@ fun AppContextMenu(
 
     LaunchedEffect(sheetState.currentDetent) {
         if (sheetState.currentDetent == SheetDetent.Hidden && uiState.visible) {
-            viewModel.hide()
+            contextMenuViewModel.hide()
         }
     }
-
-    val scrimAlpha by animateFloatAsState(
-        targetValue = if (sheetState.currentDetent != SheetDetent.Hidden) 0.5f else 0f,
-        animationSpec = tween(durationMillis = 300),
-        label = "scrim_alpha"
-    )
 
     ModalBottomSheet(state = sheetState) {
         Scrim(
             modifier = Modifier.noRippleClickable(
-                onClick = { viewModel.hide() })
+                onClick = { contextMenuViewModel.hide() })
         )
 
         Sheet(
-            modifier = modifier
+            modifier = Modifier
                 .padding(top = 48.dp)
                 .shadow(4.dp, RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
@@ -134,25 +122,14 @@ fun AppContextMenu(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                ContextMenuContent(
-                    thumbnailPath = uiState.thumbnailPath,
-                    songTitle = uiState.songTitle,
-                    artistName = uiState.artistName,
-                    onMenuItemClick = { action ->
-                        when (action) {
-                            is MenuAction.Share -> {}
-                            is MenuAction.Premium -> {}
-                            is MenuAction.AddToLiked -> {}
-                            is MenuAction.AddToPlaylist -> {}
-                            is MenuAction.GoToRadio -> {}
-                            is MenuAction.GoToAlbum -> {}
-                            is MenuAction.GoToArtist -> {}
-                            is MenuAction.GoToConcerts -> {}
-                            is MenuAction.ViewCredits -> {}
-                        }
-                        viewModel.hide()
-                    }
-                )
+                if (config is ContextMenuConfig.SongItem) {
+                    ContextMenuContent(
+                        config = config,
+                        enqueueSong = { song -> mediaPlayerViewModel.enqueueSong(song) },
+                        navigateToArtist = navigateToArtist,
+                        onDismiss = { contextMenuViewModel.hide() }
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
             }
@@ -162,22 +139,23 @@ fun AppContextMenu(
 
 @Composable
 private fun ContextMenuContent(
-    thumbnailPath: String,
-    songTitle: String,
-    artistName: String,
-    onMenuItemClick: (MenuAction) -> Unit
+    config: ContextMenuConfig.SongItem,
+    enqueueSong: (Song) -> Unit,
+    navigateToArtist: (User) -> Unit,
+    onDismiss: () -> Unit,
 ) {
     val scrollState = rememberLazyListState()
+    val header = config.header
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
     ) {
-        SongHeader(
-            thumbnailPath = thumbnailPath,
-            songTitle = songTitle,
-            artistName = artistName
+        TopSongComponent(
+            thumbnailPath = header.thumbnailPath ?: "",
+            songTitle = header.title ?: "",
+            artistName = header.subtitle ?: ""
         )
 
         HorizontalDivider(
@@ -189,127 +167,67 @@ private fun ContextMenuContent(
             modifier = Modifier.fillMaxWidth(),
             state = scrollState
         ) {
-            item {
-                MenuItem(
-                    icon = Icons.Default.Share,
-                    text = "Share",
-                    onClick = { onMenuItemClick(MenuAction.Share) }
-                )
+            if (config.showAddToQueue) {
+                item {
+                    MenuItem(
+                        icon = PhosphorIcons.Regular.Playlist,
+                        text = "Thêm vào danh sách phát",
+                        onClick = {
+                            val handler = config.onAddToQueue
+                            if (handler != null) {
+                                handler(config.song)
+                            } else {
+                                enqueueSong(config.song)
+                            }
+                            onDismiss()
+                        }
+                    )
+                }
             }
 
-            item {
-                MenuItem(
-                    icon = Icons.Default.Diamond,
-                    text = "Listen to music ad-free",
-                    trailingText = "Premium",
-                    trailingColor = MaterialTheme.colorScheme.primary,
-                    onClick = { onMenuItemClick(MenuAction.Premium) }
-                )
+            if (config.showAddToLiked) {
+                item {
+                    MenuItem(
+                        icon = Icons.Default.FavoriteBorder,
+                        text = "Yêu thích bài hát",
+                        onClick = {
+                            config.onAddToLiked?.invoke(config.song)
+                            onDismiss()
+                        }
+                    )
+                }
             }
 
-            item {
-                MenuItem(
-                    icon = Icons.Default.FavoriteBorder,
-                    text = "Add to Liked Songs",
-                    onClick = { onMenuItemClick(MenuAction.AddToLiked) }
-                )
+            if (config.showAddToPlaylist) {
+                item {
+                    MenuItem(
+                        icon = Icons.Default.Add,
+                        text = "Thêm vào playlist",
+                        onClick = {
+                            config.onAddToPlaylist?.invoke(config.song)
+                            onDismiss()
+                        }
+                    )
+                }
             }
 
-            item {
-                MenuItem(
-                    icon = Icons.Default.Add,
-                    text = "Add to playlist",
-                    onClick = { onMenuItemClick(MenuAction.AddToPlaylist) }
-                )
-            }
-
-            item {
-                MenuItem(
-                    icon = Icons.Default.Radio,
-                    text = "Go to radio",
-                    onClick = { onMenuItemClick(MenuAction.GoToRadio) }
-                )
-            }
-
-            item {
-                MenuItem(
-                    icon = Icons.Default.Album,
-                    text = "Go to album",
-                    onClick = { onMenuItemClick(MenuAction.GoToAlbum) }
-                )
-            }
-
-            item {
-                MenuItem(
-                    icon = Icons.Default.Person,
-                    text = "Go to artist",
-                    onClick = { onMenuItemClick(MenuAction.GoToArtist) }
-                )
-            }
-
-            item {
-                MenuItem(
-                    icon = Icons.Default.Theaters,
-                    text = "Go to artist concerts",
-                    onClick = { onMenuItemClick(MenuAction.GoToConcerts) }
-                )
-            }
-
-            item {
-                MenuItem(
-                    icon = Icons.Default.Info,
-                    text = "View song credits",
-                    onClick = { onMenuItemClick(MenuAction.ViewCredits) }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun SongHeader(
-    thumbnailPath: String,
-    songTitle: String,
-    artistName: String
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        AsyncImage(
-            modifier = Modifier
-                .size(64.dp)
-                .clip(shape = RoundedCornerShape(4.dp)),
-            contentDescription = "",
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(thumbnailPath.encodeURLPath())
-                .size(400)
-                .crossfade(true)
-                .build(),
-            placeholder = painterResource(R.drawable.default_image),
-            error = painterResource(R.drawable.default_image),
-            contentScale = ContentScale.Crop
-        )
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        Column {
-            Text(
-                text = songTitle,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                lineHeight = 1.sp
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            if (artistName.isNotBlank()) {
-                Text(
-                    text = artistName,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 12.sp
-                )
+            if (config.showGoToArtist && config.song.author != null) {
+                item {
+                    MenuItem(
+                        icon = Icons.Default.Person,
+                        text = "Thông tin nghệ sỹ",
+                        onClick = {
+                            val handler = config.onGoToArtist
+                            val artist = config.song.author
+                            if (handler != null && artist != null) {
+                                handler(artist)
+                            } else if (artist != null) {
+                                navigateToArtist(artist)
+                            }
+                            onDismiss()
+                        }
+                    )
+                }
             }
         }
     }
@@ -358,22 +276,3 @@ private fun MenuItem(
         }
     }
 }
-
-sealed class MenuAction {
-    object Share : MenuAction()
-    object Premium : MenuAction()
-    object AddToLiked : MenuAction()
-    object AddToPlaylist : MenuAction()
-    object GoToRadio : MenuAction()
-    object GoToAlbum : MenuAction()
-    object GoToArtist : MenuAction()
-    object GoToConcerts : MenuAction()
-    object ViewCredits : MenuAction()
-}
-
-data class ContextMenuState(
-    val visible: Boolean = false,
-    val thumbnailPath: String = "",
-    val songTitle: String = "Six Feet Under",
-    val artistName: String = "Billie Eilish"
-)

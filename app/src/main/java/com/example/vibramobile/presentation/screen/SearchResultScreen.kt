@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -56,6 +57,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -64,7 +66,6 @@ import coil3.request.crossfade
 import com.example.vibramobile.R
 import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.domain.model.User
-import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
 import com.example.vibramobile.presentation.component.ListSongComponent
@@ -82,6 +83,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SearchResultScreen(
     modifier: Modifier = Modifier,
+    bottomContentPadding: Dp = 0.dp,
     searchViewModel: SearchViewModel = koinViewModel(),
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
     contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
@@ -98,13 +100,13 @@ fun SearchResultScreen(
     val searchResult by searchViewModel.searchResult.collectAsState()
     val isLoading by searchViewModel.isLoading.collectAsState()
 
-    val currentSong by mediaPlayerViewModel.currentSong.collectAsState()
-    val mediaPlayerIsPlaying by mediaPlayerViewModel.isPlaying.collectAsState()
+    val mediaState by mediaPlayerViewModel.uiState.collectAsState()
+    val currentSong = mediaState.currentSong
 
     val topSong = searchResult?.songs?.firstOrNull()
-    val isPlaying by remember(currentSong, mediaPlayerIsPlaying, topSong) {
+    val isPlaying by remember(currentSong, mediaState.isPlaying, topSong) {
         derivedStateOf {
-            topSong != null && currentSong == topSong && mediaPlayerIsPlaying
+            topSong != null && currentSong == topSong && mediaState.isPlaying
         }
     }
 
@@ -118,7 +120,8 @@ fun SearchResultScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .statusBarsPadding(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 SearchBar(
@@ -189,7 +192,12 @@ fun SearchResultScreen(
                     else -> {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
+                            contentPadding = PaddingValues(
+                                top = 16.dp,
+                                start = 16.dp,
+                                end = 16.dp,
+                                bottom = bottomContentPadding
+                            ),
                             verticalArrangement = Arrangement.spacedBy(24.dp)
                         ) {
                             if (searchResult!!.songs.isNotEmpty()) {
@@ -209,11 +217,7 @@ fun SearchResultScreen(
                                     ) {
                                         ListSongComponent(
                                             onClick = {
-                                                contextMenuViewModel.show(
-                                                    thumbnailPath = it.thumbnailPath,
-                                                    songTitle = it.name,
-                                                    artistName = it.author?.name
-                                                )
+                                                contextMenuViewModel.showSong(it)
                                             },
                                             onPlay = { mediaPlayerViewModel.playSong(it) },
                                             layoutStyle = LayoutStyleConfig.Vertical,
@@ -263,14 +267,6 @@ fun SearchResultScreen(
                                             onClick = { }
                                         )
                                     }
-                                }
-                            }
-
-                            item(key = "bottom_spacer") {
-                                Spacer(Modifier.height(96.dp))
-
-                                if (UiState.getDisplayMediaPlayer()) {
-                                    Spacer(Modifier.height(96.dp))
                                 }
                             }
                         }

@@ -7,13 +7,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object SongState {
-    private val _currentSong = MutableStateFlow<Song?>(null)
-    val currentSong: StateFlow<Song?> = _currentSong.asStateFlow()
-
-    fun setCurrentSong(song: Song?) {
-        _currentSong.value = song
-    }
-
     private val _recommendedSongs = MutableStateFlow<List<Song>>(emptyList())
     val recommendedSongs: StateFlow<List<Song>> = _recommendedSongs.asStateFlow()
 

@@ -31,4 +31,7 @@ sealed class MainDestination : NavKey {
 
     @Serializable
     data class AlbumDetail(val album: Playlist) : MainDestination()
+
+    @Serializable
+    object FullscreenPlayer : MainDestination()
 }

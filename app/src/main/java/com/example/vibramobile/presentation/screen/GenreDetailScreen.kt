@@ -1,6 +1,11 @@
 package com.example.vibramobile.presentation.screen
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -25,7 +31,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -34,6 +39,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,13 +56,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.example.vibramobile.R
 import com.example.vibramobile.domain.model.Category
+import com.example.vibramobile.presentation.component.DetailTopbarComponent
 import com.example.vibramobile.presentation.state.SongState
-import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.component.GenreDetailShimmer
 import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
@@ -71,6 +78,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun GenreDetailScreen(
     modifier: Modifier = Modifier,
+    bottomContentPadding: Dp = 0.dp,
     category: Category,
     genreDetailViewModel: GenreDetailViewModel = koinViewModel(),
     mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
@@ -80,11 +88,22 @@ fun GenreDetailScreen(
 ) {
     val scope = rememberCoroutineScope()
     val isRefreshing by genreDetailViewModel.isRefreshing.collectAsState()
-    val pullToRefreshState = rememberPullToRefreshState()
-    val scrollState = rememberLazyListState()
     val songsByCategory by SongState.songsByCategory.collectAsState()
     var isInitialLoading by remember(category.id) { mutableStateOf(true) }
     val showLoading = isInitialLoading || isRefreshing
+
+    val pullToRefreshState = rememberPullToRefreshState()
+    val scrollState = rememberLazyListState()
+    val scrollOffset by remember {
+        derivedStateOf {
+            scrollState.firstVisibleItemIndex * 1000f + scrollState.firstVisibleItemScrollOffset
+        }
+    }
+    val topBarAlpha by animateFloatAsState(
+        targetValue = (scrollOffset / 500f).coerceIn(0f, 1f),
+        animationSpec = tween(0),
+        label = "topBarAlpha"
+    )
 
     LaunchedEffect(category.id) {
         isInitialLoading = true
@@ -93,116 +112,108 @@ fun GenreDetailScreen(
         isInitialLoading = false
     }
 
-    PullToRefreshBox(
-        state = pullToRefreshState,
-        isRefreshing = isRefreshing,
-        onRefresh = {
-            scope.launch { genreDetailViewModel.getSongsByCategory(category.id!!) }
-        },
-        indicator = {
-            PullToRefreshDefaults.Indicator(
-                state = pullToRefreshState,
-                isRefreshing = isRefreshing,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-            )
-        }
-    ) {
-        Crossfade(
-            targetState = showLoading,
-            label = "GenreDetailContent"
-        ) { loading ->
-            LazyColumn(
-                state = scrollState,
-                contentPadding = PaddingValues(bottom = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
-            ) {
-                item(key = "header") {
-                    GenreHeader(category = category, onBackClick = navigateBack)
-                }
-
-                if (loading) {
-                    item(key = "loading") {
-                        GenreDetailShimmer()
+    Box(modifier = Modifier.fillMaxSize()) {
+        PullToRefreshBox(
+            state = pullToRefreshState,
+            isRefreshing = isRefreshing,
+            onRefresh = {
+                scope.launch { genreDetailViewModel.getSongsByCategory(category.id!!) }
+            },
+            indicator = {
+                PullToRefreshDefaults.Indicator(
+                    state = pullToRefreshState,
+                    isRefreshing = isRefreshing,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                )
+            }
+        ) {
+            Crossfade(
+                targetState = showLoading,
+                label = "GenreDetailContent"
+            ) { loading ->
+                LazyColumn(
+                    state = scrollState,
+                    contentPadding = PaddingValues(bottom = bottomContentPadding),
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    item(key = "header") {
+                        GenreDetailHeader(category = category)
                     }
-                } else {
-                    if (songsByCategory.isEmpty()) {
-                        item(key = "empty_state") {
-                            EmptyStateView(onExploreClick = navigateToSearch)
+
+                    if (loading) {
+                        item(key = "loading") {
+                            GenreDetailShimmer()
                         }
                     } else {
-
-                        item(key = "featured_songs") {
-                            SpotifySection(
-                                title = "Danh sách nhạc nổi bật",
-                                modifier = Modifier.padding(
-                                    start = 16.dp,
-                                    end = 16.dp
-                                )
-                            ) {
-                                TopSongsComponent(
-                                    onPlay = { mediaPlayerViewModel.playSong(it) },
-                                    onClick = {
-                                        contextMenuViewModel.show(
-                                            thumbnailPath = it.thumbnailPath,
-                                            songTitle = it.name,
-                                            artistName = it.author?.name
-                                        )
-                                    },
-                                    songs = songsByCategory.take(5)
-                                )
+                        if (songsByCategory.isEmpty()) {
+                            item(key = "empty_state") {
+                                EmptyStateView(onExploreClick = navigateToSearch)
                             }
-                        }
+                        } else {
 
-                        if (songsByCategory.size > 5) {
-                            item(key = "list_song") {
+                            item(key = "featured_songs") {
                                 SpotifySection(
-                                    title = "Bài hát",
+                                    title = "Danh sách nhạc nổi bật",
                                     modifier = Modifier.padding(
                                         start = 16.dp,
-                                        end = 16.dp,
-                                        top = 24.dp
+                                        end = 16.dp
                                     )
                                 ) {
-                                    ListSongComponent(
+                                    TopSongsComponent(
                                         onPlay = { mediaPlayerViewModel.playSong(it) },
-                                        layoutStyle = LayoutStyleConfig.Vertical,
                                         onClick = {
-                                            contextMenuViewModel.show(
-                                                thumbnailPath = it.thumbnailPath,
-                                                songTitle = it.name,
-                                                artistName = it.author?.name
-                                            )
+                                            contextMenuViewModel.showSong(it)
                                         },
-                                        songs = songsByCategory.drop(5)
+                                        songs = songsByCategory.take(5)
                                     )
                                 }
                             }
-                        }
 
-                        item(key = "bottom_spacer") {
-                            Spacer(Modifier.height(96.dp))
-                            if (UiState.getDisplayMediaPlayer()) {
-                                Spacer(Modifier.height(96.dp))
+                            if (songsByCategory.size > 5) {
+                                item(key = "list_song") {
+                                    SpotifySection(
+                                        title = "Bài hát",
+                                        modifier = Modifier.padding(
+                                            start = 16.dp,
+                                            end = 16.dp,
+                                            top = 24.dp
+                                        )
+                                    ) {
+                                        ListSongComponent(
+                                            onPlay = { mediaPlayerViewModel.playSong(it) },
+                                            layoutStyle = LayoutStyleConfig.Vertical,
+                                            onClick = {
+                                                contextMenuViewModel.showSong(it)
+                                            },
+                                            songs = songsByCategory.drop(5)
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
+        DetailTopbarComponent(
+            title = category.name ?: "",
+            topBarAlpha = topBarAlpha,
+            onBackClick = navigateBack
+        )
     }
 }
 
 @Composable
-private fun GenreHeader(
+private fun GenreDetailHeader(
     modifier: Modifier = Modifier,
-    category: Category,
-    onBackClick: () -> Unit = {}
+    category: Category
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(280.dp)
+            .height(300.dp)
     ) {
         AsyncImage(
             model = category.thumbnailPath,
@@ -227,23 +238,6 @@ private fun GenreHeader(
                     )
                 )
         )
-
-
-        IconButton(
-            onClick = onBackClick,
-            modifier = Modifier
-                .padding(8.dp)
-                .align(Alignment.TopStart),
-            colors = IconButtonDefaults.iconButtonColors(
-                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
-            )
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                tint = MaterialTheme.colorScheme.onSurface
-            )
-        }
 
         Row(
             modifier = Modifier

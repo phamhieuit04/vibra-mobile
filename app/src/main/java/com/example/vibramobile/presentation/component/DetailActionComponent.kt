@@ -12,7 +12,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.DownloadForOffline
+import androidx.compose.material.icons.filled.LibraryAdd
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Shuffle
@@ -36,6 +38,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.adamglin.PhosphorIcons
+import com.adamglin.phosphoricons.Regular
+import com.adamglin.phosphoricons.regular.Playlist
 import com.example.vibramobile.presentation.config.DetailActionConfig
 
 @Composable
@@ -92,27 +97,25 @@ fun DetailActionComponent(
                     }
 
                     is DetailActionConfig.Album -> {
-                        IconButton(onClick = config.onAddToLibrary) {
-                            Icon(
-                                imageVector = Icons.Default.AddCircleOutline,
-                                contentDescription = "Thêm vào thư viện",
-                                tint = MaterialTheme.colorScheme.onBackground,
-                                modifier = Modifier.size(28.dp)
-                            )
+                        Row {
+                            IconButton(onClick = config.onAddToQueue) {
+                                Icon(
+                                    imageVector = Icons.Default.LibraryAdd,
+                                    contentDescription = "Thêm vào danh sách phát",
+                                    tint = MaterialTheme.colorScheme.onBackground,
+                                    modifier = Modifier.size(28.dp)
+                                )
+                            }
+
+                            IconButton(onClick = config.onDownload) {
+                                Icon(
+                                    imageVector = Icons.Default.Download,
+                                    contentDescription = "Tải xuống",
+                                    tint = MaterialTheme.colorScheme.onBackground,
+                                    modifier = Modifier.size(28.dp)
+                                )
+                            }
                         }
-                        IconButton(onClick = config.onDownload) {
-                            Icon(
-                                imageVector = Icons.Default.DownloadForOffline,
-                                contentDescription = "Tải xuống",
-                                tint = MaterialTheme.colorScheme.onBackground,
-                                modifier = Modifier.size(28.dp)
-                            )
-                        }
-                        DetailMoreButton(
-                            showDropdownMenu = showDropdownMenu,
-                            onShowDropdown = { showDropdownMenu = it },
-                            dropdownItems = config.dropdownItems
-                        )
                     }
                 }
             }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -46,17 +48,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.example.vibramobile.domain.model.Playlist
 import com.example.vibramobile.presentation.component.DetailActionComponent
+import com.example.vibramobile.presentation.component.DetailTopbarComponent
 import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.config.DetailActionConfig
 import com.example.vibramobile.presentation.config.LayoutStyleConfig
 import com.example.vibramobile.presentation.state.SongState
-import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.viewmodel.AlbumDetailViewModel
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
@@ -65,6 +68,8 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlbumDetailScreen(
+    modifier: Modifier = Modifier,
+    bottomContentPadding: Dp = 0.dp,
     album: Playlist,
     navigateBack: () -> Unit,
     albumDetailViewModel: AlbumDetailViewModel = koinViewModel(),
@@ -111,22 +116,33 @@ fun AlbumDetailScreen(
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(bottom = bottomContentPadding)
             ) {
                 item("header") {
                     AlbumDetailHeader(album = album)
 
                     DetailActionComponent(
                         config = DetailActionConfig.Album(
-                            dropdownItems = listOf(
-                                "Thêm vào danh sách phát" to {},
-                                "Chia sẻ" to {},
-                            ),
-                            onAddToLibrary = {},
+                            onAddToQueue = { mediaPlayerViewModel.enqueueSongs(songs = songs) },
                             onDownload = {},
                         ),
-                        onShuffle = { },
-                        onPlay = { },
+                        onShuffle = {
+                            mediaPlayerViewModel.playAll(
+                                songs = songs,
+                                startIndex = 0,
+                                prioritize = true,
+                                enableShuffle = true
+                            )
+                        },
+                        onPlay = {
+                            mediaPlayerViewModel.playAll(
+                                songs = songs,
+                                startIndex = 0,
+                                prioritize = true,
+                                enableShuffle = false
+                            )
+                        },
                     )
                 }
 
@@ -140,11 +156,7 @@ fun AlbumDetailScreen(
                                 songs = songs,
                                 layoutStyle = LayoutStyleConfig.Vertical,
                                 onClick = {
-                                    contextMenuViewModel.show(
-                                        thumbnailPath = it.thumbnailPath,
-                                        songTitle = it.name,
-                                        artistName = it.author?.name
-                                    )
+                                    contextMenuViewModel.showSong(it)
                                 },
                                 onPlay = {
                                     mediaPlayerViewModel.playSong(song = it)
@@ -153,19 +165,11 @@ fun AlbumDetailScreen(
                         }
                     }
                 }
-
-                item("bottom_spacer") {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(if (UiState.getDisplayMediaPlayer()) 192.dp else 96.dp)
-                    )
-                }
             }
         }
 
-        AlbumDetailTopBar(
-            album = album,
+        DetailTopbarComponent(
+            title = album.name ?: "",
             topBarAlpha = topBarAlpha,
             onBackClick = navigateBack
         )
@@ -267,49 +271,6 @@ private fun AlbumDetailHeader(album: Playlist) {
                         fontSize = 13.sp
                     )
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun AlbumDetailTopBar(
-    album: Playlist,
-    topBarAlpha: Float,
-    onBackClick: () -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background.copy(alpha = topBarAlpha))
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .padding(horizontal = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-            AnimatedVisibility(
-                visible = topBarAlpha > 0.8f,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                Text(
-                    text = album.name ?: "",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
             }
         }
     }

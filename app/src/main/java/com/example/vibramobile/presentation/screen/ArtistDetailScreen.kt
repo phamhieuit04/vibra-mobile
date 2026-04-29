@@ -9,12 +9,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -55,6 +58,7 @@ import com.example.vibramobile.domain.model.Playlist
 import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.component.DetailActionComponent
+import com.example.vibramobile.presentation.component.DetailTopbarComponent
 import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
@@ -63,7 +67,6 @@ import com.example.vibramobile.presentation.config.DetailActionConfig
 import com.example.vibramobile.presentation.config.LayoutStyleConfig
 import com.example.vibramobile.presentation.state.ArtistState
 import com.example.vibramobile.presentation.state.SongState
-import com.example.vibramobile.presentation.state.UiState
 import com.example.vibramobile.presentation.viewmodel.ArtistDetailViewModel
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
@@ -73,6 +76,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ArtistDetailScreen(
     modifier: Modifier = Modifier,
+    bottomContentPadding: Dp = 0.dp,
     artist: User,
     navigateBack: () -> Unit,
     navigateToAlbumDetail: (Playlist) -> Unit,
@@ -125,7 +129,8 @@ fun ArtistDetailScreen(
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                contentPadding = PaddingValues(bottom = bottomContentPadding)
             ) {
                 item("header") {
                     ArtistDetailHeader(
@@ -139,11 +144,32 @@ fun ArtistDetailScreen(
                     DetailActionComponent(
                         config = DetailActionConfig.Artist(
                             avatarPath = artist.avatarPath,
-                            dropdownItems = listOf("Hạn chế nghệ sĩ" to {}),
-                            onFollow = {},
+                            dropdownItems = listOf(
+                                "Thêm vào danh sách phát" to {
+                                    mediaPlayerViewModel.enqueueSongs(
+                                        songs
+                                    )
+                                },
+                                "Hạn chế nghệ sĩ" to {}
+                            ),
+                            onFollow = {}
                         ),
-                        onShuffle = { },
-                        onPlay = { },
+                        onShuffle = {
+                            mediaPlayerViewModel.playAll(
+                                songs = songs,
+                                startIndex = 0,
+                                prioritize = true,
+                                enableShuffle = true
+                            )
+                        },
+                        onPlay = {
+                            mediaPlayerViewModel.playAll(
+                                songs = songs,
+                                startIndex = 0,
+                                prioritize = true,
+                                enableShuffle = false
+                            )
+                        },
                     )
                 }
 
@@ -156,11 +182,7 @@ fun ArtistDetailScreen(
                             TopSongsComponent(
                                 songs = songs.take(5),
                                 onClick = {
-                                    contextMenuViewModel.show(
-                                        thumbnailPath = it.thumbnailPath,
-                                        songTitle = it.name,
-                                        artistName = it.author?.name
-                                    )
+                                    contextMenuViewModel.showSong(it)
                                 },
                                 onPlay = { mediaPlayerViewModel.playSong(song = it) }
                             )
@@ -179,11 +201,7 @@ fun ArtistDetailScreen(
                                     songs = songs.drop(5),
                                     layoutStyle = LayoutStyleConfig.Vertical,
                                     onClick = {
-                                        contextMenuViewModel.show(
-                                            thumbnailPath = it.thumbnailPath,
-                                            songTitle = it.name,
-                                            artistName = it.author?.name
-                                        )
+                                        contextMenuViewModel.showSong(it)
                                     },
                                     onPlay = { mediaPlayerViewModel.playSong(song = it) }
                                 )
@@ -213,21 +231,13 @@ fun ArtistDetailScreen(
                         ArtistDetailIntroduction(artist = artist)
                     }
                 }
-
-                item(key = "bottom_spacer") {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(if (UiState.getDisplayMediaPlayer()) 192.dp else 96.dp)
-                    )
-                }
             }
         }
 
-        ArtistDetailTopBar(
-            artist = artist,
+        DetailTopbarComponent(
+            title = artist.name ?: "",
             topBarAlpha = topBarAlpha,
-            onClick = navigateBack
+            onBackClick = navigateBack
         )
     }
 }
@@ -278,11 +288,14 @@ private fun ArtistDetailHeader(
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(Modifier.height(4.dp))
-            Text(
-                text = "${artist.followers?.let { FormatHelper.formatFollowers(it) } ?: "0"} người nghe hằng tháng",
-                color = Color.White.copy(alpha = 0.8f),
-                fontSize = 14.sp
-            )
+
+            if (artist.followers != null) {
+                Text(
+                    text = artist.followers.let { FormatHelper.formatMonthlyListeners(it!!) },
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    fontSize = 13.sp
+                )
+            }
         }
     }
 }
@@ -301,7 +314,7 @@ private fun ArtistDetailIntroduction(artist: User) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(220.dp)
+                    .aspectRatio(3f / 4f)
                     .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
             )
         }
@@ -316,14 +329,30 @@ private fun ArtistDetailIntroduction(artist: User) {
                         text = artist.name ?: "",
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        lineHeight = 1.sp
                     )
-                    Text(
-                        text = "${artist.followers?.let { FormatHelper.formatFollowers(it) } ?: "0"} người nghe hằng tháng",
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                        fontSize = 13.sp
-                    )
+
+                    if (artist.followers != null) {
+                        Text(
+                            text = artist.followers.let { FormatHelper.formatMonthlyListeners(it!!) },
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            fontSize = 13.sp
+                        )
+                    }
+
+                    if (!artist.description.isNullOrBlank()) {
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            text = artist.description ?: "",
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp,
+                            maxLines = 5
+                        )
+                    }
                 }
+
                 OutlinedButton(onClick = { }, shape = RoundedCornerShape(50)) {
                     Text(
                         text = "Theo dõi",
@@ -331,58 +360,6 @@ private fun ArtistDetailIntroduction(artist: User) {
                         fontSize = 13.sp
                     )
                 }
-            }
-            if (!artist.description.isNullOrBlank()) {
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    text = artist.description ?: "",
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ArtistDetailTopBar(
-    artist: User,
-    topBarAlpha: Float,
-    onClick: () -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background.copy(alpha = topBarAlpha))
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .padding(horizontal = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-            AnimatedVisibility(
-                visible = topBarAlpha > 0.8f,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                Text(
-                    text = artist.name ?: "",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
             }
         }
     }
