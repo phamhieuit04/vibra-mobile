@@ -1,10 +1,12 @@
 package com.example.vibramobile.presentation.config
 
+import androidx.annotation.StringRes
+
 sealed class DetailActionConfig {
     data class Artist(
         val avatarPath: String?,
-        val followLabel: String = "Theo dõi",
-        val dropdownItems: List<Pair<String, () -> Unit>> = emptyList(),
+        @StringRes val followLabelRes: Int? = null,
+        val dropdownItems: List<Pair<Int, () -> Unit>> = emptyList(),
         val onFollow: () -> Unit = {},
     ) : DetailActionConfig()
 

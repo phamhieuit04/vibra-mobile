@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,6 +44,7 @@ import com.composables.core.Scrim
 import com.composables.core.Sheet
 import com.composables.core.SheetDetent
 import com.composables.core.rememberModalBottomSheetState
+import com.example.vibramobile.R
 import com.example.vibramobile.core.extension.noRippleClickable
 import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.domain.model.User
@@ -171,7 +173,7 @@ private fun ContextMenuContent(
                 item {
                     MenuItem(
                         icon = PhosphorIcons.Regular.Playlist,
-                        text = "Thêm vào danh sách phát",
+                        text = stringResource(R.string.menu_add_to_queue),
                         onClick = {
                             val handler = config.onAddToQueue
                             if (handler != null) {
@@ -189,7 +191,7 @@ private fun ContextMenuContent(
                 item {
                     MenuItem(
                         icon = Icons.Default.FavoriteBorder,
-                        text = "Yêu thích bài hát",
+                        text = stringResource(R.string.menu_like_song),
                         onClick = {
                             config.onAddToLiked?.invoke(config.song)
                             onDismiss()
@@ -202,7 +204,7 @@ private fun ContextMenuContent(
                 item {
                     MenuItem(
                         icon = Icons.Default.Add,
-                        text = "Thêm vào playlist",
+                        text = stringResource(R.string.menu_add_to_playlist),
                         onClick = {
                             config.onAddToPlaylist?.invoke(config.song)
                             onDismiss()
@@ -215,7 +217,7 @@ private fun ContextMenuContent(
                 item {
                     MenuItem(
                         icon = Icons.Default.Person,
-                        text = "Thông tin nghệ sỹ",
+                        text = stringResource(R.string.menu_artist_info),
                         onClick = {
                             val handler = config.onGoToArtist
                             val artist = config.song.author

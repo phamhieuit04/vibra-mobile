@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -47,7 +48,6 @@ import coil3.request.allowHardware
 import coil3.request.crossfade
 import com.example.vibramobile.R
 import com.example.vibramobile.domain.model.Category
-import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.state.CategoryState
 import com.example.vibramobile.presentation.component.SectionTitle
 import com.example.vibramobile.presentation.component.SpotifySection
@@ -87,7 +87,7 @@ fun SearchScreen(
                     Spacer(modifier = Modifier.width(12.dp))
 
                     Text(
-                        text = "Bạn muốn khám phá điều gì?",
+                        text = stringResource(R.string.search_prompt),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium,
                         fontSize = 16.sp
@@ -114,7 +114,7 @@ fun SearchScreen(
                 GridItemSpan(maxLineSpan)
             }) {
                 SpotifySection(
-                    title = "Thể loại nổi bật", modifier = Modifier.padding(top = 4.dp)
+                    title = stringResource(R.string.search_featured_genres), modifier = Modifier.padding(top = 4.dp)
                 ) { }
             }
 

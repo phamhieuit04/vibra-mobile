@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -152,7 +153,7 @@ private fun TopSongRow(
             Icon(
                 modifier = Modifier.size(20.dp),
                 imageVector = Icons.Default.MoreHoriz,
-                contentDescription = "More",
+                contentDescription = stringResource(R.string.cd_more),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

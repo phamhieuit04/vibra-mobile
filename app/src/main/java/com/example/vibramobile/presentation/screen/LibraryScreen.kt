@@ -23,11 +23,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.example.vibramobile.R
 import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.component.LibraryShimmer
 import com.example.vibramobile.presentation.component.ListAlbumComponent
@@ -116,7 +118,7 @@ fun LibraryScreen(
                             item {
                                 SpotifySection(
                                     modifier = Modifier.padding(horizontal = 16.dp),
-                                    title = "Bài hát yêu thích",
+                                    title = stringResource(R.string.library_favorite_songs),
                                 ) {
                                     ListSongComponent(
                                         songs = likedSongs,
@@ -136,7 +138,7 @@ fun LibraryScreen(
                             item {
                                 SpotifySection(
                                     modifier = Modifier.padding(horizontal = 16.dp),
-                                    title = "Playlist của bạn"
+                                    title = stringResource(R.string.library_your_playlists)
                                 ) {
                                     ListAlbumComponent(
                                         albums = myPlaylists,
@@ -151,7 +153,7 @@ fun LibraryScreen(
                             item {
                                 SpotifySection(
                                     modifier = Modifier.padding(horizontal = 16.dp),
-                                    title = "Nghệ sĩ"
+                                    title = stringResource(R.string.label_artist)
                                 ) {
                                     ListArtistComponent(
                                         artists = followedArtists,
@@ -192,7 +194,7 @@ fun LibraryScreen(
 
                         Column {
                             Text(
-                                text = "Thư viện của bạn",
+                                text = stringResource(R.string.library_title),
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = colorScheme.onBackground

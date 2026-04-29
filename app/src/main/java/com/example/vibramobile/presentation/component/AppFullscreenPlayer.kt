@@ -62,6 +62,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -78,6 +79,7 @@ import com.composables.core.Scrim
 import com.composables.core.Sheet
 import com.composables.core.SheetDetent
 import com.composables.core.rememberModalBottomSheetState
+import com.example.vibramobile.R
 import com.example.vibramobile.core.extension.noRippleClickable
 import com.example.vibramobile.core.util.FormatHelper
 import com.example.vibramobile.core.util.ImageHelper
@@ -222,7 +224,7 @@ fun AppFullscreenPlayer(
                                     }) {
                                         Icon(
                                             modifier = Modifier.size(32.dp),
-                                            contentDescription = "Close",
+                                            contentDescription = stringResource(R.string.cd_close),
                                             imageVector = Icons.Default.KeyboardArrowDown,
                                             tint = Color.White
                                         )
@@ -233,7 +235,7 @@ fun AppFullscreenPlayer(
                                         Icon(
                                             modifier = Modifier.size(24.dp),
                                             imageVector = Icons.Default.MoreHoriz,
-                                            contentDescription = "More",
+                                            contentDescription = stringResource(R.string.cd_more),
                                             tint = Color.White
                                         )
                                     }
@@ -422,7 +424,7 @@ private fun LyricsPreviewSection(
             .padding(horizontal = 20.dp, vertical = 18.dp)
     ) {
         Text(
-            text = "Lyrics preview",
+            text = stringResource(R.string.lyrics_preview_title),
             color = Color.White,
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold
@@ -461,7 +463,7 @@ private fun LyricsPreviewSection(
             elevation = ButtonDefaults.buttonElevation(0.dp)
         ) {
             Text(
-                text = "Show lyrics",
+                text = stringResource(R.string.action_show_lyrics),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold
             )
@@ -496,7 +498,7 @@ private fun AboutArtistSection(
             )
 
             Text(
-                text = "About the artist",
+                text = stringResource(R.string.about_artist),
                 color = Color.White,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
@@ -542,7 +544,7 @@ private fun AboutArtistSection(
                 contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = "Follow",
+                    text = stringResource(R.string.action_follow),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -651,7 +653,7 @@ private fun ExploreSongsSection(
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Text(
-            text = "Explore $artistName",
+            text = stringResource(R.string.explore_artist, artistName),
             color = Color.White,
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold

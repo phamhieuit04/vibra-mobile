@@ -40,9 +40,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.vibramobile.R
 import com.example.vibramobile.domain.model.Category
 import com.example.vibramobile.domain.model.Playlist
 import com.example.vibramobile.domain.model.User
@@ -139,7 +141,7 @@ fun HomeScreen(
                     ) {
                         item(key = "recent_rotation") {
                             AnimatedVisibility(visible = recentRotationSongs.isNotEmpty()) {
-                                SpotifySection(title = "Lắng nghe gần đây") {
+                                SpotifySection(title = stringResource(R.string.home_recently_listened)) {
                                     ListSongComponent(
                                         layoutStyle = LayoutStyleConfig.Vertical,
                                         onClick = {
@@ -154,7 +156,7 @@ fun HomeScreen(
 
                         item(key = "recommended") {
                             AnimatedVisibility(visible = recommendedSongs.isNotEmpty()) {
-                                SpotifySection(title = "Dành cho bạn") {
+                                SpotifySection(title = stringResource(R.string.home_for_you)) {
                                     TopSongsComponent(
                                         songs = recommendedSongs.take(10),
                                         onClick = {
@@ -168,7 +170,7 @@ fun HomeScreen(
 
                         item(key = "top_artists") {
                             AnimatedVisibility(visible = popularArtists.isNotEmpty()) {
-                                SpotifySection(title = "Nghệ sĩ nổi bật") {
+                                SpotifySection(title = stringResource(R.string.home_featured_artists)) {
                                     TopArtistsComponent(
                                         artists = popularArtists.take(5),
                                         onClick = { navigateToArtistDetail(it) }
@@ -190,7 +192,7 @@ fun HomeScreen(
 
                         item(key = "popular_songs") {
                             AnimatedVisibility(visible = popularSongs.isNotEmpty()) {
-                                SpotifySection(title = "Bài hát phổ biến") {
+                                SpotifySection(title = stringResource(R.string.home_popular_songs)) {
                                     ListSongComponent(
                                         onClick = {
                                             contextMenuViewModel.showSong(it)
@@ -213,7 +215,7 @@ fun HomeScreen(
 
                         item(key = "popular_albums") {
                             AnimatedVisibility(visible = popularAlbums.isNotEmpty()) {
-                                SpotifySection(title = "Album phổ biến") {
+                                SpotifySection(title = stringResource(R.string.home_popular_albums)) {
                                     ListAlbumComponent(
                                         albums = popularAlbums.take(5),
                                         onClick = { navigateToAlbumDetail(it) }
@@ -283,7 +285,7 @@ fun HomeScreen(
                         )
                     ) {
                         Text(
-                            text = "All",
+                            text = stringResource(R.string.home_all),
                             color = if (selectedCategoryId == null) MaterialTheme.colorScheme.onPrimary
                             else MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 14.sp
@@ -313,7 +315,7 @@ fun HomeScreen(
                 item {
                     OutlinedButton(onClick = { selectedCategoryId = null; navigateToSearch() }) {
                         Text(
-                            text = "See more",
+                            text = stringResource(R.string.home_see_more),
                             color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 14.sp
                         )

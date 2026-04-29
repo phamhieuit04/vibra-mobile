@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,14 +55,14 @@ fun WelcomeScreen(
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "Millions of songs.",
+                text = stringResource(R.string.welcome_title_line1),
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold,
                 fontSize = 28.sp,
                 lineHeight = 32.sp
             )
             Text(
-                text = "Free on Vibra.",
+                text = stringResource(R.string.welcome_title_line2),
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold,
                 fontSize = 28.sp,
@@ -81,7 +82,7 @@ fun WelcomeScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Text(
-                    text = "Sign up free",
+                    text = stringResource(R.string.action_sign_up_free),
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 16.sp
                 )
@@ -94,7 +95,7 @@ fun WelcomeScreen(
                     .height(50.dp)
             ) {
                 Text(
-                    text = "Log in",
+                    text = stringResource(R.string.action_log_in),
                     color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 16.sp
                 )

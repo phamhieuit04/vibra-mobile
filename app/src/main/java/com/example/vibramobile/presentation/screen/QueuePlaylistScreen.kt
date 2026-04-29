@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -64,7 +65,7 @@ fun QueuePlaylistScreen(
                 item {
                     Column() {
                         Text(
-                            text = "Danh sách phát",
+                            text = stringResource(R.string.queue_title),
                             color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold,
                             fontSize = 24.sp,
@@ -74,7 +75,7 @@ fun QueuePlaylistScreen(
                         Spacer(Modifier.height(8.dp))
 
                         Text(
-                            text = "Đăng phát",
+                            text = stringResource(R.string.queue_now_playing),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 14.sp,
                             lineHeight = 14.sp
@@ -96,14 +97,14 @@ fun QueuePlaylistScreen(
                                 )
                                 Column() {
                                     Text(
-                                        text = "Tên bài hát",
+                                        text = stringResource(R.string.queue_song_name_placeholder),
                                         color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 16.sp,
                                         lineHeight = 16.sp
                                     )
                                     Spacer(Modifier.height(2.dp))
                                     Text(
-                                        text = "Tên nghệ sĩ",
+                                        text = stringResource(R.string.queue_artist_name_placeholder),
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 12.sp,
                                         lineHeight = 12.sp

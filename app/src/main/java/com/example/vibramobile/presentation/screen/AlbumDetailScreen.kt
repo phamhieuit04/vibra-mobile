@@ -46,12 +46,14 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.example.vibramobile.R
 import com.example.vibramobile.domain.model.Playlist
 import com.example.vibramobile.presentation.component.DetailActionComponent
 import com.example.vibramobile.presentation.component.DetailTopbarComponent
@@ -150,7 +152,7 @@ fun AlbumDetailScreen(
                     item("songs") {
                         SpotifySection(
                             modifier = Modifier.padding(horizontal = 16.dp),
-                            title = "Bài hát"
+                            title = stringResource(R.string.album_songs)
                         ) {
                             ListSongComponent(
                                 songs = songs,
@@ -255,18 +257,19 @@ private fun AlbumDetailHeader(album: Playlist) {
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = "Album",
+                    text = stringResource(R.string.album_label),
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                     fontSize = 13.sp
                 )
-                if (album.totalSong != null) {
+                val totalSong = album.totalSong
+                if (totalSong != null) {
                     Text(
-                        text = "•",
+                        text = stringResource(R.string.separator_dot),
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                         fontSize = 13.sp
                     )
                     Text(
-                        text = "${album.totalSong} bài hát",
+                        text = stringResource(R.string.song_count_format, totalSong),
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                         fontSize = 13.sp
                     )

@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +42,7 @@ import coil3.compose.AsyncImage
 import com.adamglin.PhosphorIcons
 import com.adamglin.phosphoricons.Regular
 import com.adamglin.phosphoricons.regular.Playlist
+import com.example.vibramobile.R
 import com.example.vibramobile.presentation.config.DetailActionConfig
 
 @Composable
@@ -69,6 +71,9 @@ fun DetailActionComponent(
             ) {
                 when (config) {
                     is DetailActionConfig.Artist -> {
+                        val followLabel = stringResource(
+                            config.followLabelRes ?: R.string.action_follow
+                        )
                         AsyncImage(
                             model = config.avatarPath,
                             contentDescription = null,
@@ -83,7 +88,7 @@ fun DetailActionComponent(
                             modifier = Modifier.padding(start = 4.dp)
                         ) {
                             Text(
-                                text = config.followLabel,
+                                text = followLabel,
                                 color = MaterialTheme.colorScheme.onBackground,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
@@ -101,7 +106,7 @@ fun DetailActionComponent(
                             IconButton(onClick = config.onAddToQueue) {
                                 Icon(
                                     imageVector = Icons.Default.LibraryAdd,
-                                    contentDescription = "Thêm vào danh sách phát",
+                                    contentDescription = stringResource(R.string.action_add_to_queue),
                                     tint = MaterialTheme.colorScheme.onBackground,
                                     modifier = Modifier.size(28.dp)
                                 )
@@ -110,7 +115,7 @@ fun DetailActionComponent(
                             IconButton(onClick = config.onDownload) {
                                 Icon(
                                     imageVector = Icons.Default.Download,
-                                    contentDescription = "Tải xuống",
+                                    contentDescription = stringResource(R.string.action_download),
                                     tint = MaterialTheme.colorScheme.onBackground,
                                     modifier = Modifier.size(28.dp)
                                 )
@@ -126,7 +131,7 @@ fun DetailActionComponent(
             ) {
                 Icon(
                     imageVector = Icons.Default.Shuffle,
-                    contentDescription = "Shuffle",
+                    contentDescription = stringResource(R.string.action_shuffle),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .size(32.dp)
@@ -142,7 +147,7 @@ fun DetailActionComponent(
                 ) {
                     Icon(
                         imageVector = Icons.Default.PlayArrow,
-                        contentDescription = "Play",
+                        contentDescription = stringResource(R.string.action_play),
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(28.dp)
                     )
@@ -156,13 +161,13 @@ fun DetailActionComponent(
 private fun DetailMoreButton(
     showDropdownMenu: Boolean,
     onShowDropdown: (Boolean) -> Unit,
-    dropdownItems: List<Pair<String, () -> Unit>>,
+    dropdownItems: List<Pair<Int, () -> Unit>>,
 ) {
     Box {
         IconButton(onClick = { onShowDropdown(true) }) {
             Icon(
                 imageVector = Icons.Default.MoreVert,
-                contentDescription = "More options",
+                contentDescription = stringResource(R.string.action_more_options),
                 tint = MaterialTheme.colorScheme.onBackground
             )
         }
@@ -171,11 +176,11 @@ private fun DetailMoreButton(
             onDismissRequest = { onShowDropdown(false) },
             modifier = Modifier.background(MaterialTheme.colorScheme.surface)
         ) {
-            dropdownItems.forEach { (label, action) ->
+            dropdownItems.forEach { (labelRes, action) ->
                 DropdownMenuItem(
                     text = {
                         Text(
-                            text = label,
+                            text = stringResource(labelRes),
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     },

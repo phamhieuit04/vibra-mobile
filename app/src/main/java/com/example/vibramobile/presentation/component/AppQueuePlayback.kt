@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
@@ -32,6 +33,7 @@ import com.composables.core.Scrim
 import com.composables.core.Sheet
 import com.composables.core.SheetDetent
 import com.composables.core.rememberModalBottomSheetState
+import com.example.vibramobile.R
 import com.example.vibramobile.core.extension.noRippleClickable
 import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.presentation.config.LayoutStyleConfig
@@ -112,7 +114,7 @@ fun AppQueuePlayback(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 SpotifySection(
-                    title = "Danh sách phát của bạn"
+                    title = stringResource(R.string.library_your_playlists)
                 ) {
                     TopSongComponent(
                         thumbnailPath = currentSong?.thumbnailPath ?: "",

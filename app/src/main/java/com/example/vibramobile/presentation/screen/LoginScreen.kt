@@ -38,7 +38,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -71,6 +73,7 @@ fun LoginScreen(
     navigateToMain: () -> Unit,
     viewModel: AuthViewModel = koinViewModel()
 ) {
+    val context = LocalContext.current
     val backstack = rememberNavBackStack(LoginStep.Email)
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -81,7 +84,7 @@ fun LoginScreen(
 
                 is LoginEvent.Error -> {
                     snackbarHostState.showSnackbar(
-                        message = event.message ?: "Error",
+                        message = event.message ?: context.getString(R.string.error_generic),
                         duration = SnackbarDuration.Short
                     )
                 }
@@ -118,13 +121,13 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Don't have an account?",
+                    text = stringResource(R.string.auth_dont_have_account),
                     color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 16.sp
                 )
                 TextButton(onClick = navigateToSignUp) {
                     Text(
-                        text = "Sign up",
+                        text = stringResource(R.string.action_sign_up),
                         color = MaterialTheme.colorScheme.onBackground,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
@@ -157,7 +160,7 @@ fun LoginScreen(
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "Login to Vibra",
+                    text = stringResource(R.string.auth_login_to_vibra),
                     color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp,
@@ -180,10 +183,10 @@ fun LoginScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                FormInput(placeholder = "What's your email?")
+                                FormInput(placeholder = stringResource(R.string.auth_email_placeholder))
                                 FormButton(
                                     onClick = { backstack.add(LoginStep.Password) },
-                                    text = "Continue"
+                                    text = stringResource(R.string.auth_continue)
                                 )
                             }
                         }
@@ -193,19 +196,19 @@ fun LoginScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                FormInput(placeholder = "Enter your password")
+                                FormInput(placeholder = stringResource(R.string.auth_password_placeholder))
                                 FormButton(onClick = {
                                     viewModel.login(
                                         email = "tomnguyenhieu2004@gmail.com",
                                         password = "12345678"
                                     )
-                                }, text = "Log in")
+                                }, text = stringResource(R.string.action_log_in))
                             }
                         }
                     }
                 )
                 Text(
-                    text = "or",
+                    text = stringResource(R.string.auth_or),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     fontSize = 12.sp
@@ -248,7 +251,7 @@ fun SocialMethod(
             )
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = "Continue with $provider",
+                text = stringResource(R.string.auth_social_continue_with, provider),
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
