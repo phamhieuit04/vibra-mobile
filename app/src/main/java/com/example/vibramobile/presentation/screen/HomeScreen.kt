@@ -143,11 +143,7 @@ fun HomeScreen(
                                     ListSongComponent(
                                         layoutStyle = LayoutStyleConfig.Vertical,
                                         onClick = {
-                                            contextMenuViewModel.show(
-                                                thumbnailPath = it.thumbnailPath,
-                                                songTitle = it.name,
-                                                artistName = it.author?.name
-                                            )
+                                            contextMenuViewModel.showSong(it)
                                         },
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
                                         songs = recentRotationSongs
@@ -162,11 +158,7 @@ fun HomeScreen(
                                     TopSongsComponent(
                                         songs = recommendedSongs.take(10),
                                         onClick = {
-                                            contextMenuViewModel.show(
-                                                thumbnailPath = it.thumbnailPath,
-                                                songTitle = it.name,
-                                                artistName = it.author?.name
-                                            )
+                                            contextMenuViewModel.showSong(it)
                                         },
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
                                     )
@@ -201,11 +193,7 @@ fun HomeScreen(
                                 SpotifySection(title = "Bài hát phổ biến") {
                                     ListSongComponent(
                                         onClick = {
-                                            contextMenuViewModel.show(
-                                                thumbnailPath = it.thumbnailPath,
-                                                songTitle = it.name,
-                                                artistName = it.author?.name
-                                            )
+                                            contextMenuViewModel.showSong(it)
                                         },
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
                                         songs = popularSongs.take(5)
@@ -214,11 +202,7 @@ fun HomeScreen(
                                     ListSongComponent(
                                         layoutStyle = LayoutStyleConfig.Vertical,
                                         onClick = {
-                                            contextMenuViewModel.show(
-                                                thumbnailPath = it.thumbnailPath,
-                                                songTitle = it.name,
-                                                artistName = it.author?.name
-                                            )
+                                            contextMenuViewModel.showSong(it)
                                         },
                                         onPlay = { mediaPlayerViewModel.playSong(song = it) },
                                         songs = popularSongs.drop(5).take(10)

@@ -217,11 +217,7 @@ fun SearchResultScreen(
                                     ) {
                                         ListSongComponent(
                                             onClick = {
-                                                contextMenuViewModel.show(
-                                                    thumbnailPath = it.thumbnailPath,
-                                                    songTitle = it.name,
-                                                    artistName = it.author?.name
-                                                )
+                                                contextMenuViewModel.showSong(it)
                                             },
                                             onPlay = { mediaPlayerViewModel.playSong(it) },
                                             layoutStyle = LayoutStyleConfig.Vertical,

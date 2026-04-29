@@ -182,11 +182,7 @@ fun ArtistDetailScreen(
                             TopSongsComponent(
                                 songs = songs.take(5),
                                 onClick = {
-                                    contextMenuViewModel.show(
-                                        thumbnailPath = it.thumbnailPath,
-                                        songTitle = it.name,
-                                        artistName = it.author?.name
-                                    )
+                                    contextMenuViewModel.showSong(it)
                                 },
                                 onPlay = { mediaPlayerViewModel.playSong(song = it) }
                             )
@@ -205,11 +201,7 @@ fun ArtistDetailScreen(
                                     songs = songs.drop(5),
                                     layoutStyle = LayoutStyleConfig.Vertical,
                                     onClick = {
-                                        contextMenuViewModel.show(
-                                            thumbnailPath = it.thumbnailPath,
-                                            songTitle = it.name,
-                                            artistName = it.author?.name
-                                        )
+                                        contextMenuViewModel.showSong(it)
                                     },
                                     onPlay = { mediaPlayerViewModel.playSong(song = it) }
                                 )

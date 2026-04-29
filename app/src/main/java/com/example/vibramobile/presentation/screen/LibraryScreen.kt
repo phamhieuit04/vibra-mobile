@@ -122,11 +122,7 @@ fun LibraryScreen(
                                         songs = likedSongs,
                                         layoutStyle = LayoutStyleConfig.Vertical,
                                         onClick = {
-                                            contextMenuViewModel.show(
-                                                it.thumbnailPath,
-                                                it.name,
-                                                it.author?.name
-                                            )
+                                            contextMenuViewModel.showSong(it)
                                         },
                                         onPlay = {
                                             mediaPlayerViewModel.playSong(it)
@@ -145,13 +141,7 @@ fun LibraryScreen(
                                     ListAlbumComponent(
                                         albums = myPlaylists,
                                         layoutStyle = LayoutStyleConfig.Vertical,
-                                        onClick = {
-                                            contextMenuViewModel.show(
-                                                it.thumbnailPath,
-                                                it.name,
-                                                it.author?.name
-                                            )
-                                        }
+                                        onClick = { }
                                     )
                                 }
                             }

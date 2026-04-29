@@ -163,11 +163,7 @@ fun GenreDetailScreen(
                                     TopSongsComponent(
                                         onPlay = { mediaPlayerViewModel.playSong(it) },
                                         onClick = {
-                                            contextMenuViewModel.show(
-                                                thumbnailPath = it.thumbnailPath,
-                                                songTitle = it.name,
-                                                artistName = it.author?.name
-                                            )
+                                            contextMenuViewModel.showSong(it)
                                         },
                                         songs = songsByCategory.take(5)
                                     )
@@ -188,11 +184,7 @@ fun GenreDetailScreen(
                                             onPlay = { mediaPlayerViewModel.playSong(it) },
                                             layoutStyle = LayoutStyleConfig.Vertical,
                                             onClick = {
-                                                contextMenuViewModel.show(
-                                                    thumbnailPath = it.thumbnailPath,
-                                                    songTitle = it.name,
-                                                    artistName = it.author?.name
-                                                )
+                                                contextMenuViewModel.showSong(it)
                                             },
                                             songs = songsByCategory.drop(5)
                                         )

@@ -15,14 +15,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Album
-import androidx.compose.material.icons.filled.Diamond
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Radio
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Theaters
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -50,9 +44,9 @@ import com.composables.core.Sheet
 import com.composables.core.SheetDetent
 import com.composables.core.rememberModalBottomSheetState
 import com.example.vibramobile.core.extension.noRippleClickable
-import com.example.vibramobile.domain.model.Playlist
 import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.domain.model.User
+import com.example.vibramobile.presentation.config.ContextMenuConfig
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -61,9 +55,11 @@ import org.koin.androidx.compose.koinViewModel
 fun AppContextMenu(
     modifier: Modifier = Modifier,
     contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
+    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
     navigateToArtist: (artist: User) -> Unit
 ) {
     val uiState by contextMenuViewModel.uiState.collectAsState()
+    val config = uiState.config
 
     val Peek = SheetDetent(identifier = "peek") { containerHeight, sheetHeight ->
         containerHeight * 0.6f
@@ -126,22 +122,14 @@ fun AppContextMenu(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                ContextMenuContent(
-                    thumbnailPath = uiState.thumbnailPath,
-                    songTitle = uiState.songTitle,
-                    artistName = uiState.artistName,
-                    onMenuItemClick = { action ->
-                        when (action) {
-                            is MenuAction.AddToQueue -> {
-                            }
-
-                            is MenuAction.AddToLiked -> {}
-                            is MenuAction.AddToPlaylist -> {}
-                            is MenuAction.GoToArtist -> {}
-                        }
-                        contextMenuViewModel.hide()
-                    }
-                )
+                if (config is ContextMenuConfig.SongItem) {
+                    ContextMenuContent(
+                        config = config,
+                        enqueueSong = { song -> mediaPlayerViewModel.enqueueSong(song) },
+                        navigateToArtist = navigateToArtist,
+                        onDismiss = { contextMenuViewModel.hide() }
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
             }
@@ -151,12 +139,13 @@ fun AppContextMenu(
 
 @Composable
 private fun ContextMenuContent(
-    thumbnailPath: String,
-    songTitle: String,
-    artistName: String,
-    onMenuItemClick: (MenuAction) -> Unit,
+    config: ContextMenuConfig.SongItem,
+    enqueueSong: (Song) -> Unit,
+    navigateToArtist: (User) -> Unit,
+    onDismiss: () -> Unit,
 ) {
     val scrollState = rememberLazyListState()
+    val header = config.header
 
     Column(
         modifier = Modifier
@@ -164,9 +153,9 @@ private fun ContextMenuContent(
             .padding(horizontal = 16.dp)
     ) {
         TopSongComponent(
-            thumbnailPath = thumbnailPath,
-            songTitle = songTitle,
-            artistName = artistName
+            thumbnailPath = header.thumbnailPath ?: "",
+            songTitle = header.title ?: "",
+            artistName = header.subtitle ?: ""
         )
 
         HorizontalDivider(
@@ -178,36 +167,67 @@ private fun ContextMenuContent(
             modifier = Modifier.fillMaxWidth(),
             state = scrollState
         ) {
-            item {
-                MenuItem(
-                    icon = PhosphorIcons.Regular.Playlist,
-                    text = "Thêm vào danh sách phát",
-                    onClick = { onMenuItemClick(MenuAction.AddToQueue) }
-                )
+            if (config.showAddToQueue) {
+                item {
+                    MenuItem(
+                        icon = PhosphorIcons.Regular.Playlist,
+                        text = "Thêm vào danh sách phát",
+                        onClick = {
+                            val handler = config.onAddToQueue
+                            if (handler != null) {
+                                handler(config.song)
+                            } else {
+                                enqueueSong(config.song)
+                            }
+                            onDismiss()
+                        }
+                    )
+                }
             }
 
-            item {
-                MenuItem(
-                    icon = Icons.Default.FavoriteBorder,
-                    text = "Yêu thích bài hát",
-                    onClick = { onMenuItemClick(MenuAction.AddToLiked) }
-                )
+            if (config.showAddToLiked) {
+                item {
+                    MenuItem(
+                        icon = Icons.Default.FavoriteBorder,
+                        text = "Yêu thích bài hát",
+                        onClick = {
+                            config.onAddToLiked?.invoke(config.song)
+                            onDismiss()
+                        }
+                    )
+                }
             }
 
-            item {
-                MenuItem(
-                    icon = Icons.Default.Add,
-                    text = "Thêm vào playlist",
-                    onClick = { onMenuItemClick(MenuAction.AddToPlaylist) }
-                )
+            if (config.showAddToPlaylist) {
+                item {
+                    MenuItem(
+                        icon = Icons.Default.Add,
+                        text = "Thêm vào playlist",
+                        onClick = {
+                            config.onAddToPlaylist?.invoke(config.song)
+                            onDismiss()
+                        }
+                    )
+                }
             }
 
-            item {
-                MenuItem(
-                    icon = Icons.Default.Person,
-                    text = "Thông tin nghệ sỹ",
-                    onClick = { onMenuItemClick(MenuAction.GoToArtist) }
-                )
+            if (config.showGoToArtist && config.song.author != null) {
+                item {
+                    MenuItem(
+                        icon = Icons.Default.Person,
+                        text = "Thông tin nghệ sỹ",
+                        onClick = {
+                            val handler = config.onGoToArtist
+                            val artist = config.song.author
+                            if (handler != null && artist != null) {
+                                handler(artist)
+                            } else if (artist != null) {
+                                navigateToArtist(artist)
+                            }
+                            onDismiss()
+                        }
+                    )
+                }
             }
         }
     }
@@ -255,11 +275,4 @@ private fun MenuItem(
             )
         }
     }
-}
-
-sealed class MenuAction {
-    object AddToLiked : MenuAction()
-    object AddToPlaylist : MenuAction()
-    object AddToQueue : MenuAction()
-    object GoToArtist : MenuAction()
 }

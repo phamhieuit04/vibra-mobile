@@ -131,11 +131,7 @@ fun AppQueuePlayback(
                     layoutStyle = LayoutStyleConfig.Vertical,
                     onPlay = { mediaPlayerViewModel.playSong(it) },
                     onClick = {
-                        contextMenuViewModel.show(
-                            thumbnailPath = it.thumbnailPath,
-                            songTitle = it.name,
-                            artistName = it.author?.name
-                        )
+                        contextMenuViewModel.showSong(it)
                     },
                     currentSongId = currentSong?.id,
                     currentSongPath = currentSong?.songPath

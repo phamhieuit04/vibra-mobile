@@ -156,11 +156,7 @@ fun AlbumDetailScreen(
                                 songs = songs,
                                 layoutStyle = LayoutStyleConfig.Vertical,
                                 onClick = {
-                                    contextMenuViewModel.show(
-                                        thumbnailPath = it.thumbnailPath,
-                                        songTitle = it.name,
-                                        artistName = it.author?.name
-                                    )
+                                    contextMenuViewModel.showSong(it)
                                 },
                                 onPlay = {
                                     mediaPlayerViewModel.playSong(song = it)

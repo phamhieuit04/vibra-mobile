@@ -61,7 +61,6 @@ import androidx.core.graphics.toColorInt
 import coil3.compose.AsyncImage
 import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.SpotifySection
-import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -74,8 +73,7 @@ fun ProfileScreen(
     onDarkModeChange: (Boolean) -> Unit,
     selectedAccentColorHex: String,
     onAccentColorChange: (String) -> Unit,
-    profileViewModel: ProfileViewModel = koinViewModel(),
-    contextMenuViewModel: ContextMenuViewModel = koinViewModel()
+    profileViewModel: ProfileViewModel = koinViewModel()
 ) {
     val currentUser by UserState.currentUser.collectAsState()
     val followedArtists by UserState.followedArtists.collectAsState()
@@ -149,13 +147,7 @@ fun ProfileScreen(
                     ) {
                         ListAlbumComponent(
                             albums = myAlbums,
-                            onClick = {
-                                contextMenuViewModel.show(
-                                    it.thumbnailPath,
-                                    it.name,
-                                    it.author?.name
-                                )
-                            }
+                            onClick = { }
                         )
                     }
                 }
