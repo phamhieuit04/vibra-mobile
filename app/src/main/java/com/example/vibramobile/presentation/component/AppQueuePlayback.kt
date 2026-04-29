@@ -44,7 +44,7 @@ fun AppQueuePlayback(
 ) {
     val uiState by mediaPlayerViewModel.uiState.collectAsState()
     val currentSong by mediaPlayerViewModel.currentSong.collectAsState()
-    val queuePlaybacks = emptyList<Song>()
+    val queuePlaybacks = uiState.queue
 
     val Peek = SheetDetent(identifier = "peek") { containerHeight, sheetHeight ->
         containerHeight * 0.6f

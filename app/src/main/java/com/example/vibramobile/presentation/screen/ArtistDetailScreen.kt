@@ -147,8 +147,22 @@ fun ArtistDetailScreen(
                             dropdownItems = listOf("Hạn chế nghệ sĩ" to {}),
                             onFollow = {},
                         ),
-                        onShuffle = { },
-                        onPlay = { },
+                        onShuffle = {
+                            mediaPlayerViewModel.playAll(
+                                songs = songs,
+                                startIndex = 0,
+                                prioritize = true,
+                                enableShuffle = true
+                            )
+                        },
+                        onPlay = {
+                            mediaPlayerViewModel.playAll(
+                                songs = songs,
+                                startIndex = 0,
+                                prioritize = true,
+                                enableShuffle = false
+                            )
+                        },
                     )
                 }
 

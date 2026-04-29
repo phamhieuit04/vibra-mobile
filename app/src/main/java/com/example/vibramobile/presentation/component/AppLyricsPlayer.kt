@@ -137,8 +137,14 @@ fun AppLyricsPlayer(
                         currentTime = currentTime,
                         totalTime = totalTime,
                         isPlaying = uiState.isPlaying,
+                        isShuffleEnabled = uiState.isShuffleEnabled,
+                        repeatMode = uiState.repeatMode,
                         onPlay = { mediaPlayerViewModel.toggle() },
-                        onSeek = onSeek
+                        onSeek = onSeek,
+                        onShuffle = { mediaPlayerViewModel.toggleShuffle() },
+                        onPrevious = { mediaPlayerViewModel.skipToPrevious() },
+                        onNext = { mediaPlayerViewModel.skipToNext() },
+                        onLoop = { mediaPlayerViewModel.toggleRepeat() }
                     )
                 }
             ) { padding ->
@@ -322,6 +328,8 @@ private fun LyricsBottomBar(
     currentTime: Long,
     totalTime: Long,
     isPlaying: Boolean,
+    isShuffleEnabled: Boolean = false,
+    repeatMode: com.example.vibramobile.presentation.state.RepeatMode = com.example.vibramobile.presentation.state.RepeatMode.OFF,
     onPlay: () -> Unit = { },
     onSeek: (Float) -> Unit = { },
     onShuffle: () -> Unit = { },
@@ -345,7 +353,13 @@ private fun LyricsBottomBar(
 
         MediaControlsComponent(
             isPlaying = isPlaying,
-            onPlay = onPlay
+            isShuffleEnabled = isShuffleEnabled,
+            repeatMode = repeatMode,
+            onPlay = onPlay,
+            onShuffle = onShuffle,
+            onPrevious = onPrevious,
+            onNext = onNext,
+            onLoop = onLoop
         )
     }
 }

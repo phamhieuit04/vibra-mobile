@@ -14,40 +14,49 @@ import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.vibramobile.presentation.state.RepeatMode
 
 @Composable
 fun MediaControlsComponent(
     isPlaying: Boolean,
+    isShuffleEnabled: Boolean = false,
+    repeatMode: RepeatMode = RepeatMode.OFF,
     onPlay: () -> Unit = { },
     onShuffle: () -> Unit = { },
     onPrevious: () -> Unit = { },
     onNext: () -> Unit = { },
     onLoop: () -> Unit = { }
 ) {
+    val activeColor = MaterialTheme.colorScheme.primary
+    val inactiveColor = Color.White
+    val shuffleTint = if (isShuffleEnabled) activeColor else inactiveColor
+    val repeatTint = if (repeatMode != RepeatMode.OFF) activeColor else inactiveColor
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = { }) {
+        IconButton(onClick = onShuffle) {
             Icon(
                 modifier = Modifier.size(28.dp),
-                contentDescription = "",
+                contentDescription = "Shuffle",
                 imageVector = Icons.Default.Shuffle,
-                tint = Color.White
+                tint = shuffleTint
             )
         }
-        IconButton(onClick = { }) {
+        IconButton(onClick = onPrevious) {
             Icon(
                 modifier = Modifier.size(52.dp),
-                contentDescription = "",
+                contentDescription = "Previous",
                 imageVector = Icons.Default.SkipPrevious,
-                tint = Color.White
+                tint = inactiveColor
             )
         }
         IconButton(
@@ -56,28 +65,28 @@ fun MediaControlsComponent(
         ) {
             Icon(
                 modifier = Modifier.fillMaxSize(),
-                contentDescription = "",
+                contentDescription = "Play/Pause",
                 imageVector = if (isPlaying)
                     Icons.Default.PauseCircleFilled
                 else
                     Icons.Default.PlayCircleFilled,
-                tint = Color.White
+                tint = inactiveColor
             )
         }
-        IconButton(onClick = { }) {
+        IconButton(onClick = onNext) {
             Icon(
                 modifier = Modifier.size(52.dp),
-                contentDescription = "",
+                contentDescription = "Next",
                 imageVector = Icons.Default.SkipNext,
-                tint = Color.White
+                tint = inactiveColor
             )
         }
-        IconButton(onClick = { }) {
+        IconButton(onClick = onLoop) {
             Icon(
                 modifier = Modifier.size(28.dp),
-                contentDescription = "",
+                contentDescription = "Repeat",
                 imageVector = Icons.Default.Loop,
-                tint = Color.White
+                tint = repeatTint
             )
         }
     }

@@ -326,7 +326,13 @@ fun AppFullscreenPlayer(
                         ) {
                             MediaControlsComponent(
                                 isPlaying = uiState.isPlaying,
-                                onPlay = { mediaPlayerViewModel.toggle() }
+                                isShuffleEnabled = uiState.isShuffleEnabled,
+                                repeatMode = uiState.repeatMode,
+                                onPlay = { mediaPlayerViewModel.toggle() },
+                                onShuffle = { mediaPlayerViewModel.toggleShuffle() },
+                                onPrevious = { mediaPlayerViewModel.skipToPrevious() },
+                                onNext = { mediaPlayerViewModel.skipToNext() },
+                                onLoop = { mediaPlayerViewModel.toggleRepeat() }
                             )
 
                             IconButton(
