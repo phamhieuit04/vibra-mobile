@@ -40,6 +40,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.adamglin.PhosphorIcons
+import com.adamglin.phosphoricons.Regular
+import com.adamglin.phosphoricons.regular.Playlist
 import com.composables.core.DragIndication
 import com.composables.core.ModalBottomSheet
 import com.composables.core.Scrim
@@ -47,6 +50,9 @@ import com.composables.core.Sheet
 import com.composables.core.SheetDetent
 import com.composables.core.rememberModalBottomSheetState
 import com.example.vibramobile.core.extension.noRippleClickable
+import com.example.vibramobile.domain.model.Playlist
+import com.example.vibramobile.domain.model.Song
+import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -55,10 +61,10 @@ import org.koin.androidx.compose.koinViewModel
 fun AppContextMenu(
     modifier: Modifier = Modifier,
     contextMenuViewModel: ContextMenuViewModel = koinViewModel(),
-    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel()
+    mediaPlayerViewModel: MediaPlayerViewModel = koinViewModel(),
+    navigateToArtist: (artist: User) -> Unit
 ) {
     val uiState by contextMenuViewModel.uiState.collectAsState()
-    val mediaState by mediaPlayerViewModel.uiState.collectAsState()
 
     val Peek = SheetDetent(identifier = "peek") { containerHeight, sheetHeight ->
         containerHeight * 0.6f
@@ -127,15 +133,10 @@ fun AppContextMenu(
                     artistName = uiState.artistName,
                     onMenuItemClick = { action ->
                         when (action) {
-                            is MenuAction.Share -> {}
-                            is MenuAction.Premium -> {}
+                            is MenuAction.AddToQueue -> {}
                             is MenuAction.AddToLiked -> {}
                             is MenuAction.AddToPlaylist -> {}
-                            is MenuAction.GoToRadio -> {}
-                            is MenuAction.GoToAlbum -> {}
                             is MenuAction.GoToArtist -> {}
-                            is MenuAction.GoToConcerts -> {}
-                            is MenuAction.ViewCredits -> {}
                         }
                         contextMenuViewModel.hide()
                     }
@@ -178,26 +179,16 @@ private fun ContextMenuContent(
         ) {
             item {
                 MenuItem(
-                    icon = Icons.Default.Share,
-                    text = "Share",
-                    onClick = { onMenuItemClick(MenuAction.Share) }
-                )
-            }
-
-            item {
-                MenuItem(
-                    icon = Icons.Default.Diamond,
-                    text = "Listen to music ad-free",
-                    trailingText = "Premium",
-                    trailingColor = MaterialTheme.colorScheme.primary,
-                    onClick = { onMenuItemClick(MenuAction.Premium) }
+                    icon = PhosphorIcons.Regular.Playlist,
+                    text = "Thêm vào danh sách phát",
+                    onClick = { onMenuItemClick(MenuAction.AddToQueue) }
                 )
             }
 
             item {
                 MenuItem(
                     icon = Icons.Default.FavoriteBorder,
-                    text = "Add to Liked Songs",
+                    text = "Yêu thích bài hát",
                     onClick = { onMenuItemClick(MenuAction.AddToLiked) }
                 )
             }
@@ -205,48 +196,16 @@ private fun ContextMenuContent(
             item {
                 MenuItem(
                     icon = Icons.Default.Add,
-                    text = "Add to playlist",
+                    text = "Thêm vào playlist",
                     onClick = { onMenuItemClick(MenuAction.AddToPlaylist) }
                 )
             }
 
             item {
                 MenuItem(
-                    icon = Icons.Default.Radio,
-                    text = "Go to radio",
-                    onClick = { onMenuItemClick(MenuAction.GoToRadio) }
-                )
-            }
-
-            item {
-                MenuItem(
-                    icon = Icons.Default.Album,
-                    text = "Go to album",
-                    onClick = { onMenuItemClick(MenuAction.GoToAlbum) }
-                )
-            }
-
-            item {
-                MenuItem(
                     icon = Icons.Default.Person,
-                    text = "Go to artist",
+                    text = "Thông tin nghệ sỹ",
                     onClick = { onMenuItemClick(MenuAction.GoToArtist) }
-                )
-            }
-
-            item {
-                MenuItem(
-                    icon = Icons.Default.Theaters,
-                    text = "Go to artist concerts",
-                    onClick = { onMenuItemClick(MenuAction.GoToConcerts) }
-                )
-            }
-
-            item {
-                MenuItem(
-                    icon = Icons.Default.Info,
-                    text = "View song credits",
-                    onClick = { onMenuItemClick(MenuAction.ViewCredits) }
                 )
             }
         }
@@ -298,13 +257,8 @@ private fun MenuItem(
 }
 
 sealed class MenuAction {
-    object Share : MenuAction()
-    object Premium : MenuAction()
     object AddToLiked : MenuAction()
     object AddToPlaylist : MenuAction()
-    object GoToRadio : MenuAction()
-    object GoToAlbum : MenuAction()
+    object AddToQueue : MenuAction()
     object GoToArtist : MenuAction()
-    object GoToConcerts : MenuAction()
-    object ViewCredits : MenuAction()
 }

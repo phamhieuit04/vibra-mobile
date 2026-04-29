@@ -89,7 +89,7 @@ class MediaPlayerViewModel(
         _uiState.update { it.copy(isMiniVisible = true) }
 
         val isSameSong = currentSongValue?.id == song.id &&
-            currentSongValue?.songPath == song.songPath
+                currentSongValue?.songPath == song.songPath
         if (isSameSong) {
             toggle()
             return
@@ -142,10 +142,6 @@ class MediaPlayerViewModel(
     fun enqueueSong(song: Song?) {
         if (song == null) return
         enqueueSongs(listOf(song))
-    }
-
-    fun enqueueAlbum(songs: List<Song>) {
-        enqueueSongs(songs)
     }
 
     fun enqueuePlaylist(songs: List<Song>) {

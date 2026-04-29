@@ -190,7 +190,11 @@ fun MainGraph(
                     )
                 )
 
-                AppContextMenu()
+                AppContextMenu(
+                    navigateToArtist = { artist ->
+                        navigator.navigate(MainDestination.ArtistDetail(artist))
+                    }
+                )
 
                 AppFullscreenPlayer(
                     bottomContentPadding = bottomContentPadding,

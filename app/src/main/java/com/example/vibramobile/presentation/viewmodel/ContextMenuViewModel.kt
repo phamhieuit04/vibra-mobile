@@ -13,7 +13,8 @@ class ContextMenuViewModel : ViewModel() {
     fun show(thumbnailPath: String?, songTitle: String?, artistName: String?) {
         _uiState.update {
             it.copy(
-                visible = true, thumbnailPath = thumbnailPath ?: "",
+                visible = true,
+                thumbnailPath = thumbnailPath ?: "",
                 songTitle = songTitle ?: "",
                 artistName = artistName ?: ""
             )
