@@ -41,6 +41,7 @@ uiTextGoogleFonts = "1.10.1"
 dataStorePreferences = "1.1.7"
 palette = "1.0.0"
 phosphor = "1.0.0"
+socketio = "2.1.0"
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
@@ -104,6 +105,7 @@ androidx-compose-animation = { group = "androidx.compose.animation", name = "ani
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "dataStorePreferences" }
 palette-ktx = { group = "androidx.palette", name = "palette-ktx", version.ref = "palette" }
 phosphor-icon = { module = "com.adamglin:phosphor-icon", version.ref = "phosphor" }
+socketio-client = { module = "io.socket:socket.io-client", version.ref = "socketio" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

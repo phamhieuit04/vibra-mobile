@@ -97,4 +97,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.palette.ktx)
     implementation(libs.phosphor.icon)
+    implementation(libs.socketio.client) {
+        exclude(group = "org.json", module = "json")
+    }
 }
