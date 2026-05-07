@@ -1,4 +1,9 @@
 package com.example.vibramobile.data.source.remote.config
 
-const val API_ENDPOINT = "http://100.113.48.99:8000"
-const val API_BASE_URL = "$API_ENDPOINT/api/"
+private const val API_PORT = 8000
+private const val SOCKET_PORT = 3000
+
+private const val SERVER_ENDPOINT = "http://100.107.16.50"
+
+const val API_ENDPOINT = "$SERVER_ENDPOINT:$API_PORT/api/"
+const val SOCKET_ENDPOINT = "$SERVER_ENDPOINT:$SOCKET_PORT"

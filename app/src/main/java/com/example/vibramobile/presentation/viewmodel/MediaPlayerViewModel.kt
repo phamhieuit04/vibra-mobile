@@ -145,10 +145,6 @@ class MediaPlayerViewModel(
         enqueueSongs(listOf(song))
     }
 
-    fun enqueuePlaylist(songs: List<Song>) {
-        enqueueSongs(songs)
-    }
-
     fun enqueueSongs(songs: List<Song>) {
         val normalized = normalizeQueue(songs)
         if (normalized.isEmpty()) return

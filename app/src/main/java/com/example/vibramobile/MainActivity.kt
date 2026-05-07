@@ -15,7 +15,6 @@ import androidx.core.content.edit
 import com.example.vibramobile.core.di.jsonModule
 import com.example.vibramobile.core.di.networkModule
 import com.example.vibramobile.core.di.repositoryModule
-import com.example.vibramobile.core.di.socketModule
 import com.example.vibramobile.core.di.storeModule
 import com.example.vibramobile.core.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
@@ -32,8 +31,7 @@ class App : Application() {
                 networkModule,
                 repositoryModule,
                 storeModule,
-                viewModelModule,
-                socketModule
+                viewModelModule
             )
         }
     }
