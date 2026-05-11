@@ -57,8 +57,6 @@ class MediaPlayerViewModel(
 
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
-                _uiState.update { it.copy(isPlaying = isPlaying) }
-                if (isPlaying) startProgressUpdater() else stopProgressUpdater()
             }
 
             override fun onPlaybackStateChanged(state: Int) {
@@ -195,23 +193,27 @@ class MediaPlayerViewModel(
 
         progressJob = viewModelScope.launch {
             while (isActive) {
-                val now = System.currentTimeMillis()
-                val position = if (lastServerIsPlaying && lastServerStartedAtMs != null) {
-                    lastServerPositionMs + (now - lastServerStartedAtMs!!).coerceAtLeast(0L)
-                } else {
-                    lastServerPositionMs
-                }
+
+                val position = player.currentPosition
+
                 val duration = player.duration
+
                 if (duration > 0) {
                     _uiState.update {
                         it.copy(
-                            progress = position / duration.toFloat(),
+                            progress =
+                                position / duration.toFloat(),
+
                             currentPosition = position,
                             duration = duration
                         )
                     }
                 } else {
-                    _uiState.update { it.copy(currentPosition = position) }
+                    _uiState.update {
+                        it.copy(
+                            currentPosition = position
+                        )
+                    }
                 }
 
                 delay(500)
@@ -243,13 +245,16 @@ class MediaPlayerViewModel(
 
     private fun applyRemoteState(state: SocketRoomState) {
         lastSocketState = state
-        val actualPosition = computeServerPosition(state)
-        lastServerPositionMs = state.currentPosition.coerceAtLeast(0L)
+        lastServerPositionMs =
+            state.currentPosition.coerceAtLeast(0L)
         lastServerStartedAtMs = state.startedAt
         lastServerIsPlaying = state.isPlaying
+
+        val actualPosition = computeServerPosition(state)
         val queueSongs = resolveQueueSongs(state.queueSongIds)
         val currentIndex = state.currentIndex
-        val currentSong = queueSongs.getOrNull(currentIndex)
+        val currentSong =
+            queueSongs.getOrNull(currentIndex)
         val repeatMode = runCatching {
             RepeatMode.valueOf(state.repeatMode)
         }.getOrDefault(RepeatMode.OFF)
@@ -257,28 +262,40 @@ class MediaPlayerViewModel(
         _uiState.update {
             it.copy(
                 isPlaying = state.isPlaying,
-                currentPosition = actualPosition,
+
+                currentPosition = player.currentPosition,
+
                 queue = queueSongs,
                 currentIndex = currentIndex,
                 currentSong = currentSong,
+
                 isMiniVisible = queueSongs.isNotEmpty(),
+
                 isShuffleEnabled = state.isShuffleEnabled,
                 repeatMode = repeatMode
             )
         }
 
-        player.shuffleModeEnabled = state.isShuffleEnabled
+        player.shuffleModeEnabled =
+            state.isShuffleEnabled
+
         player.repeatMode = when (repeatMode) {
             RepeatMode.OFF -> Player.REPEAT_MODE_OFF
             RepeatMode.ALL -> Player.REPEAT_MODE_ALL
             RepeatMode.ONE -> Player.REPEAT_MODE_ONE
         }
 
+        if (state.isPlaying) {
+            startProgressUpdater()
+        } else {
+            stopProgressUpdater()
+        }
+
         syncPlayerWithRemote(
             queueSongs = queueSongs,
             queueSongIds = state.queueSongIds,
             currentIndex = currentIndex,
-            positionMs = actualPosition,
+            positionMs = state.currentPosition,
             isPlaying = state.isPlaying
         )
     }
@@ -373,4 +390,3 @@ class MediaPlayerViewModel(
         super.onCleared()
     }
 }
-
