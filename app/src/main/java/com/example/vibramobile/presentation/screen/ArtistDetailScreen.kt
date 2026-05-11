@@ -160,17 +160,13 @@ fun ArtistDetailScreen(
                         onShuffle = {
                             mediaPlayerViewModel.playAll(
                                 songs = songs,
-                                startIndex = 0,
-                                prioritize = true,
-                                enableShuffle = true
+                                startIndex = 0
                             )
                         },
                         onPlay = {
                             mediaPlayerViewModel.playAll(
                                 songs = songs,
-                                startIndex = 0,
-                                prioritize = true,
-                                enableShuffle = false
+                                startIndex = 0
                             )
                         },
                     )

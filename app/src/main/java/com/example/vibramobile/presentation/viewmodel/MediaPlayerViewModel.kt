@@ -29,7 +29,6 @@ import kotlin.math.abs
 
 class MediaPlayerViewModel(
     context: Context,
-    private val songRepository: ISongRepository,
     private val socket: ISocketClient
 ) : ViewModel() {
     private val player = ExoPlayer.Builder(context).build()
@@ -102,9 +101,7 @@ class MediaPlayerViewModel(
 
     fun playAll(
         songs: List<Song>,
-        startIndex: Int = 0,
-        prioritize: Boolean = true,
-        enableShuffle: Boolean? = null
+        startIndex: Int = 0
     ) {
         val userId = currentUserId() ?: return
         val normalizedNew = normalizeQueue(songs)
@@ -215,31 +212,6 @@ class MediaPlayerViewModel(
         progressJob = null
     }
 
-    private fun playFromQueue(queue: List<Song>, startIndex: Int) {
-        val playableQueue = normalizeQueue(queue)
-        if (playableQueue.isEmpty()) return
-
-        val mediaItems = playableQueue.mapNotNull { buildMediaItem(it) }
-        if (mediaItems.isEmpty()) return
-
-        val safeIndex = startIndex.coerceIn(0, playableQueue.lastIndex)
-        currentSongValue = playableQueue[safeIndex]
-
-        player.setMediaItems(mediaItems, safeIndex, 0L)
-        player.prepare()
-        player.play()
-
-        _uiState.update {
-            it.copy(
-                isMiniVisible = true,
-                queue = playableQueue,
-                currentIndex = safeIndex,
-                progress = 0f,
-                currentPosition = 0L
-            )
-        }
-    }
-
     private fun normalizeQueue(songs: List<Song>): List<Song> {
         return songs.filter { !it.songPath.isNullOrBlank() }
     }
@@ -255,28 +227,6 @@ class MediaPlayerViewModel(
 
     private fun mediaIdForSong(song: Song): String? {
         return song.id?.toString() ?: song.songPath?.encodeURLPath()
-    }
-
-    private fun indexOfSong(queue: List<Song>, song: Song): Int {
-        song.id?.let { id ->
-            val index = queue.indexOfFirst { it.id == id }
-            if (index >= 0) return index
-        }
-        val path = song.songPath
-        if (!path.isNullOrBlank()) {
-            val index = queue.indexOfFirst { it.songPath == path }
-            if (index >= 0) return index
-        }
-        return -1
-    }
-
-    private fun isSameSong(left: Song, right: Song): Boolean {
-        if (left.id != null && right.id != null) {
-            return left.id == right.id
-        }
-        val leftPath = left.songPath
-        val rightPath = right.songPath
-        return !leftPath.isNullOrBlank() && leftPath == rightPath
     }
 
     private fun applyRemoteState(state: SocketRoomState) {
@@ -402,16 +352,5 @@ class MediaPlayerViewModel(
     override fun onCleared() {
         player.release()
         super.onCleared()
-    }
-
-    suspend fun fetchSongsByArtist(artistId: Int, accessToken: String) {
-        withContext(Dispatchers.IO) {
-            runCatching {
-                val result = songRepository.getSongsByArtist(artistId, accessToken)
-                SongState.setSongsByArtist(result)
-            }.onFailure { exception ->
-                Log.e("MyApp", exception.toString())
-            }
-        }
     }
 }
