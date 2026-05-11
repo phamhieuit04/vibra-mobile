@@ -39,8 +39,14 @@ class MediaPlayerViewModel(
     var currentSongValue = _uiState.value.currentSong
 
     private var progressJob: Job? = null
+
+    // TODO: move all last* var to Room database
     private var lastRemoteQueueIds: List<Int> = emptyList()
     private var lastRemoteIndex: Int = -1
+    private var lastServerPositionMs: Long = 0L
+    private var lastServerStartedAtMs: Long? = null
+    private var lastServerIsPlaying: Boolean = false
+    private var lastSocketState: SocketRoomState? = null
 
     init {
         socket.observeState { state ->
@@ -189,9 +195,13 @@ class MediaPlayerViewModel(
 
         progressJob = viewModelScope.launch {
             while (isActive) {
+                val now = System.currentTimeMillis()
+                val position = if (lastServerIsPlaying && lastServerStartedAtMs != null) {
+                    lastServerPositionMs + (now - lastServerStartedAtMs!!).coerceAtLeast(0L)
+                } else {
+                    lastServerPositionMs
+                }
                 val duration = player.duration
-                val position = player.currentPosition
-
                 if (duration > 0) {
                     _uiState.update {
                         it.copy(
@@ -200,6 +210,8 @@ class MediaPlayerViewModel(
                             duration = duration
                         )
                     }
+                } else {
+                    _uiState.update { it.copy(currentPosition = position) }
                 }
 
                 delay(500)
@@ -230,13 +242,11 @@ class MediaPlayerViewModel(
     }
 
     private fun applyRemoteState(state: SocketRoomState) {
-        val now = System.currentTimeMillis()
-        val basePosition = state.currentPosition.coerceAtLeast(0L)
-        val actualPosition = if (state.isPlaying) {
-            basePosition + (now - state.timestamp).coerceAtLeast(0L)
-        } else {
-            basePosition
-        }
+        lastSocketState = state
+        val actualPosition = computeServerPosition(state)
+        lastServerPositionMs = state.currentPosition.coerceAtLeast(0L)
+        lastServerStartedAtMs = state.startedAt
+        lastServerIsPlaying = state.isPlaying
         val queueSongs = resolveQueueSongs(state.queueSongIds)
         val currentIndex = state.currentIndex
         val currentSong = queueSongs.getOrNull(currentIndex)
@@ -347,6 +357,15 @@ class MediaPlayerViewModel(
         return songIds.mapNotNull { lookup[it] }
     }
 
+    private fun computeServerPosition(state: SocketRoomState): Long {
+        val basePosition = state.currentPosition.coerceAtLeast(0L)
+        val startedAt = state.startedAt
+        if (state.isPlaying && startedAt != null) {
+            return basePosition + (System.currentTimeMillis() - startedAt).coerceAtLeast(0L)
+        }
+        return basePosition
+    }
+
     private fun currentUserId(): Int? = UserState.currentUser.value?.id
 
     override fun onCleared() {
@@ -354,3 +373,4 @@ class MediaPlayerViewModel(
         super.onCleared()
     }
 }
+

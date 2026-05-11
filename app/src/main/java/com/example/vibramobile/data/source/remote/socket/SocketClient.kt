@@ -123,7 +123,11 @@ class SocketClient : ISocketClient {
                 currentPosition = player.optLong("currentPosition", 0L),
                 queueSongIds = songIds,
                 currentIndex = queue.optInt("currentIndex", -1),
-                timestamp = data.optLong("timestamp", System.currentTimeMillis()),
+                startedAt = if (player.has("startedAt") && !player.isNull("startedAt")) {
+                    player.optLong("startedAt")
+                } else {
+                    null
+                },
                 isShuffleEnabled = player.optBoolean("isShuffleEnabled", false),
                 repeatMode = player.optString("repeatMode", "OFF")
             )

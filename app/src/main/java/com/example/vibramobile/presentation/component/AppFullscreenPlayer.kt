@@ -230,16 +230,7 @@ fun AppFullscreenPlayer(
                                         )
                                     }
                                 },
-                                actions = {
-                                    IconButton(onClick = { }) {
-                                        Icon(
-                                            modifier = Modifier.size(24.dp),
-                                            imageVector = Icons.Default.MoreHoriz,
-                                            contentDescription = stringResource(R.string.cd_more),
-                                            tint = Color.White
-                                        )
-                                    }
-                                },
+                                actions = { },
                                 title = { }
                             )
 

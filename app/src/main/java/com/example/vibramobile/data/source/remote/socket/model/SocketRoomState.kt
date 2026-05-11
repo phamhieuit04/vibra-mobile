@@ -5,7 +5,7 @@ data class SocketRoomState(
     val currentPosition: Long,
     val queueSongIds: List<Int>,
     val currentIndex: Int,
-    val timestamp: Long,
+    val startedAt: Long?,
     val isShuffleEnabled: Boolean,
     val repeatMode: String
 )
