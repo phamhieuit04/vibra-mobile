@@ -68,6 +68,48 @@ class SocketClient : ISocketClient {
         socket.emit("queue:add", payload)
     }
 
+    override fun shuffle(userId: Int, isShuffleEnabled: Boolean) {
+        val payload = JSONObject().apply {
+            put("userId", userId)
+            put("isShuffleEnabled", isShuffleEnabled)
+        }
+
+        socket.emit("shuffle", payload)
+    }
+
+    override fun repeat(userId: Int, repeatMode: String) {
+        val payload = JSONObject().apply {
+            put("userId", userId)
+            put("repeatMode", repeatMode)
+        }
+
+        socket.emit("repeat", payload)
+    }
+
+    override fun next(userId: Int) {
+        val payload = JSONObject().apply {
+            put("userId", userId)
+        }
+
+        socket.emit("next", payload)
+    }
+
+    override fun previous(userId: Int) {
+        val payload = JSONObject().apply {
+            put("userId", userId)
+        }
+
+        socket.emit("previous", payload)
+    }
+
+    override fun trackEnded(userId: Int) {
+        val payload = JSONObject().apply {
+            put("userId", userId)
+        }
+
+        socket.emit("trackEnded", payload)
+    }
+
     override fun observeState(callback: (SocketRoomState) -> Unit) {
         socket.on("state") { args ->
             val data = args[0] as JSONObject
@@ -81,7 +123,9 @@ class SocketClient : ISocketClient {
                 currentPosition = player.optLong("currentPosition", 0L),
                 queueSongIds = songIds,
                 currentIndex = queue.optInt("currentIndex", -1),
-                timestamp = data.optLong("timestamp", System.currentTimeMillis())
+                timestamp = data.optLong("timestamp", System.currentTimeMillis()),
+                isShuffleEnabled = player.optBoolean("isShuffleEnabled", false),
+                repeatMode = player.optString("repeatMode", "OFF")
             )
 
             callback(state)

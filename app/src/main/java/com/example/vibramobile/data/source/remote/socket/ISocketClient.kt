@@ -8,6 +8,11 @@ interface ISocketClient {
     fun pause(userId: Int)
     fun seek(userId: Int, positionMs: Long)
     fun queueAdd(userId: Int, songIds: List<Int>)
+    fun shuffle(userId: Int, isShuffleEnabled: Boolean)
+    fun repeat(userId: Int, repeatMode: String)
+    fun next(userId: Int)
+    fun previous(userId: Int)
+    fun trackEnded(userId: Int)
     fun observeState(callback: (SocketRoomState) -> Unit)
     fun disconnect()
 }

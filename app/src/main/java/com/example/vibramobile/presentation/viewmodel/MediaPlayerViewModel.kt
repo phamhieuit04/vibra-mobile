@@ -13,7 +13,6 @@ import com.example.vibramobile.domain.contract.ISongRepository
 import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.presentation.state.MediaPlayerState
 import com.example.vibramobile.presentation.state.RepeatMode
-import com.example.vibramobile.presentation.state.SessionStore
 import com.example.vibramobile.presentation.state.SongState
 import com.example.vibramobile.presentation.state.UserState
 import io.ktor.http.encodeURLPath
@@ -31,7 +30,6 @@ import kotlin.math.abs
 class MediaPlayerViewModel(
     context: Context,
     private val songRepository: ISongRepository,
-    private val sessionStore: SessionStore,
     private val socket: ISocketClient
 ) : ViewModel() {
     private val player = ExoPlayer.Builder(context).build()
@@ -60,8 +58,8 @@ class MediaPlayerViewModel(
 
             override fun onPlaybackStateChanged(state: Int) {
                 if (state == Player.STATE_ENDED) {
-                    _uiState.update { it.copy(progress = 1f) }
-                    stopProgressUpdater()
+                    val userId = currentUserId() ?: return
+                    socket.trackEnded(userId)
                 }
             }
 
@@ -138,30 +136,28 @@ class MediaPlayerViewModel(
     }
 
     fun toggleShuffle() {
-        setShuffleEnabled(!_uiState.value.isShuffleEnabled)
+        val userId = currentUserId() ?: return
+        socket.shuffle(userId, !_uiState.value.isShuffleEnabled)
     }
 
     fun toggleRepeat() {
+        val userId = currentUserId() ?: return
         val nextMode = when (_uiState.value.repeatMode) {
             RepeatMode.OFF -> RepeatMode.ALL
             RepeatMode.ALL -> RepeatMode.ONE
             RepeatMode.ONE -> RepeatMode.OFF
         }
-        setRepeatMode(nextMode)
+        socket.repeat(userId, nextMode.name)
     }
 
     fun skipToNext() {
-        if (player.hasNextMediaItem() || player.repeatMode != Player.REPEAT_MODE_OFF) {
-            player.seekToNextMediaItem()
-        }
+        val userId = currentUserId() ?: return
+        socket.next(userId)
     }
 
     fun skipToPrevious() {
-        if (player.currentPosition > 3000L) {
-            player.seekTo(0)
-        } else {
-            player.seekToPreviousMediaItem()
-        }
+        val userId = currentUserId() ?: return
+        socket.previous(userId)
     }
 
     fun toggle() {
@@ -294,6 +290,9 @@ class MediaPlayerViewModel(
         val queueSongs = resolveQueueSongs(state.queueSongIds)
         val currentIndex = state.currentIndex
         val currentSong = queueSongs.getOrNull(currentIndex)
+        val repeatMode = runCatching {
+            RepeatMode.valueOf(state.repeatMode)
+        }.getOrDefault(RepeatMode.OFF)
 
         _uiState.update {
             it.copy(
@@ -302,8 +301,17 @@ class MediaPlayerViewModel(
                 queue = queueSongs,
                 currentIndex = currentIndex,
                 currentSong = currentSong,
-                isMiniVisible = queueSongs.isNotEmpty()
+                isMiniVisible = queueSongs.isNotEmpty(),
+                isShuffleEnabled = state.isShuffleEnabled,
+                repeatMode = repeatMode
             )
+        }
+
+        player.shuffleModeEnabled = state.isShuffleEnabled
+        player.repeatMode = when (repeatMode) {
+            RepeatMode.OFF -> Player.REPEAT_MODE_OFF
+            RepeatMode.ALL -> Player.REPEAT_MODE_ALL
+            RepeatMode.ONE -> Player.REPEAT_MODE_ONE
         }
 
         syncPlayerWithRemote(
@@ -390,20 +398,6 @@ class MediaPlayerViewModel(
     }
 
     private fun currentUserId(): Int? = UserState.currentUser.value?.id
-
-    private fun setShuffleEnabled(enabled: Boolean) {
-        player.shuffleModeEnabled = enabled
-        _uiState.update { it.copy(isShuffleEnabled = enabled) }
-    }
-
-    private fun setRepeatMode(mode: RepeatMode) {
-        player.repeatMode = when (mode) {
-            RepeatMode.OFF -> Player.REPEAT_MODE_OFF
-            RepeatMode.ALL -> Player.REPEAT_MODE_ALL
-            RepeatMode.ONE -> Player.REPEAT_MODE_ONE
-        }
-        _uiState.update { it.copy(repeatMode = mode) }
-    }
 
     override fun onCleared() {
         player.release()
