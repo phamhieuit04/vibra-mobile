@@ -7,33 +7,33 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import com.example.vibramobile.domain.contract.IPlaylistRepository
+import com.example.vibramobile.data.source.remote.socket.ISocketClient
+import com.example.vibramobile.data.source.remote.socket.model.SocketRoomState
 import com.example.vibramobile.domain.contract.ISongRepository
 import com.example.vibramobile.domain.model.Song
-import com.example.vibramobile.presentation.state.ArtistState
 import com.example.vibramobile.presentation.state.MediaPlayerState
 import com.example.vibramobile.presentation.state.RepeatMode
 import com.example.vibramobile.presentation.state.SessionStore
 import com.example.vibramobile.presentation.state.SongState
+import com.example.vibramobile.presentation.state.UserState
 import io.ktor.http.encodeURLPath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.abs
 
 class MediaPlayerViewModel(
     context: Context,
     private val songRepository: ISongRepository,
-    private val sessionStore: SessionStore
+    private val sessionStore: SessionStore,
+    private val socket: ISocketClient
 ) : ViewModel() {
-    private fun accessToken() = sessionStore.currentAccessToken()
-
     private val player = ExoPlayer.Builder(context).build()
 
     private val _uiState = MutableStateFlow(MediaPlayerState())
@@ -42,8 +42,16 @@ class MediaPlayerViewModel(
     var currentSongValue = _uiState.value.currentSong
 
     private var progressJob: Job? = null
+    private var lastRemoteQueueIds: List<Int> = emptyList()
+    private var lastRemoteIndex: Int = -1
 
     init {
+        socket.observeState { state ->
+            viewModelScope.launch(Dispatchers.Main) {
+                applyRemoteState(state)
+            }
+        }
+
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 _uiState.update { it.copy(isPlaying = isPlaying) }
@@ -82,6 +90,8 @@ class MediaPlayerViewModel(
     fun playSong(song: Song?) {
         if (song == null) return
         if (song.songPath.isNullOrBlank()) return
+        val userId = currentUserId() ?: return
+        val songId = song.id ?: return
 
         _uiState.update {
             it.copy(
@@ -89,29 +99,7 @@ class MediaPlayerViewModel(
             )
         }
 
-        val isSameSong = currentSongValue?.id == song.id &&
-                currentSongValue?.songPath == song.songPath
-        if (isSameSong) {
-            toggle()
-            return
-        }
-
-        val queueSnapshot = _uiState.value.queue
-        val existingIndex = indexOfSong(queueSnapshot, song)
-        val updatedQueue = if (existingIndex >= 0) queueSnapshot else queueSnapshot + song
-        val playIndex = if (existingIndex >= 0) existingIndex else updatedQueue.lastIndex
-
-        playFromQueue(updatedQueue, playIndex)
-
-        val tokenSnapshot = accessToken()
-        if (tokenSnapshot.isBlank()) {
-            return
-        }
-
-        val artistId = currentSongValue?.author?.id ?: return
-        viewModelScope.launch {
-            fetchSongsByArtist(artistId, tokenSnapshot)
-        }
+        socket.play(userId, songId)
     }
 
     fun playAll(
@@ -120,24 +108,17 @@ class MediaPlayerViewModel(
         prioritize: Boolean = true,
         enableShuffle: Boolean? = null
     ) {
+        val userId = currentUserId() ?: return
         val normalizedNew = normalizeQueue(songs)
         if (normalizedNew.isEmpty()) return
 
-        val queueSnapshot = _uiState.value.queue
-        val filteredExisting = queueSnapshot.filterNot { existing ->
-            normalizedNew.any { candidate -> isSameSong(candidate, existing) }
-        }
+        val songIds = normalizedNew.mapNotNull { it.id }
+        if (songIds.isEmpty()) return
 
-        val mergedQueue = if (prioritize) {
-            normalizedNew + filteredExisting
-        } else {
-            filteredExisting + normalizedNew
-        }
+        socket.queueAdd(userId, songIds)
 
-        enableShuffle?.let { setShuffleEnabled(it) }
-
-        val safeIndex = startIndex.coerceIn(0, normalizedNew.lastIndex)
-        playFromQueue(mergedQueue, safeIndex)
+        val safeIndex = startIndex.coerceIn(0, songIds.lastIndex)
+        socket.play(userId, songIds[safeIndex])
     }
 
     fun enqueueSong(song: Song?) {
@@ -146,24 +127,14 @@ class MediaPlayerViewModel(
     }
 
     fun enqueueSongs(songs: List<Song>) {
+        val userId = currentUserId() ?: return
         val normalized = normalizeQueue(songs)
         if (normalized.isEmpty()) return
 
-        val queueSnapshot = _uiState.value.queue
-        val additions = normalized.filterNot { candidate ->
-            queueSnapshot.any { existing -> isSameSong(existing, candidate) }
-        }
-        if (additions.isEmpty()) return
+        val songIds = normalized.mapNotNull { it.id }
+        if (songIds.isEmpty()) return
 
-        val updatedQueue = queueSnapshot + additions
-        _uiState.update { it.copy(queue = updatedQueue) }
-
-        if (player.mediaItemCount > 0) {
-            val mediaItems = additions.mapNotNull { buildMediaItem(it) }
-            if (mediaItems.isNotEmpty()) {
-                player.addMediaItems(mediaItems)
-            }
-        }
+        socket.queueAdd(userId, songIds)
     }
 
     fun toggleShuffle() {
@@ -194,7 +165,12 @@ class MediaPlayerViewModel(
     }
 
     fun toggle() {
-        if (player.isPlaying) player.pause() else player.play()
+        val userId = currentUserId() ?: return
+        if (_uiState.value.isPlaying) {
+            socket.pause(userId)
+        } else {
+            socket.play(userId, null)
+        }
     }
 
     fun toggleFullscreen(value: Boolean) {
@@ -211,18 +187,8 @@ class MediaPlayerViewModel(
 
     fun seekTo(positionMs: Long) {
         if (positionMs < 0L) return
-        player.seekTo(positionMs)
-
-        val duration = player.duration
-        if (duration > 0) {
-            _uiState.update {
-                it.copy(
-                    progress = positionMs / duration.toFloat(),
-                    currentPosition = positionMs,
-                    duration = duration
-                )
-            }
-        }
+        val userId = currentUserId() ?: return
+        socket.seek(userId, positionMs)
     }
 
     private fun startProgressUpdater() {
@@ -316,6 +282,114 @@ class MediaPlayerViewModel(
         val rightPath = right.songPath
         return !leftPath.isNullOrBlank() && leftPath == rightPath
     }
+
+    private fun applyRemoteState(state: SocketRoomState) {
+        val now = System.currentTimeMillis()
+        val basePosition = state.currentPosition.coerceAtLeast(0L)
+        val actualPosition = if (state.isPlaying) {
+            basePosition + (now - state.timestamp).coerceAtLeast(0L)
+        } else {
+            basePosition
+        }
+        val queueSongs = resolveQueueSongs(state.queueSongIds)
+        val currentIndex = state.currentIndex
+        val currentSong = queueSongs.getOrNull(currentIndex)
+
+        _uiState.update {
+            it.copy(
+                isPlaying = state.isPlaying,
+                currentPosition = actualPosition,
+                queue = queueSongs,
+                currentIndex = currentIndex,
+                currentSong = currentSong,
+                isMiniVisible = queueSongs.isNotEmpty()
+            )
+        }
+
+        syncPlayerWithRemote(
+            queueSongs = queueSongs,
+            queueSongIds = state.queueSongIds,
+            currentIndex = currentIndex,
+            positionMs = actualPosition,
+            isPlaying = state.isPlaying
+        )
+    }
+
+    private fun syncPlayerWithRemote(
+        queueSongs: List<Song>,
+        queueSongIds: List<Int>,
+        currentIndex: Int,
+        positionMs: Long,
+        isPlaying: Boolean
+    ) {
+        val queueChanged = queueSongIds != lastRemoteQueueIds
+        val indexChanged = currentIndex != lastRemoteIndex
+
+        if (queueChanged || indexChanged) {
+            val playableQueue = queueSongs.filter { !it.songPath.isNullOrBlank() }
+            val playableIndex = queueSongs
+                .take(currentIndex + 1)
+                .count { !it.songPath.isNullOrBlank() }
+                .minus(1)
+
+            if (playableQueue.isEmpty() || playableIndex < 0) {
+                lastRemoteQueueIds = queueSongIds
+                lastRemoteIndex = currentIndex
+                return
+            }
+
+            val mediaItems = playableQueue.mapNotNull { buildMediaItem(it) }
+            if (mediaItems.isEmpty()) {
+                lastRemoteQueueIds = queueSongIds
+                lastRemoteIndex = currentIndex
+                return
+            }
+
+            player.setMediaItems(mediaItems, playableIndex, positionMs.coerceAtLeast(0L))
+            player.prepare()
+            if (isPlaying) player.play() else player.pause()
+
+            lastRemoteQueueIds = queueSongIds
+            lastRemoteIndex = currentIndex
+        } else {
+            val shouldSeek = abs(player.currentPosition - positionMs) > 1500
+            if (shouldSeek && positionMs >= 0L) {
+                player.seekTo(positionMs)
+            }
+
+            if (isPlaying && !player.isPlaying) player.play()
+            if (!isPlaying && player.isPlaying) player.pause()
+        }
+    }
+
+    private fun resolveQueueSongs(songIds: List<Int>): List<Song> {
+        if (songIds.isEmpty()) return emptyList()
+
+        val sources = listOf(
+            _uiState.value.queue,
+            SongState.recommendedSongs.value,
+            SongState.popularSongs.value,
+            SongState.recentRotationSongs.value,
+            SongState.songsByCategory.value,
+            SongState.songsByArtist.value,
+            SongState.songsByAlbum.value,
+            UserState.likedSongs.value
+        )
+
+        val lookup = LinkedHashMap<Int, Song>()
+        sources.asSequence()
+            .flatten()
+            .forEach { song ->
+                val id = song.id
+                if (id != null && !lookup.containsKey(id)) {
+                    lookup[id] = song
+                }
+            }
+
+        return songIds.mapNotNull { lookup[it] }
+    }
+
+    private fun currentUserId(): Int? = UserState.currentUser.value?.id
 
     private fun setShuffleEnabled(enabled: Boolean) {
         player.shuffleModeEnabled = enabled
