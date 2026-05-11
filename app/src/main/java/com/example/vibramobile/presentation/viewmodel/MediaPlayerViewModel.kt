@@ -258,32 +258,38 @@ class MediaPlayerViewModel(
 
     private fun applyRemoteState(state: SocketRoomState) {
         lastSocketState = state
-        lastServerPositionMs =
-            state.currentPosition.coerceAtLeast(0L)
+        lastServerPositionMs = state.currentPosition.coerceAtLeast(0L)
         lastServerStartedAtMs = state.startedAt
         lastServerIsPlaying = state.isPlaying
 
         val actualPosition = computeServerPosition(state)
         val queueSongs = resolveQueueSongs(state.queueSongIds)
         val currentIndex = state.currentIndex
-        val currentSong =
-            queueSongs.getOrNull(currentIndex)
+        val currentSong = queueSongs.getOrNull(currentIndex)
         val repeatMode = runCatching {
             RepeatMode.valueOf(state.repeatMode)
         }.getOrDefault(RepeatMode.OFF)
+
+        val isSameTrack =
+            _uiState.value.currentIndex == currentIndex &&
+                _uiState.value.queue.size == queueSongs.size
+
+        val safePosition = if (isSameTrack && actualPosition < _uiState.value.currentPosition) {
+            _uiState.value.currentPosition
+        } else {
+            actualPosition
+        }
 
         _uiState.update {
             it.copy(
                 isPlaying = state.isPlaying,
 
-                currentPosition = player.currentPosition,
-
+                currentPosition = safePosition,
+                progress = if (it.duration > 0L) safePosition / it.duration.toFloat() else it.progress,
                 queue = queueSongs,
                 currentIndex = currentIndex,
                 currentSong = currentSong,
-
                 isMiniVisible = queueSongs.isNotEmpty(),
-
                 isShuffleEnabled = state.isShuffleEnabled,
                 repeatMode = repeatMode
             )
@@ -308,7 +314,7 @@ class MediaPlayerViewModel(
             queueSongs = queueSongs,
             queueSongIds = state.queueSongIds,
             currentIndex = currentIndex,
-            positionMs = state.currentPosition,
+            positionMs = safePosition,
             isPlaying = state.isPlaying
         )
     }
