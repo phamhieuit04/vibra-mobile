@@ -185,6 +185,19 @@ class MediaPlayerViewModel(
     fun seekTo(positionMs: Long) {
         if (positionMs < 0L) return
         val userId = currentUserId() ?: return
+        val duration = _uiState.value.duration
+        val safePosition = positionMs.coerceAtLeast(0L)
+        val now = System.currentTimeMillis()
+        lastServerPositionMs = safePosition
+        lastServerStartedAtMs = if (_uiState.value.isPlaying) now else null
+        lastServerIsPlaying = _uiState.value.isPlaying
+
+        _uiState.update {
+            it.copy(
+                currentPosition = safePosition,
+                progress = if (duration > 0L) safePosition / duration.toFloat() else it.progress
+            )
+        }
         socket.seek(userId, positionMs)
     }
 
