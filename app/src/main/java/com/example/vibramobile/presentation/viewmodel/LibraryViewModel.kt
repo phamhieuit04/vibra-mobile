@@ -36,11 +36,22 @@ class LibraryViewModel(
             _isRefreshing.value = true
             try {
                 delay(500)
+                fetchProfile(tokenSnapshot)
                 fetchLikedSongs(tokenSnapshot)
                 fetchMyPlaylists(tokenSnapshot)
                 fetchFollowedArtists(tokenSnapshot)
             } finally {
                 _isRefreshing.value = false
+            }
+        }
+    }
+
+    suspend fun fetchProfile(token: String = accessToken()) {
+        withContext(Dispatchers.IO) {
+            runCatching {
+                UserState.setCurrentUser(userRepository.getProfile(token).copy(token = null))
+            }.onFailure { exception ->
+                Log.e("MyApp", exception.toString())
             }
         }
     }
