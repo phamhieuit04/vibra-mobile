@@ -1,30 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:pathData="M31,63.928c0,0 6.4,-11 12.1,-13.1c7.2,-2.6 26,-1.4 26,-1.4l38.1,38.1L107,108.928l-32,-1L31,63.928z">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                android:endX="85.84757"
-                android:endY="92.4963"
-                android:startX="42.9492"
-                android:startY="49.59793"
-                android:type="linear">
-                <item
-                    android:color="#44000000"
-                    android:offset="0.0" />
-                <item
-                    android:color="#00000000"
-                    android:offset="1.0" />
-            </gradient>
-        </aapt:attr>
-    </path>
-    <path
-        android:fillColor="#FFFFFF"
-        android:fillType="nonZero"
-        android:pathData="M65.3,45.828l3.8,-6.6c0.2,-0.4 0.1,-0.9 -0.3,-1.1c-0.4,-0.2 -0.9,-0.1 -1.1,0.3l-3.9,6.7c-6.3,-2.8 -13.4,-2.8 -19.7,0l-3.9,-6.7c-0.2,-0.4 -0.7,-0.5 -1.1,-0.3C38.8,38.328 38.7,38.828 38.9,39.228l3.8,6.6C36.2,49.428 31.7,56.028 31,63.928h46C76.3,56.028 71.8,49.428 65.3,45.828zM43.4,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2c-0.3,-0.7 -0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C45.3,56.528 44.5,57.328 43.4,57.328L43.4,57.328zM64.6,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2s-0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C66.5,56.528 65.6,57.328 64.6,57.328L64.6,57.328z"
-        android:strokeWidth="1"
-        android:strokeColor="#00000000" />
+
+    <group
+        android:translateX="-19.6"
+        android:translateY="32.15"
+        android:scaleX="0.05844"
+        android:scaleY="0.05844">
+
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M1182.8,412.1h-0.1v-3.7C1182.7,409.7 1182.8,410.9 1182.8,412.1Z"/>
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M1182.8,131.6V245.3a9.2,9.2 0,0 1,-0.1 1.2V130.6A8.6,8.6 0,0 1,1182.8 131.6Z"/>
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M1473.3,357.8q-14.9,-35.5 -41,-60.8a182.4,182.4 0,0 0,-61.6 -39.2Q1335.2,244 1293.8,244a197.8,197.8 0,0 0,-23.6 1.4v94.1c0.5,0 1,-0.1 1.5,-0.1 0.9,0 1.7,-0.1 2.6,-0.1 1.4,-0.1 2.9,-0.1 4.3,-0.1h0.5q21.5,0 39,6.8a86.4,86.4 0,0 1,50.4 49.9,103.7 103.7,0 0,1 7,35.8c0.1,2.3 0.2,4.5 0.2,6.8 0,8 -0.7,13.2 -2,18.3 -0.3,0.9 -0.5,1.8 -0.7,2.8a90.2,90.2 0,0 1,-4.5 14.4,84.8 84.8,0 0,1 -20,29.8 91.2,91.2 0,0 1,-30.5 19.1,106.2 106.2,0 0,1 -38.6,6.8 108.9,108.9 0,0 1,-38.9 -6.8,90.3 90.3,0 0,1 -30.8,-19.1 84.1,84.1 0,0 1,-20 -30.1,102.3 102.3,0 0,1 -7,-33.3h-0.2V130.6a9.6,9.6 0,0 0,-15.3 -6.8l-97.9,71.6 -86.5,63.3a9.7,9.7 0,0 0,-4 7.8V380.1a9.6,9.6 0,0 0,15.4 7.8l75.1,-54.9V403c0,29.7 5.2,77.6 15.6,102.4a188.2,188.2 0,0 0,43.4 63.8q27.8,26.7 66.4,41.5t84,14.9q46.1,0 84.3,-14.5t66.1,-40.9a186.5,186.5 0,0 0,43.3 -62.8c10.4,-24.3 15.6,-42.8 15.6,-71.6Q1488.2,393.3 1473.3,357.8Z"/>
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M1271.7,339.5c0.9,0 1.7,-0.1 2.6,-0.1C1273.4,339.4 1272.6,339.4 1271.7,339.5Z"/>
+        <path
+            android:pathData="M1271.7,339.5c0.9,0 1.7,-0.1 2.6,-0.1C1273.4,339.4 1272.6,339.4 1271.7,339.5Z"
+            android:strokeAlpha="0.44"
+            android:fillColor="#c19784"
+            android:fillAlpha="0.44"/>
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M1278.9,339.2h0Z"/>
+        <path
+            android:pathData="M1278.9,339.2h0Z"
+            android:strokeAlpha="0.44"
+            android:fillColor="#c19784"
+            android:fillAlpha="0.44"/>
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M1325.4,436.5l-74.8,42.3a4.4,4.4 0,0 1,-6.7 -3.8V390.5a4.4,4.4 0,0 1,6.7 -3.8l11.6,6.6 63.2,35.7A4.3,4.3 0,0 1,1325.4 436.5Z"/>
+
+    </group>
 </vector>

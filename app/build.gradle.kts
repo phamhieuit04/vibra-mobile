@@ -100,4 +100,9 @@ dependencies {
     implementation(libs.socketio.client) {
         exclude(group = "org.json", module = "json")
     }
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.paging)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.core.splashscreen)
 }

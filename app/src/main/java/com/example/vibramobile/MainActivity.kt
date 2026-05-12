@@ -19,10 +19,24 @@ import com.example.vibramobile.core.di.storeModule
 import com.example.vibramobile.core.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.example.vibramobile.presentation.viewmodel.SplashViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import androidx.appcompat.app.AppCompatDelegate
+
+private const val APP_SETTINGS = "app_settings"
+private const val KEY_DARK_MODE = "dark_mode"
+private const val KEY_ACCENT_HEX = "accent_hex"
 
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
+
+        val sharedPreferences = getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE)
+        val isDarkPref = sharedPreferences.getBoolean(KEY_DARK_MODE, true)
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDarkPref) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        )
 
         startKoin {
             androidContext(this@App)
@@ -39,20 +53,26 @@ class App : Application() {
 
 class MainActivity : ComponentActivity() {
 
-    companion object {
-        private const val APP_SETTINGS = "app_settings"
-        private const val KEY_DARK_MODE = "dark_mode"
-        private const val KEY_ACCENT_HEX = "accent_hex"
-    }
+    private val splashViewModel: SplashViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
         val sharedPreferences = getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE)
+        val isDarkPref = sharedPreferences.getBoolean(KEY_DARK_MODE, true)
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDarkPref) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        )
+
+        val splashScreen = installSplashScreen()
+        super.onCreate(savedInstanceState)
+        splashScreen.setKeepOnScreenCondition {
+            splashViewModel.uiState.value.isLoading
+        }
 
         enableEdgeToEdge()
 
         setContent {
+            val startupState by splashViewModel.uiState.collectAsState()
+
             var isDarkMode by remember {
                 mutableStateOf(sharedPreferences.getBoolean(KEY_DARK_MODE, true))
             }
@@ -89,12 +109,15 @@ class MainActivity : ComponentActivity() {
                 darkTheme = isDarkMode,
                 accentColorHex = accentColorHex
             ) {
-                RootGraph(
-                    isDarkMode,
-                    { isDarkMode = it },
-                    accentColorHex,
-                    { accentColorHex = it }
-                )
+                if (!startupState.isLoading) {
+                    RootGraph(
+                        startDestination = startupState.startDestination,
+                        isDarkMode = isDarkMode,
+                        onDarkModeChange = { isDarkMode = it },
+                        accentColorHex = accentColorHex,
+                        onAccentColorChange = { accentColorHex = it }
+                    )
+                }
             }
         }
     }

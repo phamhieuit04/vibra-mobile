@@ -9,12 +9,13 @@ import com.example.vibramobile.presentation.navigation.destination.RootDestinati
 
 @Composable
 fun RootGraph(
+    startDestination: RootDestination,
     isDarkMode: Boolean,
     onDarkModeChange: (Boolean) -> Unit,
     accentColorHex: String,
     onAccentColorChange: (String) -> Unit
 ) {
-    val backStack = rememberNavBackStack(RootDestination.Auth)
+    val backStack = rememberNavBackStack(startDestination)
 
     NavDisplay(
         backStack = backStack,
