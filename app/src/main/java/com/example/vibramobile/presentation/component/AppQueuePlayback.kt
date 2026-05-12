@@ -1,8 +1,10 @@
 package com.example.vibramobile.presentation.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -19,10 +22,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -39,6 +47,7 @@ import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.presentation.config.LayoutStyleConfig
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
+import io.ktor.http.headers
 import org.koin.androidx.compose.koinViewModel
 import kotlin.collections.emptyList
 
@@ -64,6 +73,9 @@ fun AppQueuePlayback(
             SheetDetent.FullyExpanded
         )
     )
+
+    var headerHeight by remember { mutableStateOf(0.dp) }
+    val density = LocalDensity.current
 
     LaunchedEffect(uiState.isQueueVisible) {
         sheetState.targetDetent = if (uiState.isQueueVisible) {
@@ -94,52 +106,63 @@ fun AppQueuePlayback(
                 .fillMaxWidth()
                 .imePadding()
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-            ) {
-                DragIndication(
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
                     modifier = Modifier
-                        .padding(top = 8.dp)
-                        .background(
-                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f),
-                            RoundedCornerShape(100.dp)
-                        )
-                        .width(40.dp)
-                        .height(4.dp)
-                        .align(Alignment.CenterHorizontally)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                SpotifySection(
-                    title = stringResource(R.string.library_your_playlists)
+                        .padding(horizontal = 16.dp)
+                        .onGloballyPositioned { coordinates ->
+                            headerHeight = with(density) { coordinates.size.height.toDp() }
+                        },
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    TopSongComponent(
-                        thumbnailPath = currentSong?.thumbnailPath ?: "",
-                        songTitle = currentSong?.name ?: "",
-                        artistName = currentSong?.author?.name ?: ""
+                    DragIndication(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .background(
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f),
+                                RoundedCornerShape(100.dp)
+                            )
+                            .width(40.dp)
+                            .height(4.dp)
+                            .align(alignment = Alignment.CenterHorizontally)
+                    )
+
+                    SpotifySection(
+                        title = stringResource(R.string.library_your_playlists)
+                    ) {
+                        TopSongComponent(
+                            thumbnailPath = currentSong?.thumbnailPath ?: "",
+                            songTitle = currentSong?.name ?: "",
+                            artistName = currentSong?.author?.name ?: ""
+                        )
+                    }
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(top = 12.dp, bottom = 18.dp),
+                        thickness = 2.dp
                     )
                 }
 
-                HorizontalDivider(
-                    modifier = Modifier.padding(top = 12.dp, bottom = 18.dp),
-                    thickness = 2.dp
-                )
-
-                ListSongComponent(
-                    songs = queuePlaybacks,
-                    layoutStyle = LayoutStyleConfig.Vertical,
-                    onPlay = { mediaPlayerViewModel.playSong(it) },
-                    onClick = {
-                        contextMenuViewModel.showSong(it)
-                    },
-                    currentSongId = currentSong?.id,
-                    currentSongPath = currentSong?.songPath
-                )
-
-                Spacer(modifier = Modifier.height(bottomContentPadding))
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(top = headerHeight),
+                    contentPadding = PaddingValues(bottom = bottomContentPadding)
+                ) {
+                    item {
+                        ListSongComponent(
+                            songs = queuePlaybacks,
+                            layoutStyle = LayoutStyleConfig.Vertical,
+                            onPlay = { mediaPlayerViewModel.playSong(it) },
+                            onClick = {
+                                contextMenuViewModel.showSong(it)
+                            },
+                            currentSongId = currentSong?.id,
+                            currentSongPath = currentSong?.songPath
+                        )
+                    }
+                }
             }
         }
     }
