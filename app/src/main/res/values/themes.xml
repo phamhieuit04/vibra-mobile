@@ -5,7 +5,7 @@
 
     <style name="Theme.VibraMobile.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/splash_background</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/logo</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo_splash</item>
         <item name="postSplashScreenTheme">@style/Theme.VibraMobile</item>
     </style>
 </resources>
