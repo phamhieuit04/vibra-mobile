@@ -2,4 +2,10 @@
 <resources>
 
     <style name="Theme.VibraMobile" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.VibraMobile.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.VibraMobile</item>
+    </style>
 </resources>

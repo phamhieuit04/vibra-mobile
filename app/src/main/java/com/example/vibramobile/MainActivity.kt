@@ -19,6 +19,11 @@ import com.example.vibramobile.core.di.storeModule
 import com.example.vibramobile.core.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.example.vibramobile.presentation.screen.SplashScreen
+import com.example.vibramobile.presentation.viewmodel.SplashViewModel
+import org.koin.androidx.compose.koinViewModel
+import androidx.appcompat.app.AppCompatDelegate
 
 class App : Application() {
     override fun onCreate() {
@@ -46,13 +51,21 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
         val sharedPreferences = getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE)
+        val isDarkPref = sharedPreferences.getBoolean(KEY_DARK_MODE, true)
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDarkPref) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        )
+
+        installSplashScreen()
+        super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
 
         setContent {
+            val startupViewModel: SplashViewModel = koinViewModel()
+            val startupState by startupViewModel.uiState.collectAsState()
+
             var isDarkMode by remember {
                 mutableStateOf(sharedPreferences.getBoolean(KEY_DARK_MODE, true))
             }
@@ -89,12 +102,17 @@ class MainActivity : ComponentActivity() {
                 darkTheme = isDarkMode,
                 accentColorHex = accentColorHex
             ) {
-                RootGraph(
-                    isDarkMode,
-                    { isDarkMode = it },
-                    accentColorHex,
-                    { accentColorHex = it }
-                )
+                if (startupState.isLoading) {
+                    SplashScreen()
+                } else {
+                    RootGraph(
+                        startDestination = startupState.startDestination,
+                        isDarkMode = isDarkMode,
+                        onDarkModeChange = { isDarkMode = it },
+                        accentColorHex = accentColorHex,
+                        onAccentColorChange = { accentColorHex = it }
+                    )
+                }
             }
         }
     }

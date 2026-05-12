@@ -10,6 +10,7 @@ import com.example.vibramobile.presentation.viewmodel.LibraryViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import com.example.vibramobile.presentation.viewmodel.ProfileViewModel
 import com.example.vibramobile.presentation.viewmodel.SearchViewModel
+import com.example.vibramobile.presentation.viewmodel.SplashViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -24,4 +25,5 @@ val viewModelModule = module {
     viewModelOf(::LibraryViewModel)
     viewModelOf(::ArtistDetailViewModel)
     viewModelOf(::AlbumDetailViewModel)
+    viewModelOf(::SplashViewModel)
 }

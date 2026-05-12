@@ -7,6 +7,8 @@ import com.example.vibramobile.data.mapper.toDomain
 import com.example.vibramobile.domain.model.User
 import io.ktor.client.HttpClient
 import io.ktor.client.request.forms.submitForm
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.parameters
 import kotlinx.serialization.json.Json
@@ -25,5 +27,16 @@ class AuthRepository(
         ).bodyAsText()
 
         return json.decodeFromString<Response<UserResponseDto>>(response).data.toDomain()
+    }
+
+    override suspend fun checkToken(token: String): User? {
+        val response = client.get("check-token") {
+            parameter("token", token)
+        }.bodyAsText()
+
+        return runCatching {
+            val result = json.decodeFromString<Response<List<List<UserResponseDto>>>>(response)
+            result.data.firstOrNull()?.firstOrNull()?.toDomain()
+        }.getOrNull()
     }
 }
