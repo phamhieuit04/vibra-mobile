@@ -11,6 +11,7 @@ import com.example.vibramobile.presentation.state.ArtistState
 import com.example.vibramobile.presentation.state.CategoryState
 import com.example.vibramobile.presentation.state.SessionStore
 import com.example.vibramobile.presentation.state.SongState
+import com.example.vibramobile.presentation.state.UserState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,6 +38,7 @@ class HomeViewModel(
         viewModelScope.launch {
             _isRefreshing.value = true
             try {
+                fetchProfile()
                 getCategories()
                 getRecommendedSongs()
                 getRecentRotationSongs()
@@ -45,6 +47,18 @@ class HomeViewModel(
                 getPopularArtists()
             } finally {
                 _isRefreshing.value = false
+            }
+        }
+    }
+
+    suspend fun fetchProfile() {
+        withContext(Dispatchers.IO) {
+            runCatching {
+                UserState.setCurrentUser(
+                    userRepository.getProfile(accessToken()).copy(token = null)
+                )
+            }.onFailure { exception ->
+                Log.e("MyApp", exception.toString())
             }
         }
     }

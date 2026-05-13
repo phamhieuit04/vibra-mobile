@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.LibraryMusic
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
@@ -25,11 +27,14 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.example.vibramobile.R
+import com.example.vibramobile.domain.model.Playlist
+import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.component.LibraryShimmer
 import com.example.vibramobile.presentation.component.ListAlbumComponent
@@ -53,9 +58,9 @@ fun LibraryScreen(
     navigateToArtistDetail: (User) -> Unit
 ) {
     val currentUser = UserState.currentUser.collectAsState().value
-    val likedSongs by UserState.likedSongs.collectAsState()
-    val myPlaylists by UserState.myPlaylists.collectAsState()
-    val followedArtists by UserState.followedArtists.collectAsState()
+    val likedSongs: List<Song> by UserState.likedSongs.collectAsState()
+    val myPlaylists: List<Playlist> by UserState.myPlaylists.collectAsState()
+    val followedArtists: List<User> by UserState.followedArtists.collectAsState()
 
     val colorScheme = MaterialTheme.colorScheme
 
@@ -72,11 +77,18 @@ fun LibraryScreen(
     val statusBarHeight = WindowInsets.statusBars
         .asPaddingValues()
         .calculateTopPadding()
+
     var topBarHeight by remember { mutableStateOf(0.dp) }
+
     val density = LocalDensity.current
 
+    val isEmptyLibrary =
+        likedSongs.isEmpty() &&
+                myPlaylists.isEmpty() &&
+                followedArtists.isEmpty()
+
     LaunchedEffect(Unit) {
-        if (likedSongs.isEmpty() && myPlaylists.isEmpty() && followedArtists.isEmpty()) {
+        if (isEmptyLibrary) {
             libraryViewModel.refresh()
         }
     }
@@ -96,24 +108,42 @@ fun LibraryScreen(
     ) {
         Crossfade(
             targetState = isRefreshing,
-            label = "HomeContent"
+            label = "LibraryContent"
         ) { loading ->
+
             Box(modifier = Modifier.fillMaxSize()) {
+
                 LazyColumn(
                     modifier = modifier
                         .fillMaxSize()
                         .background(colorScheme.background),
                     contentPadding = PaddingValues(
-                        bottom = bottomContentPadding,
-                        top = topBarHeight
+                        top = topBarHeight,
+                        bottom = bottomContentPadding
                     ),
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
+
                     item {
-                        Spacer(modifier = Modifier.height(topBarHeight + statusBarHeight))
+                        Spacer(
+                            modifier = Modifier.height(
+                                topBarHeight + statusBarHeight
+                            )
+                        )
                     }
 
                     if (!loading) {
+
+                        if (isEmptyLibrary) {
+                            item {
+                                EmptyLibraryState(
+                                    modifier = Modifier
+                                        .fillParentMaxSize()
+                                        .padding(horizontal = 32.dp)
+                                )
+                            }
+                        }
+
                         if (likedSongs.isNotEmpty()) {
                             item {
                                 SpotifySection(
@@ -157,11 +187,14 @@ fun LibraryScreen(
                                 ) {
                                     ListArtistComponent(
                                         artists = followedArtists,
-                                        onClick = { navigateToArtistDetail(it) }
+                                        onClick = {
+                                            navigateToArtistDetail(it)
+                                        }
                                     )
                                 }
                             }
                         }
+
                     } else {
                         item {
                             LibraryShimmer()
@@ -173,14 +206,23 @@ fun LibraryScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(headerGradient)
-                        .padding(top = 28.dp + statusBarHeight, bottom = 32.dp)
+                        .padding(
+                            top = 28.dp + statusBarHeight,
+                            bottom = 32.dp
+                        )
                         .padding(horizontal = 16.dp)
-                        .align(alignment = Alignment.TopCenter)
+                        .align(Alignment.TopCenter)
                         .onGloballyPositioned { coordinates ->
-                            topBarHeight = with(density) { coordinates.size.height.toDp() }
+                            topBarHeight = with(density) {
+                                coordinates.size.height.toDp()
+                            }
                         }
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
                         AsyncImage(
                             model = currentUser?.avatarPath,
                             contentDescription = null,
@@ -193,12 +235,14 @@ fun LibraryScreen(
                         Spacer(modifier = Modifier.width(12.dp))
 
                         Column {
+
                             Text(
                                 text = stringResource(R.string.library_title),
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = colorScheme.onBackground
                             )
+
                             Text(
                                 text = currentUser?.name ?: "",
                                 fontSize = 14.sp,
@@ -209,5 +253,45 @@ fun LibraryScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun EmptyLibraryState(
+    modifier: Modifier = Modifier
+) {
+
+    val colorScheme = MaterialTheme.colorScheme
+
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        Icon(
+            imageVector = Icons.Rounded.LibraryMusic,
+            contentDescription = null,
+            modifier = Modifier.size(72.dp),
+            tint = colorScheme.onBackground.copy(alpha = 0.35f)
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "Thư viện trống",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = colorScheme.onBackground
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Các bài hát yêu thích, playlist và nghệ sĩ theo dõi sẽ xuất hiện tại đây.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = colorScheme.onBackground.copy(alpha = 0.6f),
+            textAlign = TextAlign.Center
+        )
     }
 }
