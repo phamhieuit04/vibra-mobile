@@ -23,6 +23,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.vibramobile.presentation.viewmodel.SplashViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.vibramobile.core.di.databaseModule
 
 private const val APP_SETTINGS = "app_settings"
 private const val KEY_DARK_MODE = "dark_mode"
@@ -45,7 +46,8 @@ class App : Application() {
                 networkModule,
                 repositoryModule,
                 storeModule,
-                viewModelModule
+                viewModelModule,
+                databaseModule
             )
         }
     }
