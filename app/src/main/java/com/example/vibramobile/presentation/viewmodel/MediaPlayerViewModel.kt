@@ -49,6 +49,8 @@ class MediaPlayerViewModel(
     private var lastSocketState: SocketRoomState? = null
 
     init {
+        socket.connect(UserState.currentUser.value?.id!!)
+
         socket.observeState { state ->
             viewModelScope.launch(Dispatchers.Main) {
                 applyRemoteState(state)
@@ -272,7 +274,7 @@ class MediaPlayerViewModel(
 
         val isSameTrack =
             _uiState.value.currentIndex == currentIndex &&
-                _uiState.value.queue.size == queueSongs.size
+                    _uiState.value.queue.size == queueSongs.size
 
         val safePosition = if (isSameTrack && actualPosition < _uiState.value.currentPosition) {
             _uiState.value.currentPosition

@@ -35,8 +35,8 @@ class AuthRepository(
         }.bodyAsText()
 
         return runCatching {
-            val result = json.decodeFromString<Response<List<List<UserResponseDto>>>>(response)
-            result.data.firstOrNull()?.firstOrNull()?.toDomain()
+            val result = json.decodeFromString<Response<UserResponseDto>>(response)
+            result.data.toDomain()
         }.getOrNull()
     }
 }

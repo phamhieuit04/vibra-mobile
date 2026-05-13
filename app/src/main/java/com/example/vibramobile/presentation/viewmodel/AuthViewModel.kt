@@ -28,7 +28,7 @@ class AuthViewModel(
                 user = authRepository.login(email = email, password = password)
             }.onSuccess {
                 UserState.setCurrentUser(user?.copy(token = null))
-                sessionStore.saveAccessToken(user?.token.orEmpty())
+                sessionStore.saveAccessToken(user?.token!!)
 
                 _loginEvent.send(LoginEvent.Success)
             }.onFailure { exception ->

@@ -17,8 +17,7 @@ import kotlinx.coroutines.withContext
 
 class SplashViewModel(
     private val authRepository: IAuthRepository,
-    private val sessionStore: SessionStore,
-    private val socket: ISocketClient
+    private val sessionStore: SessionStore
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(StartupUiState())
     val uiState: StateFlow<StartupUiState> = _uiState.asStateFlow()
@@ -44,7 +43,6 @@ class SplashViewModel(
 
             if (userId != null) {
                 UserState.setCurrentUser(user.copy(token = null))
-                socket.connect(userId)
                 _uiState.update {
                     it.copy(
                         isLoading = false,
