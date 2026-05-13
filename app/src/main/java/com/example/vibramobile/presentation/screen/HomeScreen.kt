@@ -88,9 +88,6 @@ fun HomeScreen(
     val scrollState = rememberLazyListState()
     val hazeState = rememberHazeState()
 
-    val statusBarHeight = WindowInsets.statusBars
-        .asPaddingValues()
-        .calculateTopPadding()
     var topBarHeight by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
     val blurProgress by remember {

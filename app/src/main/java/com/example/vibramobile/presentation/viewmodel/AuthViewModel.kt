@@ -15,8 +15,7 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel(
     private val authRepository: IAuthRepository,
-    private val sessionStore: SessionStore,
-    private val socket: ISocketClient
+    private val sessionStore: SessionStore
 ) : ViewModel() {
     private val _loginEvent = Channel<LoginEvent>(Channel.BUFFERED)
     val loginEvent = _loginEvent.receiveAsFlow()
@@ -29,9 +28,7 @@ class AuthViewModel(
                 user = authRepository.login(email = email, password = password)
             }.onSuccess {
                 UserState.setCurrentUser(user?.copy(token = null))
-
                 sessionStore.saveAccessToken(user?.token.orEmpty())
-                socket.connect(user?.id!!)
 
                 _loginEvent.send(LoginEvent.Success)
             }.onFailure { exception ->
