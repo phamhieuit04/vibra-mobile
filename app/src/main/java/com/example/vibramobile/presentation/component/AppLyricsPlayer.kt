@@ -84,7 +84,9 @@ fun AppLyricsPlayer(
         }
     }
     val song = uiState.currentSong
-    val rawLyrics = song?.listLyric ?: emptyList()
+    val rawLyrics = song?.listLyric
+        ?: song?.lyrics?.split("\n")?.filter { it.isNotBlank() }
+        ?: emptyList()
     val lyricLines = remember(rawLyrics) { LyricsHelper.parseLyrics(rawLyrics) }
     val activeLyricIndex by remember(lyricLines, currentTime) {
         derivedStateOf { LyricsHelper.findActiveIndex(lyricLines, currentTime) }

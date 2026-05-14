@@ -9,11 +9,15 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 
 fun SongResponseDto.toDomain(): Song {
+    val resolvedLyrics = normalizeLyrics(lyrics, list_lyric)
+    val resolvedListLyric = list_lyric?.takeIf { it.isNotEmpty() }
+        ?: resolvedLyrics?.split("\n")?.filter { it.isNotBlank() }
+
     return Song(
         id = id,
         name = name,
         description = description,
-        lyrics = normalizeLyrics(lyrics, list_lyric),
+        lyrics = resolvedLyrics,
         thumbnail = thumbnail,
         totalPlayed = total_played,
         status = status,
@@ -21,7 +25,7 @@ fun SongResponseDto.toDomain(): Song {
         songPath = song_path,
         lyricsPath = lyrics_path,
         thumbnailPath = thumbnail_path,
-        listLyric = list_lyric,
+        listLyric = resolvedListLyric,
         quantity = quantity,
         author = author?.toDomain()
     )
@@ -44,6 +48,8 @@ fun SongResponseDto.toEntity(): SongEntity? {
 }
 
 fun SongEntity.toDomain(): Song {
+    val resolvedListLyric = lyrics?.split("\n")?.filter { it.isNotBlank() }
+
     return Song(
         id = id,
         name = name,
@@ -51,6 +57,7 @@ fun SongEntity.toDomain(): Song {
         price = price?.toInt(),
         songPath = songPath,
         thumbnailPath = thumbnailPath,
+        listLyric = resolvedListLyric,
         author = authorName?.let { User(name = it) }
     )
 }
