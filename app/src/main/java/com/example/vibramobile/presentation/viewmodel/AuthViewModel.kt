@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vibramobile.data.source.remote.socket.ISocketClient
 import com.example.vibramobile.domain.contract.IAuthRepository
-import com.example.vibramobile.domain.contract.ILocalUserRepository
+import com.example.vibramobile.domain.contract.IUserRepository
 import com.example.vibramobile.domain.model.User
 import com.example.vibramobile.presentation.event.LoginEvent
 import com.example.vibramobile.presentation.state.UserState
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel(
     private val authRepository: IAuthRepository,
-    private val localUserRepository: ILocalUserRepository
+    private val userRepository: IUserRepository
 ) : ViewModel() {
     private val _loginEvent = Channel<LoginEvent>(Channel.BUFFERED)
     val loginEvent = _loginEvent.receiveAsFlow()
@@ -28,7 +28,7 @@ class AuthViewModel(
                 user = authRepository.login(email = email, password = password)
             }.onSuccess {
                 user?.let {
-                    localUserRepository.upsertUser(it)
+                    userRepository.upsertUser(it)
                     UserState.setCurrentUser(it.copy(token = null))
                 }
 

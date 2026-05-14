@@ -118,7 +118,7 @@ fun HomeScreen(
             modifier = Modifier.hazeSource(hazeState),
             state = pullToRefreshState,
             isRefreshing = isRefreshing,
-            onRefresh = { homeViewModel.fetchAll() },
+            onRefresh = { homeViewModel.fetchAll(forceRemote = true) },
             indicator = {
                 PullToRefreshDefaults.Indicator(
                     state = pullToRefreshState,

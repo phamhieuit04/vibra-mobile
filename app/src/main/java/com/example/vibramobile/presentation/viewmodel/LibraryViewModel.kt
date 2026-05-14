@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.vibramobile.domain.contract.IPlaylistRepository
 import com.example.vibramobile.domain.contract.ISongRepository
 import com.example.vibramobile.domain.contract.IUserRepository
-import com.example.vibramobile.presentation.state.SessionStore
 import com.example.vibramobile.presentation.state.UserState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -18,17 +17,14 @@ import kotlinx.coroutines.withContext
 class LibraryViewModel(
     private val playlistRepository: IPlaylistRepository,
     private val songRepository: ISongRepository,
-    private val userRepository: IUserRepository,
-    private val sessionStore: SessionStore
+    private val userRepository: IUserRepository
 ) : ViewModel() {
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
-    private fun accessToken() = sessionStore.currentAccessToken()
-
     fun refresh() {
         viewModelScope.launch {
-            val tokenSnapshot = accessToken()
+            val tokenSnapshot = userRepository.getAccessToken()
             if (tokenSnapshot.isBlank()) {
                 return@launch
             }
@@ -45,7 +41,7 @@ class LibraryViewModel(
         }
     }
 
-    suspend fun fetchMyPlaylists(token: String = accessToken()) {
+    suspend fun fetchMyPlaylists(token: String) {
         withContext(Dispatchers.IO) {
             runCatching {
                 UserState.setMyPlaylists(playlistRepository.getMyPlaylists(token))
@@ -55,7 +51,7 @@ class LibraryViewModel(
         }
     }
 
-    suspend fun fetchLikedSongs(token: String = accessToken()) {
+    suspend fun fetchLikedSongs(token: String) {
         withContext(Dispatchers.IO) {
             runCatching {
                 UserState.setLikedSongs(songRepository.getLikedSongs(token))
@@ -65,7 +61,7 @@ class LibraryViewModel(
         }
     }
 
-    suspend fun fetchFollowedArtists(token: String = accessToken()) {
+    suspend fun fetchFollowedArtists(token: String) {
         withContext(Dispatchers.IO) {
             runCatching {
                 UserState.setFollowedArtists(userRepository.getFollowedArtists(token))

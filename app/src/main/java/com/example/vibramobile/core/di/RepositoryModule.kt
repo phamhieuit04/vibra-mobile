@@ -7,12 +7,10 @@ import com.example.vibramobile.domain.contract.IPlaylistRepository
 import com.example.vibramobile.domain.contract.ISearchResultRepository
 import com.example.vibramobile.domain.contract.ISongRepository
 import com.example.vibramobile.domain.contract.IUserRepository
-import com.example.vibramobile.domain.contract.ILocalUserRepository
 import com.example.vibramobile.domain.contract.ISettingRepository
 import com.example.vibramobile.data.repository.AuthRepository
 import com.example.vibramobile.data.repository.BillRepository
 import com.example.vibramobile.data.repository.CategoryRepository
-import com.example.vibramobile.data.repository.LocalUserRepository
 import com.example.vibramobile.data.repository.PlaylistRepository
 import com.example.vibramobile.data.repository.SearchResultRepository
 import com.example.vibramobile.data.repository.SettingRepository
@@ -31,5 +29,4 @@ val repositoryModule = module {
     singleOf(::SearchResultRepository) bind ISearchResultRepository::class
     singleOf(::BillRepository) bind IBillRepository::class
     singleOf(::SettingRepository) bind ISettingRepository::class
-    singleOf(::LocalUserRepository) bind ILocalUserRepository::class
 }

@@ -60,6 +60,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
 import com.example.vibramobile.R
 import com.example.vibramobile.domain.model.Category
@@ -76,6 +77,7 @@ import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
+@UnstableApi
 @Composable
 fun GenreDetailScreen(
     modifier: Modifier = Modifier,

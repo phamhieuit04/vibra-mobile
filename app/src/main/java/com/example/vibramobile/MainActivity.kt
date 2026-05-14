@@ -13,7 +13,6 @@ import com.example.vibramobile.presentation.theme.VibraMobileTheme
 import com.example.vibramobile.core.di.jsonModule
 import com.example.vibramobile.core.di.networkModule
 import com.example.vibramobile.core.di.repositoryModule
-import com.example.vibramobile.core.di.storeModule
 import com.example.vibramobile.core.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -35,7 +34,6 @@ class App : Application() {
                 jsonModule,
                 networkModule,
                 repositoryModule,
-                storeModule,
                 viewModelModule,
                 databaseModule
             )
