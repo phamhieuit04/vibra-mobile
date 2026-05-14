@@ -1,5 +1,8 @@
 package com.example.vibramobile.presentation.screen
 
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
@@ -7,13 +10,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -28,7 +28,8 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -39,12 +40,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.common.util.UnstableApi
 import com.example.vibramobile.R
+import com.example.vibramobile.core.util.SystemUtils
 import com.example.vibramobile.domain.model.Category
 import com.example.vibramobile.domain.model.Playlist
 import com.example.vibramobile.domain.model.User
@@ -55,6 +59,7 @@ import com.example.vibramobile.presentation.component.HomeShimmer
 import com.example.vibramobile.presentation.component.ListAlbumComponent
 import com.example.vibramobile.presentation.component.ListArtistComponent
 import com.example.vibramobile.presentation.component.ListSongComponent
+import com.example.vibramobile.presentation.component.OfflineContentComponent
 import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.component.TopArtistsComponent
 import com.example.vibramobile.presentation.component.TopSongsComponent
@@ -70,6 +75,7 @@ import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
 import org.koin.androidx.compose.koinViewModel
 
+@UnstableApi
 @OptIn(ExperimentalHazeMaterialsApi::class)
 @Composable
 fun HomeScreen(
@@ -87,6 +93,7 @@ fun HomeScreen(
     val pullToRefreshState = rememberPullToRefreshState()
     val scrollState = rememberLazyListState()
     val hazeState = rememberHazeState()
+    val isOnline by rememberIsOnline()
 
     var topBarHeight by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
@@ -111,7 +118,7 @@ fun HomeScreen(
             modifier = Modifier.hazeSource(hazeState),
             state = pullToRefreshState,
             isRefreshing = isRefreshing,
-            onRefresh = { homeViewModel.fetchAll() },
+            onRefresh = { homeViewModel.fetchAll(forceRemote = true) },
             indicator = {
                 PullToRefreshDefaults.Indicator(
                     state = pullToRefreshState,
@@ -123,112 +130,124 @@ fun HomeScreen(
             }
         ) {
             Crossfade(
-                targetState = isRefreshing,
+                targetState = isOnline to isRefreshing,
                 label = "HomeContent"
-            ) { loading ->
-                if (!loading) {
-                    LazyColumn(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        contentPadding = PaddingValues(
-                            top = topBarHeight + 16.dp,
-                            bottom = bottomContentPadding
-                        ),
-                        state = scrollState,
-                        verticalArrangement = Arrangement.spacedBy(24.dp)
-                    ) {
-                        item(key = "recent_rotation") {
-                            AnimatedVisibility(visible = recentRotationSongs.isNotEmpty()) {
-                                SpotifySection(title = stringResource(R.string.home_recently_listened)) {
-                                    ListSongComponent(
-                                        layoutStyle = LayoutStyleConfig.Vertical,
-                                        onClick = {
-                                            contextMenuViewModel.showSong(it)
-                                        },
-                                        onPlay = { mediaPlayerViewModel.playSong(song = it) },
-                                        songs = recentRotationSongs
-                                    )
+            ) { (online, loading) ->
+                when {
+                    !online -> {
+                        OfflineContentComponent(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(top = topBarHeight + 16.dp)
+                        )
+                    }
+
+                    !loading -> {
+                        LazyColumn(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            contentPadding = PaddingValues(
+                                top = topBarHeight + 16.dp,
+                                bottom = bottomContentPadding
+                            ),
+                            state = scrollState,
+                            verticalArrangement = Arrangement.spacedBy(24.dp)
+                        ) {
+                            item(key = "recent_rotation") {
+                                AnimatedVisibility(visible = recentRotationSongs.isNotEmpty()) {
+                                    SpotifySection(title = stringResource(R.string.home_recently_listened)) {
+                                        ListSongComponent(
+                                            layoutStyle = LayoutStyleConfig.Vertical,
+                                            onClick = {
+                                                contextMenuViewModel.showSong(it)
+                                            },
+                                            onPlay = { mediaPlayerViewModel.playSong(song = it) },
+                                            songs = recentRotationSongs
+                                        )
+                                    }
                                 }
                             }
-                        }
 
-                        item(key = "recommended") {
-                            AnimatedVisibility(visible = recommendedSongs.isNotEmpty()) {
-                                SpotifySection(title = stringResource(R.string.home_for_you)) {
-                                    TopSongsComponent(
-                                        songs = recommendedSongs.take(10),
-                                        onClick = {
-                                            contextMenuViewModel.showSong(it)
-                                        },
-                                        onPlay = { mediaPlayerViewModel.playSong(song = it) },
-                                    )
+                            item(key = "recommended") {
+                                AnimatedVisibility(visible = recommendedSongs.isNotEmpty()) {
+                                    SpotifySection(title = stringResource(R.string.home_for_you)) {
+                                        TopSongsComponent(
+                                            songs = recommendedSongs.take(10),
+                                            onClick = {
+                                                contextMenuViewModel.showSong(it)
+                                            },
+                                            onPlay = { mediaPlayerViewModel.playSong(song = it) },
+                                        )
+                                    }
                                 }
                             }
-                        }
 
-                        item(key = "top_artists") {
-                            AnimatedVisibility(visible = popularArtists.isNotEmpty()) {
-                                SpotifySection(title = stringResource(R.string.home_featured_artists)) {
-                                    TopArtistsComponent(
-                                        artists = popularArtists.take(5),
-                                        onClick = { navigateToArtistDetail(it) }
-                                    )
-                                    Spacer(Modifier.height(16.dp))
-                                    ListArtistComponent(
-                                        artists = popularArtists.drop(5).take(5),
-                                        onClick = { navigateToArtistDetail(it) }
-                                    )
-                                    Spacer(Modifier.height(16.dp))
-                                    ListArtistComponent(
-                                        layoutStyle = LayoutStyleConfig.Vertical,
-                                        artists = popularArtists.drop(10).take(10),
-                                        onClick = { navigateToArtistDetail(it) }
-                                    )
+                            item(key = "top_artists") {
+                                AnimatedVisibility(visible = popularArtists.isNotEmpty()) {
+                                    SpotifySection(title = stringResource(R.string.home_featured_artists)) {
+                                        TopArtistsComponent(
+                                            artists = popularArtists.take(5),
+                                            onClick = { navigateToArtistDetail(it) }
+                                        )
+                                        Spacer(Modifier.height(16.dp))
+                                        ListArtistComponent(
+                                            artists = popularArtists.drop(5).take(5),
+                                            onClick = { navigateToArtistDetail(it) }
+                                        )
+                                        Spacer(Modifier.height(16.dp))
+                                        ListArtistComponent(
+                                            layoutStyle = LayoutStyleConfig.Vertical,
+                                            artists = popularArtists.drop(10).take(10),
+                                            onClick = { navigateToArtistDetail(it) }
+                                        )
+                                    }
                                 }
                             }
-                        }
 
-                        item(key = "popular_songs") {
-                            AnimatedVisibility(visible = popularSongs.isNotEmpty()) {
-                                SpotifySection(title = stringResource(R.string.home_popular_songs)) {
-                                    ListSongComponent(
-                                        onClick = {
-                                            contextMenuViewModel.showSong(it)
-                                        },
-                                        onPlay = { mediaPlayerViewModel.playSong(song = it) },
-                                        songs = popularSongs.take(5)
-                                    )
-                                    Spacer(Modifier.height(16.dp))
-                                    ListSongComponent(
-                                        layoutStyle = LayoutStyleConfig.Vertical,
-                                        onClick = {
-                                            contextMenuViewModel.showSong(it)
-                                        },
-                                        onPlay = { mediaPlayerViewModel.playSong(song = it) },
-                                        songs = popularSongs.drop(5).take(10)
-                                    )
+                            item(key = "popular_songs") {
+                                AnimatedVisibility(visible = popularSongs.isNotEmpty()) {
+                                    SpotifySection(title = stringResource(R.string.home_popular_songs)) {
+                                        ListSongComponent(
+                                            onClick = {
+                                                contextMenuViewModel.showSong(it)
+                                            },
+                                            onPlay = { mediaPlayerViewModel.playSong(song = it) },
+                                            songs = popularSongs.take(5)
+                                        )
+                                        Spacer(Modifier.height(16.dp))
+                                        ListSongComponent(
+                                            layoutStyle = LayoutStyleConfig.Vertical,
+                                            onClick = {
+                                                contextMenuViewModel.showSong(it)
+                                            },
+                                            onPlay = { mediaPlayerViewModel.playSong(song = it) },
+                                            songs = popularSongs.drop(5).take(10)
+                                        )
+                                    }
                                 }
                             }
-                        }
 
-                        item(key = "popular_albums") {
-                            AnimatedVisibility(visible = popularAlbums.isNotEmpty()) {
-                                SpotifySection(title = stringResource(R.string.home_popular_albums)) {
-                                    ListAlbumComponent(
-                                        albums = popularAlbums.take(5),
-                                        onClick = { navigateToAlbumDetail(it) }
-                                    )
-                                    Spacer(Modifier.height(16.dp))
-                                    ListAlbumComponent(
-                                        layoutStyle = LayoutStyleConfig.Vertical,
-                                        albums = popularAlbums.drop(5).take(20),
-                                        onClick = { navigateToAlbumDetail(it) }
-                                    )
+                            item(key = "popular_albums") {
+                                AnimatedVisibility(visible = popularAlbums.isNotEmpty()) {
+                                    SpotifySection(title = stringResource(R.string.home_popular_albums)) {
+                                        ListAlbumComponent(
+                                            albums = popularAlbums.take(5),
+                                            onClick = { navigateToAlbumDetail(it) }
+                                        )
+                                        Spacer(Modifier.height(16.dp))
+                                        ListAlbumComponent(
+                                            layoutStyle = LayoutStyleConfig.Vertical,
+                                            albums = popularAlbums.drop(5).take(20),
+                                            onClick = { navigateToAlbumDetail(it) }
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
-                } else {
-                    HomeShimmer(modifier = Modifier.padding(top = topBarHeight + 16.dp))
+
+                    else -> {
+                        HomeShimmer(modifier = Modifier.padding(top = topBarHeight + 16.dp))
+                    }
                 }
             }
         }
@@ -321,4 +340,49 @@ fun HomeScreen(
             }
         }
     }
+}
+
+@Composable
+private fun rememberIsOnline(): State<Boolean> {
+    val context = LocalContext.current
+    val connectivityManager = remember(context) {
+        context.getSystemService(ConnectivityManager::class.java)
+    }
+    val isOnlineState = remember {
+        mutableStateOf(connectivityManager?.let { SystemUtils.isOnline(it) } ?: true)
+    }
+
+    DisposableEffect(connectivityManager) {
+        if (connectivityManager == null) {
+            onDispose { }
+        } else {
+            val callback = object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: android.net.Network) {
+                    isOnlineState.value = true
+                }
+
+                override fun onLost(network: android.net.Network) {
+                    isOnlineState.value = SystemUtils.isOnline(connectivityManager)
+                }
+
+                override fun onCapabilitiesChanged(
+                    network: android.net.Network,
+                    networkCapabilities: NetworkCapabilities
+                ) {
+                    isOnlineState.value = networkCapabilities.hasCapability(
+                        NetworkCapabilities.NET_CAPABILITY_INTERNET
+                    ) && networkCapabilities.hasCapability(
+                        NetworkCapabilities.NET_CAPABILITY_VALIDATED
+                    )
+                }
+            }
+            val request = NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build()
+            connectivityManager.registerNetworkCallback(request, callback)
+            onDispose { connectivityManager.unregisterNetworkCallback(callback) }
+        }
+    }
+
+    return isOnlineState
 }

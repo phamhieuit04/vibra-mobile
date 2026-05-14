@@ -1,16 +1,20 @@
 package com.example.vibramobile.presentation.viewmodel
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import com.example.vibramobile.data.mapper.toDomain
+import com.example.vibramobile.data.source.local.dao.SongDao
 import com.example.vibramobile.data.source.remote.socket.ISocketClient
 import com.example.vibramobile.data.source.remote.socket.model.SocketRoomState
 import com.example.vibramobile.domain.contract.ISongRepository
+import com.example.vibramobile.domain.contract.IUserRepository
 import com.example.vibramobile.domain.model.Song
+import com.example.vibramobile.presentation.state.AppState
 import com.example.vibramobile.presentation.state.MediaPlayerState
 import com.example.vibramobile.presentation.state.RepeatMode
 import com.example.vibramobile.presentation.state.SongState
@@ -24,14 +28,30 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.first
 import kotlin.math.abs
 
+@UnstableApi
 class MediaPlayerViewModel(
     context: Context,
-    private val socket: ISocketClient
+    private val socket: ISocketClient,
+    private val songRepository: ISongRepository,
+    private val userRepository: IUserRepository,
+    private val songDao: SongDao
 ) : ViewModel() {
-    private val player = ExoPlayer.Builder(context).build()
+    private val player = ExoPlayer.Builder(context)
+        .setLoadControl(
+            androidx.media3.exoplayer.DefaultLoadControl.Builder()
+                .setBufferDurationsMs(
+                    60_000,
+                    180_000,
+                    1_500,
+                    5_000
+                )
+                .build()
+        )
+        .build()
 
     private val _uiState = MutableStateFlow(MediaPlayerState())
     val uiState = _uiState.asStateFlow()
@@ -47,39 +67,97 @@ class MediaPlayerViewModel(
     private var lastServerStartedAtMs: Long? = null
     private var lastServerIsPlaying: Boolean = false
     private var lastSocketState: SocketRoomState? = null
+    private var lastSeekPositionMs: Long = -1L
+    private var lastSeekSentAtMs: Long = 0L
+    private var isSeeking: Boolean = false
+    private var pendingRemoteState: SocketRoomState? = null
+    private val isOffline = AppState.isOffline.value
 
     init {
-        socket.observeState { state ->
+        if (!isOffline) {
+            socket.connect(UserState.currentUser.value?.id!!)
+
+            socket.observeState { state ->
+                viewModelScope.launch(Dispatchers.Main) {
+                    applyRemoteState(state)
+                }
+            }
+
             viewModelScope.launch(Dispatchers.Main) {
-                applyRemoteState(state)
+                merge(
+                    SongState.recommendedSongs,
+                    SongState.popularSongs,
+                    SongState.recentRotationSongs,
+                    SongState.songsByCategory,
+                    SongState.songsByArtist,
+                    SongState.songsByAlbum,
+                    UserState.likedSongs
+                ).collect { songs ->
+                    if (songs.isNotEmpty()) {
+                        val pending = pendingRemoteState ?: return@collect
+                        pendingRemoteState = null
+                        applyRemoteState(pending)
+                    }
+                }
+            }
+        } else {
+            viewModelScope.launch(Dispatchers.IO) {
+                val songs = songDao.getAllSongs().first().map { it.toDomain() }
+                viewModelScope.launch(Dispatchers.Main) {
+                    setLocalQueue(songs, autoPlay = false)
+                }
             }
         }
 
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
+                if (isPlaying) {
+                    isSeeking = false
+                }
+                if (isOffline) {
+                    _uiState.update { it.copy(isPlaying = isPlaying) }
+                    if (isPlaying) {
+                        startProgressUpdater()
+                    } else {
+                        stopProgressUpdater()
+                    }
+                }
             }
 
             override fun onPlaybackStateChanged(state: Int) {
-                if (state == Player.STATE_ENDED) {
+                if (state == Player.STATE_ENDED && !isOffline) {
                     val userId = currentUserId() ?: return
                     socket.trackEnded(userId)
                 }
             }
 
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                if (!isOffline && (
+                            reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO ||
+                                    reason == Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT
+                            )
+                ) {
+                    val userId = currentUserId() ?: return
+                    socket.trackEnded(userId)
+                }
+
                 val mediaId = mediaItem?.mediaId
                 val queueSnapshot = _uiState.value.queue
                 val index = queueSnapshot.indexOfFirst { song ->
                     mediaIdForSong(song) == mediaId
                 }
                 if (index >= 0) {
-                    currentSongValue = queueSnapshot[index]
+                    val transitionedSong = queueSnapshot[index]
+                    currentSongValue = transitionedSong
                     val duration = player.duration
+                    val isSameSong = transitionedSong.id != null &&
+                            transitionedSong.id == _uiState.value.currentSong?.id
                     _uiState.update {
                         it.copy(
                             currentIndex = index,
-                            progress = 0f,
-                            currentPosition = 0L,
+                            currentSong = transitionedSong,
+                            progress = if (isSameSong) it.progress else 0f,
+                            currentPosition = if (isSameSong) it.currentPosition else 0L,
                             duration = if (duration > 0) duration else it.duration
                         )
                     }
@@ -90,23 +168,49 @@ class MediaPlayerViewModel(
 
     fun playSong(song: Song?) {
         if (song == null) return
+        if (isOffline) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val queue = ensureLocalQueue()
+                if (queue.isEmpty()) return@launch
+                val index = queue.indexOfFirst { it.id == song.id }
+                val safeIndex = if (index >= 0) index else 0
+                viewModelScope.launch(Dispatchers.Main) {
+                    setLocalQueue(queue, startIndex = safeIndex, autoPlay = true)
+                }
+            }
+            return
+        }
         if (song.songPath.isNullOrBlank()) return
         val userId = currentUserId() ?: return
         val songId = song.id ?: return
 
+        if (song.id == _uiState.value.currentSong?.id) {
+            lastRemoteIndex = -1
+        }
+
         _uiState.update {
-            it.copy(
-                isMiniVisible = true, currentSong = song
-            )
+            it.copy(isMiniVisible = true, currentSong = song)
         }
 
         socket.play(userId, songId)
+
+        viewModelScope.launch {
+            val songs = songRepository.getSongsByArtist(
+                artistId = song.author?.id!!,
+                accessToken = userRepository.getAccessToken()
+            )
+            SongState.setSongsByArtist(songs)
+        }
     }
 
     fun playAll(
         songs: List<Song>,
         startIndex: Int = 0
     ) {
+        if (isOffline) {
+            setLocalQueue(songs, startIndex = startIndex, autoPlay = true)
+            return
+        }
         val userId = currentUserId() ?: return
         val normalizedNew = normalizeQueue(songs)
         if (normalizedNew.isEmpty()) return
@@ -126,6 +230,15 @@ class MediaPlayerViewModel(
     }
 
     fun enqueueSongs(songs: List<Song>) {
+        if (isOffline) {
+            val currentQueue = _uiState.value.queue
+            val merged = (currentQueue + songs)
+                .distinctBy { it.id ?: it.songPath }
+            val currentId = _uiState.value.currentSong?.id
+            val startIndex = merged.indexOfFirst { it.id == currentId }.takeIf { it >= 0 } ?: 0
+            setLocalQueue(merged, startIndex = startIndex, autoPlay = _uiState.value.isPlaying)
+            return
+        }
         val userId = currentUserId() ?: return
         val normalized = normalizeQueue(songs)
         if (normalized.isEmpty()) return
@@ -136,35 +249,76 @@ class MediaPlayerViewModel(
         socket.queueAdd(userId, songIds)
     }
 
+    fun retryPendingRemoteState() {
+        if (isOffline) return
+        val pending = pendingRemoteState ?: return
+        pendingRemoteState = null
+        viewModelScope.launch(Dispatchers.Main) {
+            applyRemoteState(pending)
+        }
+    }
+
     fun toggleShuffle() {
+        if (isOffline) {
+            val next = !_uiState.value.isShuffleEnabled
+            _uiState.update { it.copy(isShuffleEnabled = next) }
+            player.shuffleModeEnabled = next
+            return
+        }
         val userId = currentUserId() ?: return
         socket.shuffle(userId, !_uiState.value.isShuffleEnabled)
     }
 
     fun toggleRepeat() {
-        val userId = currentUserId() ?: return
         val nextMode = when (_uiState.value.repeatMode) {
             RepeatMode.OFF -> RepeatMode.ALL
             RepeatMode.ALL -> RepeatMode.ONE
             RepeatMode.ONE -> RepeatMode.OFF
         }
+        if (isOffline) {
+            _uiState.update { it.copy(repeatMode = nextMode) }
+            player.repeatMode = when (nextMode) {
+                RepeatMode.OFF -> Player.REPEAT_MODE_OFF
+                RepeatMode.ALL -> Player.REPEAT_MODE_ALL
+                RepeatMode.ONE -> Player.REPEAT_MODE_ONE
+            }
+            return
+        }
+        val userId = currentUserId() ?: return
         socket.repeat(userId, nextMode.name)
     }
 
     fun skipToNext() {
+        if (isOffline) {
+            player.seekToNextMediaItem()
+            return
+        }
         val userId = currentUserId() ?: return
         socket.next(userId)
     }
 
     fun skipToPrevious() {
+        if (isOffline) {
+            player.seekToPreviousMediaItem()
+            return
+        }
         val userId = currentUserId() ?: return
         socket.previous(userId)
     }
 
     fun toggle() {
+        if (isOffline) {
+            if (_uiState.value.isPlaying) {
+                player.pause()
+            } else {
+                player.play()
+            }
+            return
+        }
         val userId = currentUserId() ?: return
         if (_uiState.value.isPlaying) {
-            socket.pause(userId)
+            val positionMs = player.currentPosition.coerceAtLeast(0L)
+            socket.pause(userId, positionMs)
         } else {
             socket.play(userId, null)
         }
@@ -184,6 +338,18 @@ class MediaPlayerViewModel(
 
     fun seekTo(positionMs: Long) {
         if (positionMs < 0L) return
+        if (isOffline) {
+            val duration = _uiState.value.duration
+            val safePosition = positionMs.coerceAtLeast(0L)
+            _uiState.update {
+                it.copy(
+                    currentPosition = safePosition,
+                    progress = if (duration > 0L) safePosition / duration.toFloat() else it.progress
+                )
+            }
+            player.seekTo(safePosition)
+            return
+        }
         val userId = currentUserId() ?: return
         val duration = _uiState.value.duration
         val safePosition = positionMs.coerceAtLeast(0L)
@@ -191,6 +357,9 @@ class MediaPlayerViewModel(
         lastServerPositionMs = safePosition
         lastServerStartedAtMs = if (_uiState.value.isPlaying) now else null
         lastServerIsPlaying = _uiState.value.isPlaying
+        lastSeekPositionMs = safePosition
+        lastSeekSentAtMs = now
+        isSeeking = true
 
         _uiState.update {
             it.copy(
@@ -198,7 +367,59 @@ class MediaPlayerViewModel(
                 progress = if (duration > 0L) safePosition / duration.toFloat() else it.progress
             )
         }
-        socket.seek(userId, positionMs)
+
+        player.seekTo(safePosition)
+        socket.seek(userId, safePosition)
+    }
+
+    private suspend fun ensureLocalQueue(): List<Song> {
+        val currentQueue = _uiState.value.queue
+        if (currentQueue.isNotEmpty()) {
+            return normalizeQueue(currentQueue)
+        }
+        return normalizeQueue(songDao.getAllSongs().first().map { it.toDomain() })
+    }
+
+    private fun setLocalQueue(
+        songs: List<Song>,
+        startIndex: Int = 0,
+        autoPlay: Boolean
+    ) {
+        val normalized = normalizeQueue(songs)
+        if (normalized.isEmpty()) {
+            _uiState.update {
+                it.copy(
+                    queue = emptyList(),
+                    currentIndex = -1,
+                    currentSong = null,
+                    isMiniVisible = false,
+                    currentPosition = 0L,
+                    progress = 0f
+                )
+            }
+            player.clearMediaItems()
+            return
+        }
+
+        val safeIndex = startIndex.coerceIn(0, normalized.lastIndex)
+        val currentSong = normalized[safeIndex]
+        _uiState.update {
+            it.copy(
+                queue = normalized,
+                currentIndex = safeIndex,
+                currentSong = currentSong,
+                isMiniVisible = true,
+                currentPosition = 0L,
+                progress = 0f
+            )
+        }
+
+        val mediaItems = normalized.mapNotNull { buildMediaItem(it) }
+        if (mediaItems.isNotEmpty()) {
+            player.setMediaItems(mediaItems, safeIndex, 0L)
+            player.prepare()
+            if (autoPlay) player.play() else player.pause()
+        }
     }
 
     private fun startProgressUpdater() {
@@ -206,26 +427,22 @@ class MediaPlayerViewModel(
 
         progressJob = viewModelScope.launch {
             while (isActive) {
+                if (!isSeeking) {
+                    val position = player.currentPosition
+                    val duration = player.duration
 
-                val position = player.currentPosition
-
-                val duration = player.duration
-
-                if (duration > 0) {
-                    _uiState.update {
-                        it.copy(
-                            progress =
-                                position / duration.toFloat(),
-
-                            currentPosition = position,
-                            duration = duration
-                        )
-                    }
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            currentPosition = position
-                        )
+                    if (duration > 0) {
+                        _uiState.update {
+                            it.copy(
+                                progress = position / duration.toFloat(),
+                                currentPosition = position,
+                                duration = duration
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(currentPosition = position)
+                        }
                     }
                 }
 
@@ -262,22 +479,56 @@ class MediaPlayerViewModel(
         lastServerStartedAtMs = state.startedAt
         lastServerIsPlaying = state.isPlaying
 
-        val actualPosition = computeServerPosition(state)
-        val queueSongs = resolveQueueSongs(state.queueSongIds)
+        val resolvedSongs = state.queueSongs.ifEmpty {
+            resolveQueueSongs(state.queueSongIds)
+        }
+
+        if (resolvedSongs.isEmpty() && state.queueSongIds.isNotEmpty()) {
+            pendingRemoteState = state
+            return
+        }
+
+        val queueSongs = resolvedSongs
         val currentIndex = state.currentIndex
         val currentSong = queueSongs.getOrNull(currentIndex)
+
         val repeatMode = runCatching {
             RepeatMode.valueOf(state.repeatMode)
         }.getOrDefault(RepeatMode.OFF)
 
-        val isSameTrack =
-            _uiState.value.currentIndex == currentIndex &&
-                _uiState.value.queue.size == queueSongs.size
+        val previousSongId = _uiState.value.currentSong?.id
+        val currentSongId = currentSong?.id
 
-        val safePosition = if (isSameTrack && actualPosition < _uiState.value.currentPosition) {
-            _uiState.value.currentPosition
-        } else {
-            actualPosition
+        val isSameTrack =
+            previousSongId != null &&
+                    previousSongId == currentSongId
+
+        val isTrackRestart = isSameTrack &&
+                state.currentPosition == 0L &&
+                state.isPlaying &&
+                state.startedAt != null &&
+                (System.currentTimeMillis() - state.startedAt) < 3_000L
+
+        val isRecentSeek = lastSeekPositionMs >= 0L &&
+                (System.currentTimeMillis() - lastSeekSentAtMs) < 3_000L &&
+                abs(state.currentPosition - lastSeekPositionMs) < 500L
+
+        val actualPosition =
+            if (isSameTrack && !isTrackRestart) {
+                computeServerPosition(state)
+            } else {
+                state.currentPosition.coerceAtLeast(0L)
+            }
+
+        val safePosition = when {
+            isTrackRestart -> actualPosition
+            isRecentSeek -> {
+                lastSeekPositionMs = -1L
+                actualPosition
+            }
+
+            isSameTrack -> maxOf(actualPosition, _uiState.value.currentPosition)
+            else -> actualPosition
         }
 
         _uiState.update {
@@ -285,11 +536,20 @@ class MediaPlayerViewModel(
                 isPlaying = state.isPlaying,
 
                 currentPosition = safePosition,
-                progress = if (it.duration > 0L) safePosition / it.duration.toFloat() else it.progress,
+
+                progress =
+                    if (it.duration > 0L) {
+                        safePosition / it.duration.toFloat()
+                    } else {
+                        0f
+                    },
+
                 queue = queueSongs,
                 currentIndex = currentIndex,
                 currentSong = currentSong,
-                isMiniVisible = queueSongs.isNotEmpty(),
+
+                isMiniVisible = currentSong != null,
+
                 isShuffleEnabled = state.isShuffleEnabled,
                 repeatMode = repeatMode
             )
@@ -315,7 +575,8 @@ class MediaPlayerViewModel(
             queueSongIds = state.queueSongIds,
             currentIndex = currentIndex,
             positionMs = safePosition,
-            isPlaying = state.isPlaying
+            isPlaying = state.isPlaying,
+            forceSeek = isTrackRestart
         )
     }
 
@@ -324,7 +585,8 @@ class MediaPlayerViewModel(
         queueSongIds: List<Int>,
         currentIndex: Int,
         positionMs: Long,
-        isPlaying: Boolean
+        isPlaying: Boolean,
+        forceSeek: Boolean = false
     ) {
         val queueChanged = queueSongIds != lastRemoteQueueIds
         val indexChanged = currentIndex != lastRemoteIndex
@@ -337,15 +599,11 @@ class MediaPlayerViewModel(
                 .minus(1)
 
             if (playableQueue.isEmpty() || playableIndex < 0) {
-                lastRemoteQueueIds = queueSongIds
-                lastRemoteIndex = currentIndex
                 return
             }
 
             val mediaItems = playableQueue.mapNotNull { buildMediaItem(it) }
             if (mediaItems.isEmpty()) {
-                lastRemoteQueueIds = queueSongIds
-                lastRemoteIndex = currentIndex
                 return
             }
 
@@ -356,7 +614,7 @@ class MediaPlayerViewModel(
             lastRemoteQueueIds = queueSongIds
             lastRemoteIndex = currentIndex
         } else {
-            val shouldSeek = abs(player.currentPosition - positionMs) > 1500
+            val shouldSeek = forceSeek || abs(player.currentPosition - positionMs) > 1500
             if (shouldSeek && positionMs >= 0L) {
                 player.seekTo(positionMs)
             }

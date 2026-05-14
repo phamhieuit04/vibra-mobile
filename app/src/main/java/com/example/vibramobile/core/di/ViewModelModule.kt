@@ -1,5 +1,6 @@
 package com.example.vibramobile.core.di
 
+import android.annotation.SuppressLint
 import com.example.vibramobile.presentation.viewmodel.AlbumDetailViewModel
 import com.example.vibramobile.presentation.viewmodel.ArtistDetailViewModel
 import com.example.vibramobile.presentation.viewmodel.AuthViewModel
@@ -10,10 +11,12 @@ import com.example.vibramobile.presentation.viewmodel.LibraryViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import com.example.vibramobile.presentation.viewmodel.ProfileViewModel
 import com.example.vibramobile.presentation.viewmodel.SearchViewModel
+import com.example.vibramobile.presentation.viewmodel.SettingsViewModel
 import com.example.vibramobile.presentation.viewmodel.SplashViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
+@SuppressLint("UnsafeOptInUsageError")
 val viewModelModule = module {
     viewModelOf(::AuthViewModel)
     viewModelOf(::HomeViewModel)
@@ -26,4 +29,5 @@ val viewModelModule = module {
     viewModelOf(::ArtistDetailViewModel)
     viewModelOf(::AlbumDetailViewModel)
     viewModelOf(::SplashViewModel)
+    viewModelOf(::SettingsViewModel)
 }

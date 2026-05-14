@@ -5,11 +5,13 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.vibramobile.core.extension.replace
+import com.example.vibramobile.presentation.navigation.destination.MainDestination
 import com.example.vibramobile.presentation.navigation.destination.RootDestination
 
 @Composable
 fun RootGraph(
     startDestination: RootDestination,
+    mainStartDestination: MainDestination,
     isDarkMode: Boolean,
     onDarkModeChange: (Boolean) -> Unit,
     accentColorHex: String,
@@ -32,10 +34,11 @@ fun RootGraph(
             }
             entry<RootDestination.Main> {
                 MainGraph(
-                    isDarkMode,
-                    onDarkModeChange,
-                    accentColorHex,
-                    onAccentColorChange
+                    startRoute = mainStartDestination,
+                    isDarkMode = isDarkMode,
+                    onDarkModeChange = onDarkModeChange,
+                    accentColorHex = accentColorHex,
+                    onAccentColorChange = onAccentColorChange
                 )
             }
         }

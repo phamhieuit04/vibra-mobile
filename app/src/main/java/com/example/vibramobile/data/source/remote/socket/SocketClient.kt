@@ -2,6 +2,8 @@ package com.example.vibramobile.data.source.remote.socket
 
 import com.example.vibramobile.data.source.remote.config.SOCKET_ENDPOINT
 import com.example.vibramobile.data.source.remote.socket.model.SocketRoomState
+import com.example.vibramobile.domain.model.Song
+import com.example.vibramobile.domain.model.User
 import io.socket.client.IO
 import io.socket.client.Socket
 import org.json.JSONArray
@@ -42,9 +44,10 @@ class SocketClient : ISocketClient {
         socket.emit("play", payload)
     }
 
-    override fun pause(userId: Int) {
+    override fun pause(userId: Int, positionMs: Long) {
         val payload = JSONObject().apply {
             put("userId", userId)
+            put("positionMs", positionMs)
         }
 
         socket.emit("pause", payload)
@@ -118,6 +121,7 @@ class SocketClient : ISocketClient {
             val queue = data.optJSONObject("queue") ?: JSONObject()
 
             val songIds = queue.optJSONArray("songIds")?.toIntList().orEmpty()
+            val queueSongs = queue.optJSONArray("songs")?.toSongList().orEmpty()
             val state = SocketRoomState(
                 isPlaying = player.optBoolean("isPlaying", false),
                 currentPosition = player.optLong("currentPosition", 0L),
@@ -129,7 +133,8 @@ class SocketClient : ISocketClient {
                     null
                 },
                 isShuffleEnabled = player.optBoolean("isShuffleEnabled", false),
-                repeatMode = player.optString("repeatMode", "OFF")
+                repeatMode = player.optString("repeatMode", "OFF"),
+                queueSongs = queueSongs
             )
 
             callback(state)
@@ -144,6 +149,36 @@ class SocketClient : ISocketClient {
         return (0 until length()).mapNotNull { index ->
             val value = optInt(index, Int.MIN_VALUE)
             if (value == Int.MIN_VALUE) null else value
+        }
+    }
+
+    private fun JSONArray.toSongList(): List<Song> {
+        return (0 until length()).mapNotNull { index ->
+            val item = optJSONObject(index) ?: return@mapNotNull null
+            val id = item.optInt("id", Int.MIN_VALUE).takeIf { it != Int.MIN_VALUE }
+            val name = item.optString("name").takeIf { it.isNotBlank() }
+            val songPath = item.optString("song_path").takeIf { it.isNotBlank() }
+            val thumbnailPath = item.optString("thumbnail_path").takeIf { it.isNotBlank() }
+            val thumbnail = item.optString("thumbnail").takeIf { it.isNotBlank() }
+
+            val authorObject = item.optJSONObject("author")
+            val author = authorObject?.let { authorJson ->
+                User(
+                    id = authorJson.optInt("id", Int.MIN_VALUE).takeIf { it != Int.MIN_VALUE },
+                    name = authorJson.optString("name").takeIf { it.isNotBlank() },
+                    avatar = authorJson.optString("avatar").takeIf { it.isNotBlank() },
+                    avatarPath = authorJson.optString("avatar_path").takeIf { it.isNotBlank() }
+                )
+            }
+
+            Song(
+                id = id,
+                name = name,
+                songPath = songPath,
+                thumbnailPath = thumbnailPath,
+                thumbnail = thumbnail,
+                author = author
+            )
         }
     }
 }

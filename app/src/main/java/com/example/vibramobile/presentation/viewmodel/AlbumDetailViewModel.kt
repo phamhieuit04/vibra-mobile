@@ -4,9 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vibramobile.domain.contract.IPlaylistRepository
-import com.example.vibramobile.domain.contract.ISongRepository
-import com.example.vibramobile.presentation.state.ArtistState
-import com.example.vibramobile.presentation.state.SessionStore
+import com.example.vibramobile.domain.contract.IUserRepository
 import com.example.vibramobile.presentation.state.SongState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,34 +14,32 @@ import kotlinx.coroutines.withContext
 
 class AlbumDetailViewModel(
     private val playlistRepository: IPlaylistRepository,
-    private val sessionStore: SessionStore
+    private val userRepository: IUserRepository
 ) : ViewModel() {
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
-    private fun accessToken() = sessionStore.currentAccessToken()
-
     fun refresh(albumId: Int) {
         viewModelScope.launch {
-            val tokenSnapshot = accessToken()
+            val tokenSnapshot = userRepository.getAccessToken()
             if (tokenSnapshot.isBlank()) {
                 return@launch
             }
 
             _isRefreshing.value = true
             try {
-                fetchSongsByAlbum(albumId)
+                fetchSongsByAlbum(albumId, tokenSnapshot)
             } finally {
                 _isRefreshing.value = false
             }
         }
     }
 
-    suspend fun fetchSongsByAlbum(albumId: Int) {
+    suspend fun fetchSongsByAlbum(albumId: Int, token: String) {
         withContext(Dispatchers.IO) {
             runCatching {
                 SongState.setSongsByAlbum(
-                    playlistRepository.getSongsByAlbum(albumId, accessToken())
+                    playlistRepository.getSongsByAlbum(albumId, token)
                 )
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())

@@ -9,7 +9,6 @@ import com.example.vibramobile.domain.contract.ISongRepository
 import com.example.vibramobile.domain.contract.IUserRepository
 import com.example.vibramobile.presentation.state.ArtistState
 import com.example.vibramobile.presentation.state.CategoryState
-import com.example.vibramobile.presentation.state.SessionStore
 import com.example.vibramobile.presentation.state.SongState
 import com.example.vibramobile.presentation.state.UserState
 import kotlinx.coroutines.Dispatchers
@@ -22,62 +21,70 @@ class HomeViewModel(
     private val songRepository: ISongRepository,
     private val categoryRepository: ICategoryRepository,
     private val playlistRepository: IPlaylistRepository,
-    private val userRepository: IUserRepository,
-    private val sessionStore: SessionStore
+    private val userRepository: IUserRepository
 ) : ViewModel() {
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
-    private fun accessToken(): String = sessionStore.currentAccessToken()
-
     init {
-        viewModelScope.launch { fetchAll() }
+        viewModelScope.launch { fetchAll(forceRemote = false) }
     }
 
-    fun fetchAll() {
+    fun fetchAll(forceRemote: Boolean = false) {
         viewModelScope.launch {
+            val tokenSnapshot = userRepository.getAccessToken()
+            if (tokenSnapshot.isBlank()) {
+                return@launch
+            }
+
             _isRefreshing.value = true
             try {
-                fetchProfile()
-                getCategories()
-                getRecommendedSongs()
-                getRecentRotationSongs()
-                getPopularAlbums()
-                getPopularSongs()
-                getPopularArtists()
+                fetchProfile(tokenSnapshot, forceRemote)
+                getCategories(tokenSnapshot)
+                getRecommendedSongs(tokenSnapshot)
+                getRecentRotationSongs(tokenSnapshot)
+                getPopularAlbums(tokenSnapshot)
+                getPopularSongs(tokenSnapshot)
+                getPopularArtists(tokenSnapshot)
             } finally {
                 _isRefreshing.value = false
             }
         }
     }
 
-    suspend fun fetchProfile() {
+    private suspend fun fetchProfile(token: String, forceRemote: Boolean) {
         withContext(Dispatchers.IO) {
             runCatching {
-                UserState.setCurrentUser(
-                    userRepository.getProfile(accessToken()).copy(token = null)
-                )
+                val user = if (forceRemote) {
+                    userRepository.refreshProfile(token)
+                } else {
+                    userRepository.getProfileCached(token)
+                }
+
+                user?.let {
+                    UserState.setCurrentUser(it.copy(token = null))
+                }
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
         }
     }
 
-    suspend fun getRecommendedSongs() {
+    private suspend fun getRecommendedSongs(token: String) {
         withContext(Dispatchers.IO) {
             runCatching {
-                SongState.setRecommendedSongs(songRepository.getRecommendedSongs(accessToken()))
+                SongState.setRecommendedSongs(songRepository.getRecommendedSongs(token))
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
         }
     }
 
-    suspend fun getRecentRotationSongs() {
+    private suspend fun getRecentRotationSongs(token: String) {
         withContext(Dispatchers.IO) {
             runCatching {
                 SongState.setRecentRotationSongs(
-                    songRepository.getRecentRotationSongs(accessToken = accessToken())
+                    songRepository.getRecentRotationSongs(accessToken = token)
                 )
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
@@ -85,40 +92,40 @@ class HomeViewModel(
         }
     }
 
-    suspend fun getCategories() {
+    private suspend fun getCategories(token: String) {
         withContext(Dispatchers.IO) {
             runCatching {
-                CategoryState.setCategories(categoryRepository.getCategories(accessToken()))
+                CategoryState.setCategories(categoryRepository.getCategories(token))
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
         }
     }
 
-    suspend fun getPopularAlbums() {
+    private suspend fun getPopularAlbums(token: String) {
         withContext(Dispatchers.IO) {
             runCatching {
-                SongState.setPopularAlbums(playlistRepository.getPopularAlbums(accessToken()))
+                SongState.setPopularAlbums(playlistRepository.getPopularAlbums(token))
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
         }
     }
 
-    suspend fun getPopularSongs() {
+    private suspend fun getPopularSongs(token: String) {
         withContext(Dispatchers.IO) {
             runCatching {
-                SongState.setPopularSongs(songRepository.getPopularSongs(accessToken()))
+                SongState.setPopularSongs(songRepository.getPopularSongs(token))
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }
         }
     }
 
-    suspend fun getPopularArtists() {
+    private suspend fun getPopularArtists(token: String) {
         withContext(Dispatchers.IO) {
             runCatching {
-                ArtistState.setPopularArtists(userRepository.getPopularArtists(accessToken()))
+                ArtistState.setPopularArtists(userRepository.getPopularArtists(token))
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }

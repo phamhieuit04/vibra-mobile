@@ -5,10 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vibramobile.domain.contract.IPlaylistRepository
 import com.example.vibramobile.domain.contract.ISongRepository
+import com.example.vibramobile.domain.contract.IUserRepository
 import com.example.vibramobile.presentation.state.ArtistState
-import com.example.vibramobile.presentation.state.SessionStore
 import com.example.vibramobile.presentation.state.SongState
-import com.example.vibramobile.presentation.state.UserState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,16 +17,14 @@ import kotlinx.coroutines.withContext
 class ArtistDetailViewModel(
     private val songRepository: ISongRepository,
     private val playlistRepository: IPlaylistRepository,
-    private val sessionStore: SessionStore
+    private val userRepository: IUserRepository
 ) : ViewModel() {
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
-    private fun accessToken() = sessionStore.currentAccessToken()
-
     fun refresh(artistId: Int) {
         viewModelScope.launch {
-            val tokenSnapshot = accessToken()
+            val tokenSnapshot = userRepository.getAccessToken()
             if (tokenSnapshot.isBlank()) {
                 return@launch
             }

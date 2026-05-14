@@ -3,7 +3,7 @@ package com.example.vibramobile.presentation.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.vibramobile.domain.contract.ISongRepository
-import com.example.vibramobile.presentation.state.SessionStore
+import com.example.vibramobile.domain.contract.IUserRepository
 import com.example.vibramobile.presentation.state.SongState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -13,10 +13,8 @@ import kotlinx.coroutines.withContext
 
 class GenreDetailViewModel(
     private val songRepository: ISongRepository,
-    private val sessionStore: SessionStore
+    private val userRepository: IUserRepository
 ) : ViewModel() {
-    private fun accessToken(): String = sessionStore.currentAccessToken()
-
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
@@ -26,10 +24,11 @@ class GenreDetailViewModel(
 
             delay(500)
             runCatching {
+                val token = userRepository.getAccessToken()
                 SongState.setSongsByCategory(
                     songRepository.getSongsByCategory(
                         categoryId = categoryId,
-                        accessToken = accessToken()
+                        accessToken = token
                     )
                 )
             }.onFailure { exception ->

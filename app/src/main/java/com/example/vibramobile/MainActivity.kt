@@ -2,7 +2,6 @@ package com.example.vibramobile
 
 import android.app.Application
 import android.os.Bundle
-import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -11,11 +10,9 @@ import androidx.compose.runtime.*
 import com.example.vibramobile.presentation.navigation.graph.RootGraph
 import com.example.vibramobile.presentation.theme.DEFAULT_ACCENT_COLOR_HEX
 import com.example.vibramobile.presentation.theme.VibraMobileTheme
-import androidx.core.content.edit
 import com.example.vibramobile.core.di.jsonModule
 import com.example.vibramobile.core.di.networkModule
 import com.example.vibramobile.core.di.repositoryModule
-import com.example.vibramobile.core.di.storeModule
 import com.example.vibramobile.core.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -23,29 +20,22 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.vibramobile.presentation.viewmodel.SplashViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import androidx.appcompat.app.AppCompatDelegate
-
-private const val APP_SETTINGS = "app_settings"
-private const val KEY_DARK_MODE = "dark_mode"
-private const val KEY_ACCENT_HEX = "accent_hex"
+import com.example.vibramobile.core.di.databaseModule
+import com.example.vibramobile.presentation.viewmodel.SettingsViewModel
+import org.koin.androidx.compose.koinViewModel
 
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
-
-        val sharedPreferences = getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE)
-        val isDarkPref = sharedPreferences.getBoolean(KEY_DARK_MODE, true)
-        AppCompatDelegate.setDefaultNightMode(
-            if (isDarkPref) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-        )
-
+        
         startKoin {
             androidContext(this@App)
             modules(
                 jsonModule,
                 networkModule,
                 repositoryModule,
-                storeModule,
-                viewModelModule
+                viewModelModule,
+                databaseModule
             )
         }
     }
@@ -56,12 +46,6 @@ class MainActivity : ComponentActivity() {
     private val splashViewModel: SplashViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val sharedPreferences = getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE)
-        val isDarkPref = sharedPreferences.getBoolean(KEY_DARK_MODE, true)
-        AppCompatDelegate.setDefaultNightMode(
-            if (isDarkPref) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-        )
-
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         splashScreen.setKeepOnScreenCondition {
@@ -72,24 +56,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val startupState by splashViewModel.uiState.collectAsState()
+            val settingsViewModel: SettingsViewModel = koinViewModel()
+            val setting by settingsViewModel.setting.collectAsState()
 
-            var isDarkMode by remember {
-                mutableStateOf(sharedPreferences.getBoolean(KEY_DARK_MODE, true))
-            }
-
-            var accentColorHex by remember {
-                mutableStateOf(
-                    sharedPreferences.getString(KEY_ACCENT_HEX, DEFAULT_ACCENT_COLOR_HEX)
-                        ?: DEFAULT_ACCENT_COLOR_HEX
-                )
-            }
+            val isDarkMode = setting.isDarkMode ?: true
+            val accentColorHex = setting.accentHex ?: DEFAULT_ACCENT_COLOR_HEX
 
             LaunchedEffect(isDarkMode, accentColorHex) {
-                sharedPreferences.edit {
-                    putBoolean(KEY_DARK_MODE, isDarkMode)
-                        .putString(KEY_ACCENT_HEX, accentColorHex)
-                }
-
                 val style = if (isDarkMode) {
                     SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
                 } else {
@@ -103,6 +76,11 @@ class MainActivity : ComponentActivity() {
                     statusBarStyle = style,
                     navigationBarStyle = style
                 )
+
+                AppCompatDelegate.setDefaultNightMode(
+                    if (isDarkMode) AppCompatDelegate.MODE_NIGHT_YES
+                    else AppCompatDelegate.MODE_NIGHT_NO
+                )
             }
 
             VibraMobileTheme(
@@ -112,10 +90,11 @@ class MainActivity : ComponentActivity() {
                 if (!startupState.isLoading) {
                     RootGraph(
                         startDestination = startupState.startDestination,
+                        mainStartDestination = startupState.mainStartDestination,
                         isDarkMode = isDarkMode,
-                        onDarkModeChange = { isDarkMode = it },
+                        onDarkModeChange = { settingsViewModel.updateDarkMode(it) },
                         accentColorHex = accentColorHex,
-                        onAccentColorChange = { accentColorHex = it }
+                        onAccentColorChange = { settingsViewModel.updateAccentColor(it) }
                     )
                 }
             }

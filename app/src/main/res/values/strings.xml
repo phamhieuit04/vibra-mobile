@@ -46,6 +46,8 @@
     <string name="home_popular_albums">Album phổ biến</string>
     <string name="home_all">Tất cả</string>
     <string name="home_see_more">Xem thêm</string>
+    <string name="no_internet_title">Không có Internet</string>
+    <string name="no_internet_subtitle">Vui lòng kiểm tra lại</string>
     <string name="library_favorite_songs">Bài hát yêu thích</string>
     <string name="library_your_playlists">Playlist của bạn</string>
     <string name="library_title">Thư viện của bạn</string>

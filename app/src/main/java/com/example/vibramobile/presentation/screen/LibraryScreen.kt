@@ -1,5 +1,6 @@
 package com.example.vibramobile.presentation.screen
 
+import androidx.annotation.OptIn
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
 import com.example.vibramobile.R
 import com.example.vibramobile.domain.model.Playlist
@@ -48,6 +50,7 @@ import com.example.vibramobile.presentation.viewmodel.LibraryViewModel
 import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import org.koin.androidx.compose.koinViewModel
 
+@UnstableApi
 @Composable
 fun LibraryScreen(
     modifier: Modifier = Modifier,
