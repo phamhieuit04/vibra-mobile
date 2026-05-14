@@ -12,7 +12,7 @@ import com.example.vibramobile.data.source.local.entity.UserEntity
         UserEntity::class,
         SettingEntity::class
     ],
-    version = 9,
+    version = 10,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {

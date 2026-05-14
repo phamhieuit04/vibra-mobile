@@ -22,6 +22,12 @@ data class UserEntity(
     @ColumnInfo(name = "avatar_path")
     val avatarPath: String? = null,
 
+    @ColumnInfo(name = "avatar")
+    val avatar: String? = null,
+
+    @ColumnInfo(name = "followers")
+    val followers: Int? = null,
+
     @ColumnInfo(name = "token")
     val token: String? = null
 )

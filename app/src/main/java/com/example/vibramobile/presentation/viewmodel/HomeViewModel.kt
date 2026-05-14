@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vibramobile.domain.contract.ICategoryRepository
+import com.example.vibramobile.domain.contract.ILocalUserRepository
 import com.example.vibramobile.domain.contract.IPlaylistRepository
 import com.example.vibramobile.domain.contract.ISongRepository
 import com.example.vibramobile.domain.contract.IUserRepository
@@ -23,7 +24,8 @@ class HomeViewModel(
     private val categoryRepository: ICategoryRepository,
     private val playlistRepository: IPlaylistRepository,
     private val userRepository: IUserRepository,
-    private val sessionStore: SessionStore
+    private val sessionStore: SessionStore,
+    private val localUserRepository: ILocalUserRepository
 ) : ViewModel() {
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
@@ -54,9 +56,10 @@ class HomeViewModel(
     suspend fun fetchProfile() {
         withContext(Dispatchers.IO) {
             runCatching {
-                UserState.setCurrentUser(
-                    userRepository.getProfile(accessToken()).copy(token = null)
-                )
+                val token = accessToken()
+                val user = userRepository.getProfile(token)
+                localUserRepository.upsertUser(user.copy(token = token))
+                UserState.setCurrentUser(user.copy(token = null))
             }.onFailure { exception ->
                 Log.e("MyApp", exception.toString())
             }

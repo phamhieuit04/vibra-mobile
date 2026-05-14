@@ -137,8 +137,6 @@ class MediaPlayerViewModel(
         val userId = currentUserId() ?: return
         val songId = song.id ?: return
 
-        // Nếu chọn lại đúng bài đang phát → reset lastRemoteIndex để
-        // syncPlayerWithRemote sẽ gọi setMediaItems lại thay vì bỏ qua
         if (song.id == _uiState.value.currentSong?.id) {
             lastRemoteIndex = -1
         }
@@ -323,8 +321,6 @@ class MediaPlayerViewModel(
             resolveQueueSongs(state.queueSongIds)
         }
 
-        // Nếu server có queue nhưng client chưa resolve được (SongState chưa load)
-        // → lưu lại state, đợi UI gọi retryPendingRemoteState() sau khi SongState sẵn sàng
         if (resolvedSongs.isEmpty() && state.queueSongIds.isNotEmpty()) {
             pendingRemoteState = state
             return
@@ -441,7 +437,6 @@ class MediaPlayerViewModel(
                 .minus(1)
 
             if (playableQueue.isEmpty() || playableIndex < 0) {
-                // Không update last* để lần sau applyRemoteState vẫn detect queueChanged
                 return
             }
 
