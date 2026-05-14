@@ -1,5 +1,6 @@
 package com.example.vibramobile.presentation.component
 
+import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -41,6 +43,7 @@ import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import io.ktor.http.encodeURLPath
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(UnstableApi::class)
 @Composable
 fun MiniPlayerComponent(
     modifier: Modifier = Modifier,
@@ -94,7 +97,7 @@ fun MiniPlayerComponent(
                 Spacer(Modifier.width(8.dp))
                 Column {
                     Text(
-                        text = currentSong?.name.toString(),
+                        text = currentSong?.name.orEmpty(),
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
@@ -102,7 +105,7 @@ fun MiniPlayerComponent(
                     )
                     Spacer(Modifier.height(2.dp))
                     Text(
-                        text = currentSong?.author?.name.toString(),
+                        text = currentSong?.author?.name.orEmpty(),
                         color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                         fontSize = 10.sp,
                         lineHeight = 10.sp

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.example.vibramobile.data.source.remote.socket.ISocketClient
 import com.example.vibramobile.data.source.remote.socket.model.SocketRoomState
@@ -25,11 +26,23 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
+@UnstableApi
 class MediaPlayerViewModel(
     context: Context,
     private val socket: ISocketClient
 ) : ViewModel() {
-    private val player = ExoPlayer.Builder(context).build()
+    private val player = ExoPlayer.Builder(context)
+        .setLoadControl(
+            androidx.media3.exoplayer.DefaultLoadControl.Builder()
+                .setBufferDurationsMs(
+                    60_000,
+                    180_000,
+                    1_500,
+                    5_000
+                )
+                .build()
+        )
+        .build()
 
     private val _uiState = MutableStateFlow(MediaPlayerState())
     val uiState = _uiState.asStateFlow()
@@ -47,6 +60,8 @@ class MediaPlayerViewModel(
     private var lastSocketState: SocketRoomState? = null
     private var lastSeekPositionMs: Long = -1L
     private var lastSeekSentAtMs: Long = 0L
+    private var isSeeking: Boolean = false
+    private var pendingRemoteState: SocketRoomState? = null
 
     init {
         socket.connect(UserState.currentUser.value?.id!!)
@@ -59,6 +74,9 @@ class MediaPlayerViewModel(
 
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
+                if (isPlaying) {
+                    isSeeking = false
+                }
             }
 
             override fun onPlaybackStateChanged(state: Int) {
@@ -100,10 +118,14 @@ class MediaPlayerViewModel(
         val userId = currentUserId() ?: return
         val songId = song.id ?: return
 
+        // Nếu chọn lại đúng bài đang phát → reset lastRemoteIndex để
+        // syncPlayerWithRemote sẽ gọi setMediaItems lại thay vì bỏ qua
+        if (song.id == _uiState.value.currentSong?.id) {
+            lastRemoteIndex = -1
+        }
+
         _uiState.update {
-            it.copy(
-                isMiniVisible = true, currentSong = song
-            )
+            it.copy(isMiniVisible = true, currentSong = song)
         }
 
         socket.play(userId, songId)
@@ -140,6 +162,14 @@ class MediaPlayerViewModel(
         if (songIds.isEmpty()) return
 
         socket.queueAdd(userId, songIds)
+    }
+
+    fun retryPendingRemoteState() {
+        val pending = pendingRemoteState ?: return
+        pendingRemoteState = null
+        viewModelScope.launch(Dispatchers.Main) {
+            applyRemoteState(pending)
+        }
     }
 
     fun toggleShuffle() {
@@ -200,6 +230,7 @@ class MediaPlayerViewModel(
         lastServerIsPlaying = _uiState.value.isPlaying
         lastSeekPositionMs = safePosition
         lastSeekSentAtMs = now
+        isSeeking = true
 
         _uiState.update {
             it.copy(
@@ -207,7 +238,9 @@ class MediaPlayerViewModel(
                 progress = if (duration > 0L) safePosition / duration.toFloat() else it.progress
             )
         }
-        socket.seek(userId, positionMs)
+
+        player.seekTo(safePosition)
+        socket.seek(userId, safePosition)
     }
 
     private fun startProgressUpdater() {
@@ -215,26 +248,22 @@ class MediaPlayerViewModel(
 
         progressJob = viewModelScope.launch {
             while (isActive) {
+                if (!isSeeking) {
+                    val position = player.currentPosition
+                    val duration = player.duration
 
-                val position = player.currentPosition
-
-                val duration = player.duration
-
-                if (duration > 0) {
-                    _uiState.update {
-                        it.copy(
-                            progress =
-                                position / duration.toFloat(),
-
-                            currentPosition = position,
-                            duration = duration
-                        )
-                    }
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            currentPosition = position
-                        )
+                    if (duration > 0) {
+                        _uiState.update {
+                            it.copy(
+                                progress = position / duration.toFloat(),
+                                currentPosition = position,
+                                duration = duration
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(currentPosition = position)
+                        }
                     }
                 }
 
@@ -271,7 +300,18 @@ class MediaPlayerViewModel(
         lastServerStartedAtMs = state.startedAt
         lastServerIsPlaying = state.isPlaying
 
-        val queueSongs = resolveQueueSongs(state.queueSongIds)
+        val resolvedSongs = state.queueSongs.ifEmpty {
+            resolveQueueSongs(state.queueSongIds)
+        }
+
+        // Nếu server có queue nhưng client chưa resolve được (SongState chưa load)
+        // → lưu lại state, đợi UI gọi retryPendingRemoteState() sau khi SongState sẵn sàng
+        if (resolvedSongs.isEmpty() && state.queueSongIds.isNotEmpty()) {
+            pendingRemoteState = state
+            return
+        }
+
+        val queueSongs = resolvedSongs
         val currentIndex = state.currentIndex
         val currentSong = queueSongs.getOrNull(currentIndex)
 
@@ -331,7 +371,7 @@ class MediaPlayerViewModel(
                 currentIndex = currentIndex,
                 currentSong = currentSong,
 
-                isMiniVisible = queueSongs.isNotEmpty(),
+                isMiniVisible = currentSong != null,
 
                 isShuffleEnabled = state.isShuffleEnabled,
                 repeatMode = repeatMode
@@ -382,15 +422,12 @@ class MediaPlayerViewModel(
                 .minus(1)
 
             if (playableQueue.isEmpty() || playableIndex < 0) {
-                lastRemoteQueueIds = queueSongIds
-                lastRemoteIndex = currentIndex
+                // Không update last* để lần sau applyRemoteState vẫn detect queueChanged
                 return
             }
 
             val mediaItems = playableQueue.mapNotNull { buildMediaItem(it) }
             if (mediaItems.isEmpty()) {
-                lastRemoteQueueIds = queueSongIds
-                lastRemoteIndex = currentIndex
                 return
             }
 
