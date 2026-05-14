@@ -21,6 +21,7 @@ data class SongResponseDto(
     val list_lyric: List<String>? = null,
     val quantity: Int? = null,
     val author_name: String? = null,
+    val author_avatar_path: String? = null,
 
     val author: UserResponseDto? = null,
     val playlist: PlaylistResponseDto? = null,

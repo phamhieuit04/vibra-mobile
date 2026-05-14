@@ -93,6 +93,7 @@ import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import io.ktor.http.encodeURLPath
 import org.koin.androidx.compose.koinViewModel
+import java.io.File
 
 @UnstableApi
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalHazeMaterialsApi::class)
@@ -176,7 +177,7 @@ fun AppFullscreenPlayer(
             ) {
                 Box(modifier = Modifier.matchParentSize()) {
                     AsyncImage(
-                        model = song?.thumbnailPath?.encodeURLPath(),
+                        model = resolveImageModel(song?.thumbnailPath),
                         contentDescription = null,
                         modifier = Modifier
                             .matchParentSize()
@@ -245,7 +246,7 @@ fun AppFullscreenPlayer(
                                         .size(320.dp)
                                         .clip(shape = RoundedCornerShape(12.dp)),
                                     contentDescription = "",
-                                    model = song?.thumbnailPath?.encodeURLPath(),
+                                    model = resolveImageModel(song?.thumbnailPath),
                                     contentScale = ContentScale.Crop
                                 )
                             }
@@ -374,7 +375,7 @@ fun AppFullscreenPlayer(
                                 followers = artist.followers ?: 0,
                                 navigateToArtistDetail = {
                                     mediaPlayerViewModel.toggleFullscreen(false)
-                                    song?.author?.let { navigateToArtistDetail(it) }
+                                    song.author?.let { navigateToArtistDetail(it) }
                                 }
                             )
                         }
@@ -484,7 +485,7 @@ private fun AboutArtistSection(
                 .aspectRatio(3f / 4f)
         ) {
             AsyncImage(
-                model = artistAvatarPath?.encodeURLPath(),
+                model = resolveImageModel(artistAvatarPath),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
@@ -661,7 +662,7 @@ private fun ExploreSongsSection(
                         .noRippleClickable(onClick = { onClick(song) })
                 ) {
                     AsyncImage(
-                        model = song.thumbnailPath?.encodeURLPath(),
+                        model = resolveImageModel(song.thumbnailPath),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
@@ -694,3 +695,13 @@ private fun ExploreSongsSection(
         }
     }
 }
+
+private fun resolveImageModel(path: String?): Any? {
+    if (path.isNullOrBlank()) return null
+    return if (path.startsWith("http", ignoreCase = true)) {
+        path.encodeURLPath()
+    } else {
+        File(path)
+    }
+}
+

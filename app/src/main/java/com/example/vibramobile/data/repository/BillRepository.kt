@@ -76,44 +76,95 @@ class BillRepository(
             if (candidates.isEmpty()) return@withContext
 
             val cached = songDao.getAllSongsOnce().associateBy { it.id }
-            val targetDir = File(context.filesDir, "offline_songs").apply { mkdirs() }
+            val songsDir = File(context.filesDir, "offline_songs").apply { mkdirs() }
+            val thumbnailsDir = File(context.filesDir, "offline_thumbnails").apply { mkdirs() }
+            val avatarsDir = File(context.filesDir, "offline_avatars").apply { mkdirs() }
 
             for (song in candidates) {
                 val songId = song.id ?: continue
                 val remotePath = song.song_path ?: continue
-
                 if (!remotePath.startsWith("http")) continue
 
-                val cachedPath = cached[songId]?.songPath
-                if (!cachedPath.isNullOrBlank() && !cachedPath.startsWith("http")) {
-                    if (File(cachedPath).exists()) continue
-                }
+                val cachedSong = cached[songId]
 
-                val extension = remotePath.substringAfterLast('.', "mp3")
-                val songTitle = song.name?.toSafeFileName() ?: "song_$songId"
-                val outputFile = File(targetDir, "$songTitle.$extension")
-
-                if (outputFile.exists()) {
-                    songDao.updateSongPath(songId, outputFile.absolutePath)
-                    continue
-                }
-
-                val success = try {
-                    val channel = client.get(remotePath.encodeUrl()).bodyAsChannel()
-                    outputFile.outputStream().use { out ->
-                        channel.toInputStream().use { it.copyTo(out) }
+                val songPath = run {
+                    val existingPath = cachedSong?.songPath
+                    if (!existingPath.isNullOrBlank() && !existingPath.startsWith("http") && File(
+                            existingPath
+                        ).exists()
+                    ) {
+                        existingPath
+                    } else {
+                        val extension = remotePath.substringAfterLast('.', "mp3")
+                        val fileName = "${song.name?.toSafeFileName() ?: "song_$songId"}.$extension"
+                        val outputFile = File(songsDir, fileName)
+                        if (!outputFile.exists()) {
+                            downloadFile(remotePath, outputFile)
+                        }
+                        if (outputFile.exists()) outputFile.absolutePath else null
                     }
-                    true
-                } catch (e: Exception) {
-                    outputFile.delete()
-                    false
                 }
 
-                if (success) {
-                    songDao.updateSongPath(songId, outputFile.absolutePath)
+                val thumbnailPath = run {
+                    val remoteThumb = song.thumbnail_path
+                    val existingPath = cachedSong?.thumbnailPath
+                    if (!existingPath.isNullOrBlank() && !existingPath.startsWith("http") && File(
+                            existingPath
+                        ).exists()
+                    ) {
+                        existingPath
+                    } else if (!remoteThumb.isNullOrBlank() && remoteThumb.startsWith("http")) {
+                        val extension = remoteThumb.substringAfterLast('.', "jpg")
+                        val fileName =
+                            "${song.name?.toSafeFileName() ?: "thumb_$songId"}.$extension"
+                        val outputFile = File(thumbnailsDir, fileName)
+                        if (!outputFile.exists()) {
+                            downloadFile(remoteThumb, outputFile)
+                        }
+                        if (outputFile.exists()) outputFile.absolutePath else null
+                    } else null
                 }
+
+                val avatarPath = run {
+                    val remoteAvatar = song.author_avatar_path
+                    val existingPath = cachedSong?.authorAvatarPath
+                    if (!existingPath.isNullOrBlank() && !existingPath.startsWith("http") && File(
+                            existingPath
+                        ).exists()
+                    ) {
+                        existingPath
+                    } else if (!remoteAvatar.isNullOrBlank() && remoteAvatar.startsWith("http")) {
+                        val extension = remoteAvatar.substringAfterLast('.', "jpg")
+                        val safeName = song.author_name?.toSafeFileName() ?: "avatar_$songId"
+                        val outputFile = File(avatarsDir, "$safeName.$extension")
+                        if (!outputFile.exists()) {
+                            downloadFile(remoteAvatar, outputFile)
+                        }
+                        if (outputFile.exists()) outputFile.absolutePath else null
+                    } else null
+                }
+
+                songDao.updatePaths(
+                    id = songId,
+                    songPath = songPath,
+                    thumbnailPath = thumbnailPath,
+                    authorAvatarPath = avatarPath
+                )
             }
         }
+
+    private suspend fun downloadFile(url: String, outputFile: File): Boolean {
+        return try {
+            val channel = client.get(url.encodeUrl()).bodyAsChannel()
+            outputFile.outputStream().use { out ->
+                channel.toInputStream().use { it.copyTo(out) }
+            }
+            true
+        } catch (e: Exception) {
+            outputFile.delete()
+            false
+        }
+    }
 
     private fun String.encodeUrl(): String {
         val protocolEnd = indexOf("://")

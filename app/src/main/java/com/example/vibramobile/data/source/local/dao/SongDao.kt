@@ -20,4 +20,12 @@ interface SongDao {
 
     @Query("UPDATE songs SET song_path = :songPath WHERE id = :songId")
     suspend fun updateSongPath(songId: Int, songPath: String)
+
+    @Query("UPDATE songs SET song_path = :songPath, thumbnail_path = :thumbnailPath, author_avatar_path = :authorAvatarPath WHERE id = :id")
+    suspend fun updatePaths(
+        id: Int,
+        songPath: String?,
+        thumbnailPath: String?,
+        authorAvatarPath: String?
+    )
 }

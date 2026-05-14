@@ -26,5 +26,8 @@ data class SongEntity(
     val thumbnailPath: String? = null,
 
     @ColumnInfo(name = "author_name")
-    val authorName: String? = null
+    val authorName: String? = null,
+
+    @ColumnInfo(name = "author_avatar_path")
+    val authorAvatarPath: String? = null
 )

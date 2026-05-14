@@ -43,7 +43,8 @@ fun SongResponseDto.toEntity(): SongEntity? {
         lyrics = resolvedLyrics,
         songPath = song_path,
         thumbnailPath = thumbnail_path,
-        authorName = resolvedAuthor
+        authorName = resolvedAuthor,
+        authorAvatarPath = author_avatar_path
     )
 }
 
@@ -58,7 +59,7 @@ fun SongEntity.toDomain(): Song {
         songPath = songPath,
         thumbnailPath = thumbnailPath,
         listLyric = resolvedListLyric,
-        author = authorName?.let { User(name = it) }
+        author = authorName?.let { User(name = it, avatarPath = authorAvatarPath) }
     )
 }
 
