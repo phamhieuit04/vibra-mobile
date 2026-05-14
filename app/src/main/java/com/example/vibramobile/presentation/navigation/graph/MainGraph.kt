@@ -52,13 +52,14 @@ private const val POP_DURATION = 300
 
 @Composable
 fun MainGraph(
+    startRoute: MainDestination = MainDestination.Home,
     isDarkMode: Boolean,
     onDarkModeChange: (Boolean) -> Unit,
     accentColorHex: String,
     onAccentColorChange: (String) -> Unit
 ) {
     val navigationState = rememberNavigationState(
-        startRoute = MainDestination.Home,
+        startRoute = startRoute,
         topLevelRoutes = TOP_LEVEL_DESTINATIONS.keys
     )
     val navigator = remember { Navigator(navigationState) }

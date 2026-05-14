@@ -19,6 +19,9 @@ data class SongEntity(
     @ColumnInfo(name = "lyrics")
     val lyrics: String? = null,
 
+    @ColumnInfo(name = "song_path")
+    val songPath: String? = null,
+
     @ColumnInfo(name = "thumbnail_path")
     val thumbnailPath: String? = null,
 

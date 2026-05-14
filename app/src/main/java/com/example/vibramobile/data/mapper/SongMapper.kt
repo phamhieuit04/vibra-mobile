@@ -3,6 +3,7 @@ package com.example.vibramobile.data.mapper
 import com.example.vibramobile.data.source.local.entity.SongEntity
 import com.example.vibramobile.data.source.remote.dto.SongResponseDto
 import com.example.vibramobile.domain.model.Song
+import com.example.vibramobile.domain.model.User
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
@@ -36,8 +37,21 @@ fun SongResponseDto.toEntity(): SongEntity? {
         name = name,
         price = price?.toDouble(),
         lyrics = resolvedLyrics,
+        songPath = song_path,
         thumbnailPath = thumbnail_path,
         authorName = resolvedAuthor
+    )
+}
+
+fun SongEntity.toDomain(): Song {
+    return Song(
+        id = id,
+        name = name,
+        lyrics = lyrics,
+        price = price?.toInt(),
+        songPath = songPath,
+        thumbnailPath = thumbnailPath,
+        author = authorName?.let { User(name = it) }
     )
 }
 

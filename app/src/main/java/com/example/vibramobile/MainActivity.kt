@@ -90,6 +90,7 @@ class MainActivity : ComponentActivity() {
                 if (!startupState.isLoading) {
                     RootGraph(
                         startDestination = startupState.startDestination,
+                        mainStartDestination = startupState.mainStartDestination,
                         isDarkMode = isDarkMode,
                         onDarkModeChange = { settingsViewModel.updateDarkMode(it) },
                         accentColorHex = accentColorHex,
