@@ -1,6 +1,10 @@
 package com.example.vibramobile.core.util
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Build
+import androidx.annotation.RequiresPermission
 
 object SystemUtils {
     val isEmulator: Boolean
@@ -20,4 +24,11 @@ object SystemUtils {
                 || Build.PRODUCT.contains("vbox86p")
                 || Build.PRODUCT.contains("emulator")
                 || Build.PRODUCT.contains("simulator"))
+
+    fun isOnline(connectivityManager: ConnectivityManager): Boolean {
+        val network = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+    }
 }
