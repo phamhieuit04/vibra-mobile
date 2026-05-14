@@ -9,7 +9,6 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.example.vibramobile.data.source.remote.socket.ISocketClient
 import com.example.vibramobile.data.source.remote.socket.model.SocketRoomState
-import com.example.vibramobile.domain.contract.ISongRepository
 import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.presentation.state.MediaPlayerState
 import com.example.vibramobile.presentation.state.RepeatMode
@@ -24,7 +23,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.math.abs
 
 class MediaPlayerViewModel(
@@ -47,6 +45,8 @@ class MediaPlayerViewModel(
     private var lastServerStartedAtMs: Long? = null
     private var lastServerIsPlaying: Boolean = false
     private var lastSocketState: SocketRoomState? = null
+    private var lastSeekPositionMs: Long = -1L
+    private var lastSeekSentAtMs: Long = 0L
 
     init {
         socket.connect(UserState.currentUser.value?.id!!)
@@ -75,13 +75,17 @@ class MediaPlayerViewModel(
                     mediaIdForSong(song) == mediaId
                 }
                 if (index >= 0) {
-                    currentSongValue = queueSnapshot[index]
+                    val transitionedSong = queueSnapshot[index]
+                    currentSongValue = transitionedSong
                     val duration = player.duration
+                    val isSameSong = transitionedSong.id != null &&
+                            transitionedSong.id == _uiState.value.currentSong?.id
                     _uiState.update {
                         it.copy(
                             currentIndex = index,
-                            progress = 0f,
-                            currentPosition = 0L,
+                            currentSong = transitionedSong,
+                            progress = if (isSameSong) it.progress else 0f,
+                            currentPosition = if (isSameSong) it.currentPosition else 0L,
                             duration = if (duration > 0) duration else it.duration
                         )
                     }
@@ -166,7 +170,8 @@ class MediaPlayerViewModel(
     fun toggle() {
         val userId = currentUserId() ?: return
         if (_uiState.value.isPlaying) {
-            socket.pause(userId)
+            val positionMs = player.currentPosition.coerceAtLeast(0L)
+            socket.pause(userId, positionMs)
         } else {
             socket.play(userId, null)
         }
@@ -193,6 +198,8 @@ class MediaPlayerViewModel(
         lastServerPositionMs = safePosition
         lastServerStartedAtMs = if (_uiState.value.isPlaying) now else null
         lastServerIsPlaying = _uiState.value.isPlaying
+        lastSeekPositionMs = safePosition
+        lastSeekSentAtMs = now
 
         _uiState.update {
             it.copy(
@@ -264,22 +271,47 @@ class MediaPlayerViewModel(
         lastServerStartedAtMs = state.startedAt
         lastServerIsPlaying = state.isPlaying
 
-        val actualPosition = computeServerPosition(state)
         val queueSongs = resolveQueueSongs(state.queueSongIds)
         val currentIndex = state.currentIndex
         val currentSong = queueSongs.getOrNull(currentIndex)
+
         val repeatMode = runCatching {
             RepeatMode.valueOf(state.repeatMode)
         }.getOrDefault(RepeatMode.OFF)
 
-        val isSameTrack =
-            _uiState.value.currentIndex == currentIndex &&
-                    _uiState.value.queue.size == queueSongs.size
+        val previousSongId = _uiState.value.currentSong?.id
+        val currentSongId = currentSong?.id
 
-        val safePosition = if (isSameTrack && actualPosition < _uiState.value.currentPosition) {
-            _uiState.value.currentPosition
-        } else {
-            actualPosition
+        val isSameTrack =
+            previousSongId != null &&
+                    previousSongId == currentSongId
+
+        val isTrackRestart = isSameTrack &&
+                state.currentPosition == 0L &&
+                state.isPlaying &&
+                state.startedAt != null &&
+                (System.currentTimeMillis() - state.startedAt) < 3_000L
+
+        val isRecentSeek = lastSeekPositionMs >= 0L &&
+                (System.currentTimeMillis() - lastSeekSentAtMs) < 3_000L &&
+                abs(state.currentPosition - lastSeekPositionMs) < 500L
+
+        val actualPosition =
+            if (isSameTrack && !isTrackRestart) {
+                computeServerPosition(state)
+            } else {
+                state.currentPosition.coerceAtLeast(0L)
+            }
+
+        val safePosition = when {
+            isTrackRestart -> actualPosition
+            isRecentSeek -> {
+                lastSeekPositionMs = -1L
+                actualPosition
+            }
+
+            isSameTrack -> maxOf(actualPosition, _uiState.value.currentPosition)
+            else -> actualPosition
         }
 
         _uiState.update {
@@ -287,11 +319,20 @@ class MediaPlayerViewModel(
                 isPlaying = state.isPlaying,
 
                 currentPosition = safePosition,
-                progress = if (it.duration > 0L) safePosition / it.duration.toFloat() else it.progress,
+
+                progress =
+                    if (it.duration > 0L) {
+                        safePosition / it.duration.toFloat()
+                    } else {
+                        0f
+                    },
+
                 queue = queueSongs,
                 currentIndex = currentIndex,
                 currentSong = currentSong,
+
                 isMiniVisible = queueSongs.isNotEmpty(),
+
                 isShuffleEnabled = state.isShuffleEnabled,
                 repeatMode = repeatMode
             )
@@ -317,7 +358,8 @@ class MediaPlayerViewModel(
             queueSongIds = state.queueSongIds,
             currentIndex = currentIndex,
             positionMs = safePosition,
-            isPlaying = state.isPlaying
+            isPlaying = state.isPlaying,
+            forceSeek = isTrackRestart
         )
     }
 
@@ -326,7 +368,8 @@ class MediaPlayerViewModel(
         queueSongIds: List<Int>,
         currentIndex: Int,
         positionMs: Long,
-        isPlaying: Boolean
+        isPlaying: Boolean,
+        forceSeek: Boolean = false
     ) {
         val queueChanged = queueSongIds != lastRemoteQueueIds
         val indexChanged = currentIndex != lastRemoteIndex
@@ -358,7 +401,7 @@ class MediaPlayerViewModel(
             lastRemoteQueueIds = queueSongIds
             lastRemoteIndex = currentIndex
         } else {
-            val shouldSeek = abs(player.currentPosition - positionMs) > 1500
+            val shouldSeek = forceSeek || abs(player.currentPosition - positionMs) > 1500
             if (shouldSeek && positionMs >= 0L) {
                 player.seekTo(positionMs)
             }

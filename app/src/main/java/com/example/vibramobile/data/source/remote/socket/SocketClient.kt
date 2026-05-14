@@ -42,9 +42,10 @@ class SocketClient : ISocketClient {
         socket.emit("play", payload)
     }
 
-    override fun pause(userId: Int) {
+    override fun pause(userId: Int, positionMs: Long) {
         val payload = JSONObject().apply {
             put("userId", userId)
+            put("positionMs", positionMs)
         }
 
         socket.emit("pause", payload)
