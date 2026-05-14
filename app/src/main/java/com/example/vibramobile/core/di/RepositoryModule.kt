@@ -16,6 +16,7 @@ import com.example.vibramobile.data.repository.SearchResultRepository
 import com.example.vibramobile.data.repository.SettingRepository
 import com.example.vibramobile.data.repository.SongRepository
 import com.example.vibramobile.data.repository.UserRepository
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -27,6 +28,6 @@ val repositoryModule = module {
     singleOf(::SongRepository) bind ISongRepository::class
     singleOf(::UserRepository) bind IUserRepository::class
     singleOf(::SearchResultRepository) bind ISearchResultRepository::class
-    singleOf(::BillRepository) bind IBillRepository::class
+    single { BillRepository(get(), get(), get(), androidContext()) } bind IBillRepository::class
     singleOf(::SettingRepository) bind ISettingRepository::class
 }

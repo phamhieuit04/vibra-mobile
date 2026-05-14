@@ -14,5 +14,10 @@ interface SongDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(songs: List<SongEntity>)
-}
 
+    @Query("SELECT * FROM songs")
+    suspend fun getAllSongsOnce(): List<SongEntity>
+
+    @Query("UPDATE songs SET song_path = :songPath WHERE id = :songId")
+    suspend fun updateSongPath(songId: Int, songPath: String)
+}
