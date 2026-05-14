@@ -10,6 +10,8 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.example.vibramobile.data.source.remote.socket.ISocketClient
 import com.example.vibramobile.data.source.remote.socket.model.SocketRoomState
+import com.example.vibramobile.domain.contract.ISongRepository
+import com.example.vibramobile.domain.contract.IUserRepository
 import com.example.vibramobile.domain.model.Song
 import com.example.vibramobile.presentation.state.MediaPlayerState
 import com.example.vibramobile.presentation.state.RepeatMode
@@ -30,7 +32,9 @@ import kotlin.math.abs
 @UnstableApi
 class MediaPlayerViewModel(
     context: Context,
-    private val socket: ISocketClient
+    private val socket: ISocketClient,
+    private val songRepository: ISongRepository,
+    private val userRepository: IUserRepository
 ) : ViewModel() {
     private val player = ExoPlayer.Builder(context)
         .setLoadControl(
@@ -146,6 +150,14 @@ class MediaPlayerViewModel(
         }
 
         socket.play(userId, songId)
+
+        viewModelScope.launch {
+            val songs = songRepository.getSongsByArtist(
+                artistId = song.author?.id!!,
+                accessToken = userRepository.getAccessToken()
+            )
+            SongState.setSongsByArtist(songs)
+        }
     }
 
     fun playAll(
