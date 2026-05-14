@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.merge
 import kotlin.math.abs
 
 @UnstableApi
@@ -69,6 +70,24 @@ class MediaPlayerViewModel(
         socket.observeState { state ->
             viewModelScope.launch(Dispatchers.Main) {
                 applyRemoteState(state)
+            }
+        }
+
+        viewModelScope.launch(Dispatchers.Main) {
+            merge(
+                SongState.recommendedSongs,
+                SongState.popularSongs,
+                SongState.recentRotationSongs,
+                SongState.songsByCategory,
+                SongState.songsByArtist,
+                SongState.songsByAlbum,
+                UserState.likedSongs
+            ).collect { songs ->
+                if (songs.isNotEmpty()) {
+                    val pending = pendingRemoteState ?: return@collect
+                    pendingRemoteState = null
+                    applyRemoteState(pending)
+                }
             }
         }
 
