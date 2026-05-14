@@ -17,5 +17,5 @@ val databaseModule = module {
 
     single { get<AppDatabase>().userDao() }
     single { get<AppDatabase>().settingDao() }
+    single { get<AppDatabase>().songDao() }
 }
-

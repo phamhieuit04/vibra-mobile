@@ -12,6 +12,6 @@ data class PlaylistResponseDto(
     val total_song: Int? = null,
     val price: Int? = null,
     val quantity: Int? = null,
-    val author: UserResponseDto? = null
+    val author: UserResponseDto? = null,
+    val songs: List<SongResponseDto>? = null
 )
-
