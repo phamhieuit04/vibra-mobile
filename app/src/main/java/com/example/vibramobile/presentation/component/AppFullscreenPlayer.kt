@@ -68,6 +68,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
 import com.adamglin.PhosphorIcons
 import com.adamglin.phosphoricons.Bold
@@ -93,6 +94,7 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import io.ktor.http.encodeURLPath
 import org.koin.androidx.compose.koinViewModel
 
+@UnstableApi
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalHazeMaterialsApi::class)
 @Composable
 fun AppFullscreenPlayer(

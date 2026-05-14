@@ -35,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
+import androidx.media3.common.util.UnstableApi
 import com.composables.core.DragIndication
 import com.composables.core.ModalBottomSheet
 import com.composables.core.Scrim
@@ -51,6 +52,7 @@ import io.ktor.http.headers
 import org.koin.androidx.compose.koinViewModel
 import kotlin.collections.emptyList
 
+@UnstableApi
 @Composable
 fun AppQueuePlayback(
     bottomContentPadding: Dp = 0.dp,

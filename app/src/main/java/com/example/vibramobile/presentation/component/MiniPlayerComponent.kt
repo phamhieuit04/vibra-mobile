@@ -43,7 +43,7 @@ import com.example.vibramobile.presentation.viewmodel.MediaPlayerViewModel
 import io.ktor.http.encodeURLPath
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(UnstableApi::class)
+@UnstableApi
 @Composable
 fun MiniPlayerComponent(
     modifier: Modifier = Modifier,
