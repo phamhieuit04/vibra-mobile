@@ -110,6 +110,14 @@ class MediaPlayerViewModel(
             }
 
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                if (
+                    reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO ||
+                    reason == Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT
+                ) {
+                    val userId = currentUserId() ?: return
+                    socket.trackEnded(userId)
+                }
+
                 val mediaId = mediaItem?.mediaId
                 val queueSnapshot = _uiState.value.queue
                 val index = queueSnapshot.indexOfFirst { song ->
