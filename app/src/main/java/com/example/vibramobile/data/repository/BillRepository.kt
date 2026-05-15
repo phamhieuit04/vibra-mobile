@@ -55,6 +55,7 @@ class BillRepository(
             .toList()
 
         if (songs.isNotEmpty()) {
+            songDao.deleteAll()
             songDao.insertAll(songs)
         }
     }
