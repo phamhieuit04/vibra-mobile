@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
 import com.example.vibramobile.R
@@ -44,6 +45,7 @@ import com.example.vibramobile.presentation.component.ListArtistComponent
 import com.example.vibramobile.presentation.component.ListSongComponent
 import com.example.vibramobile.presentation.component.SpotifySection
 import com.example.vibramobile.presentation.config.LayoutStyleConfig
+import com.example.vibramobile.presentation.state.AppState
 import com.example.vibramobile.presentation.state.UserState
 import com.example.vibramobile.presentation.viewmodel.ContextMenuViewModel
 import com.example.vibramobile.presentation.viewmodel.LibraryViewModel
@@ -73,6 +75,8 @@ fun LibraryScreen(
             colorScheme.background
         )
     )
+
+    val isOffline = AppState.isOffline.collectAsStateWithLifecycle()
 
     val isRefreshing by libraryViewModel.isRefreshing.collectAsState()
     val pullToRefreshState = rememberPullToRefreshState()
@@ -151,7 +155,8 @@ fun LibraryScreen(
                             item {
                                 SpotifySection(
                                     modifier = Modifier.padding(horizontal = 16.dp),
-                                    title = stringResource(R.string.library_favorite_songs),
+                                    title = if (!isOffline.value) stringResource(R.string.library_favorite_songs)
+                                    else stringResource(R.string.library_your_download),
                                 ) {
                                     ListSongComponent(
                                         songs = likedSongs,

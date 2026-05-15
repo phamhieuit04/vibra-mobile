@@ -50,6 +50,7 @@
     <string name="no_internet_subtitle">Vui lòng kiểm tra lại</string>
     <string name="library_favorite_songs">Bài hát yêu thích</string>
     <string name="library_your_playlists">Playlist của bạn</string>
+    <string name="library_your_download">Bài hát đã tải xuống</string>
     <string name="library_title">Thư viện của bạn</string>
     <string name="album_songs">Bài hát</string>
     <string name="album_label">Album</string>
