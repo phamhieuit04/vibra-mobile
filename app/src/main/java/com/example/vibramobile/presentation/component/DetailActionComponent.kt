@@ -112,14 +112,14 @@ fun DetailActionComponent(
                                 )
                             }
 
-                            IconButton(onClick = config.onDownload) {
-                                Icon(
-                                    imageVector = Icons.Default.Download,
-                                    contentDescription = stringResource(R.string.action_download),
-                                    tint = MaterialTheme.colorScheme.onBackground,
-                                    modifier = Modifier.size(28.dp)
-                                )
-                            }
+//                            IconButton(onClick = config.onDownload) {
+//                                Icon(
+//                                    imageVector = Icons.Default.Download,
+//                                    contentDescription = stringResource(R.string.action_download),
+//                                    tint = MaterialTheme.colorScheme.onBackground,
+//                                    modifier = Modifier.size(28.dp)
+//                                )
+//                            }
                         }
                     }
                 }
